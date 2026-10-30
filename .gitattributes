@@ -1,0 +1,5 @@
+# Il progetto usa LF ovunque (HTML, JS, Markdown): niente conversione a CRLF.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.ico binary

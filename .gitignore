@@ -1,0 +1,8 @@
+# Backup locali: non servono nel repo (restano solo sul disco).
+*.backup.html
+*.preformat.html
+
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store
