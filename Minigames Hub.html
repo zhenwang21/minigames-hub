@@ -41,6 +41,7 @@ body.tmon main{padding-bottom:3.2rem}
 .bg-emerald-600\/10{background-color:rgba(5,150,105,.1)}
 .bg-emerald-600\/30{background-color:rgba(5,150,105,.3)}
 .border-emerald-500\/30{border-color:rgba(16,185,129,.3)}
+.border-rose-500\/30{border-color:rgba(244,63,94,.3)}
 </style>
 </head>
 <body class="min-h-screen flex flex-col p-2.5 select-none">
@@ -562,6 +563,8 @@ const NET = {
   elec: false,
   elecT: null,
   roomT: null,
+  recT: null,
+  recovering: false,
   lastSnap: '',
   st: 'idle',
   err: '',
@@ -576,7 +579,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.4.0';
+const APP_VERSION = '1.5.0';
 function netLoad(cb) {
   if (window.Peer) return cb();
   const s = document.createElement('script');
@@ -592,6 +595,7 @@ function netReset() {
   try {
     clearTimeout(NET.elecT);
     clearTimeout(NET.roomT);
+    clearTimeout(NET.recT);
   } catch (e) {}
   try {
     NET.roomPeer && NET.roomPeer.destroy();
@@ -618,6 +622,8 @@ function netReset() {
     elec: false,
     elecT: null,
     roomT: null,
+    recT: null,
+    recovering: false,
     lastSnap: '',
     st: 'idle',
     view: null,
@@ -648,7 +654,7 @@ function netFail(e) {
   render();
 }
 function netOk() {
-  const n = ($('on-name').value || '').trim().slice(0, 16);
+  const n = cleanName($('on-name').value, 16);
   if (!n) {
     NET.err = X('Scrivi il tuo nome.', 'Enter your name.');
     render();
@@ -731,13 +737,15 @@ function netPresence() {
 function hostMsg(c, m) {
   if (!NET.host || !c) return;
   if (m && m.t !== 'join') {
+    if (m.t === 'sync') {
+      if (NET.conns[c._n] === c) netResync(c._n);
+      return;
+    }
     if (NET.conns[c._n] === c) hostApply(c._n, m);
     return;
   }
   if (!m) return;
-  const n = String(m.name || '')
-    .trim()
-    .slice(0, 16);
+  const n = cleanName(m.name, 16);
   if (m.v !== APP_VERSION) {
     c.send({ t: 'rej', why: 'version' });
     setTimeout(() => c.close(), 100);
@@ -817,6 +825,7 @@ function netResync(n) {
   }
   if (G.g === 'imp') return iBc();
   if (G.g === 'mw') return mwBc();
+  if (G.g === 'pv') return pvBc();
   if (G.g === 'nc') return ncBc();
   if (G.g === 'who') return checkW();
 }
@@ -916,7 +925,8 @@ function netJoin() {
         clearTimeout(to);
         if (NET.conn !== c || NET.host) return;
         if (!joined) return netFail({ type: 'timeout' });
-        netElect();
+        NET.conn = null;
+        netRecover();
       });
     });
   });
@@ -933,10 +943,89 @@ function netAdopt(c, m, code) {
   if (m.you) NET.name = m.you;
   if (m.snap) NET.mirror = m.snap;
   NET.elec = false;
+  NET.recovering = false;
   clearTimeout(NET.elecT);
   NET.st = 'lobby';
   NET.err = '';
   render();
+  netSync();
+}
+// Rientro rapido: se la connessione cade ma l'host e' ancora vivo mi ricollego
+// alla stanza, invece di far partire subito l'elezione di un nuovo host.
+function netRecover() {
+  if (NET.host || NET.elec || NET.recovering) return;
+  NET.recovering = true;
+  NET.st = 'recover';
+  render();
+  clearTimeout(NET.recT);
+  NET.recT = setTimeout(() => {
+    netRejoin(0, (ok) => {
+      NET.recovering = false;
+      if (ok || NET.host) return;
+      netElect();
+    });
+  }, 600);
+}
+function netRejoin(tryN, cb) {
+  const code = NET.code || NET.lastCode;
+  if (NET.st !== 'recover') return cb(false);
+  if (NET.host || NET.conn || !code || !NET.peer || NET.peer.destroyed) return cb(false);
+  let c,
+    done = false,
+    joined = false,
+    to = null;
+  const finish = (ok) => {
+    if (done) return;
+    done = true;
+    clearTimeout(to);
+    if (!ok) {
+      try {
+        c && c.close();
+      } catch (e) {}
+    }
+    cb(ok);
+  };
+  try {
+    c = NET.peer.connect('mgh-' + code, { reliable: true });
+  } catch (e) {
+    return cb(false);
+  }
+  to = setTimeout(() => finish(false), 2500);
+  c.on('open', () => {
+    try {
+      c.send({ t: 'join', name: NET.name, v: APP_VERSION });
+    } catch (e) {
+      finish(false);
+    }
+  });
+  c.on('data', (m) => {
+    if (joined) return netClientMsg(m, c);
+    if (m && m.t === 'lobby') {
+      joined = true;
+      finish(true);
+      netAdopt(c, m, code);
+      return;
+    }
+    if (m && m.t === 'rej' && m.why === 'name' && tryN < 2) {
+      // L'host e' vivo ma crede ancora occupato il mio posto: riprovo tra poco.
+      done = true;
+      clearTimeout(to);
+      try {
+        c.close();
+      } catch (e) {}
+      NET.recT = setTimeout(() => netRejoin(tryN + 1, cb), 1200);
+      return;
+    }
+    if (m && (m.t === 'rej' || m.t === 'closed')) finish(false);
+  });
+  c.on('close', () => {
+    if (!joined) return finish(false);
+    if (NET.conn === c && !NET.host) {
+      NET.conn = null;
+      netRecover();
+    }
+  });
+  c.on('error', () => finish(false));
 }
 // Messaggi che un client riceve dall'host.
 function netClientMsg(m, c) {
@@ -988,7 +1077,10 @@ function netClientMsg(m, c) {
     return render();
   }
   if (m.t === 'nct') {
-    if (NET.view && NET.view.t === 'nc') NET.view.left = m.left;
+    if (NET.view && NET.view.t === 'nc') {
+      NET.view.left = m.left;
+      if (m.end) NET.view.end = m.end;
+    }
     tmDraw();
     return;
   }
@@ -1126,7 +1218,10 @@ function netDial(name, cb) {
       finish(true);
       netAdopt(c, m, NET.code);
       c.on('close', () => {
-        if (NET.conn === c && !NET.host) netElect();
+        if (NET.conn === c && !NET.host) {
+          NET.conn = null;
+          netRecover();
+        }
       });
     } else if (m && (m.t === 'rej' || m.t === 'closed')) finish(false);
   });
@@ -1307,18 +1402,28 @@ function netAct(m) {
   if (NET.host) hostApply(NET.name, m);
   else if (NET.conn) NET.conn.send(m);
 }
+// Chiede all'host lo stato corrente (rientro, standby, rete instabile).
+let NET_SYNC_T = 0;
+function netSync() {
+  if (NET.host || !NET.conn) return;
+  const now = Date.now();
+  if (now - NET_SYNC_T < 2500) return;
+  NET_SYNC_T = now;
+  try {
+    NET.conn.send({ t: 'sync' });
+  } catch (e) {}
+}
 function hostApply(n, m) {
   const G = NET.game;
   if (!G || !m || !n) return;
+  if (m.t === 'sync') return netResync(n);
   if (G.g === 'lupus') return m.t === 'lc' ? lupCall(n, String(m.c || '')) : 0;
   if (G.g === 'imp') return iApply(n, m);
   if (G.g === 'mw') return mwApply(n, m);
   if (G.g === 'pv') return pvApply(n, m);
   if (G.g === 'nc') return ncApply(n, m);
   if (m.t === 'ans' && G.ph === 'a') {
-    const v = String(m.text || '')
-      .trim()
-      .slice(0, 60);
+    const v = cleanText(m.text, 60);
     if (v && NET.players.includes(n)) {
       G.ans[n] = v;
       checkW();
@@ -1532,9 +1637,7 @@ function iApply(n, m) {
     P = NET.players;
   if (!P.includes(n)) return;
   if (m.t === 'ans' && G.ph === 'a') {
-    const v = String(m.text || '')
-      .trim()
-      .slice(0, 60);
+    const v = cleanText(m.text, 60);
     if (v) {
       G.ans[n] = v;
       iChk();
@@ -1694,9 +1797,7 @@ function mwApply(n, m) {
     G.votes[n] = m.who;
     mwChk();
   } else if (m.t === 'mg' && G.ph === 'g' && n === G.last) {
-    const raw = String(m.text || '')
-      .trim()
-      .slice(0, 40);
+    const raw = cleanText(m.text, 40);
     if (!raw) return;
     G.guess = raw;
     if ([G.civW, G.civWEn].some((w) => matchLevel(raw, w) === 'yes')) mwWin('imp', true);
@@ -2088,6 +2189,30 @@ function viewNetGame() {
       ''
     )}<div class="flex flex-wrap gap-1.5 justify-center">${sc.map(([p, n]) => `<span class="bg-amber-500/10 text-amber-400 text-xs font-bold px-2.5 py-1 rounded-lg">${esc(p)} ${n}</span>`).join('')}</div>${NET.host ? `<button onclick="wNew()" class="${BTN}">${X('Nuova domanda', 'New question')}</button><button onclick="wBack()" class="w-full bg-slate-800 py-3 rounded-xl text-sm font-bold">${X('Torna alla lobby', 'Back to the lobby')}</button>` : P(X("In attesa dell'host…", 'Waiting for the host…'))}</div>`;
 }
+// Barra di controllo riservata all'host durante una partita online.
+function hostBar() {
+  if (!NET.host || !NET.game) return '';
+  const nc = NET.game.g === 'nc' && NET.game.ph === 'play';
+  return `<div class="pt-1 space-y-1.5">${
+    nc
+      ? `<button onclick="ncFinish()" class="w-full text-[11px] font-bold bg-emerald-600/10 border border-emerald-500/30 text-emerald-300 py-2 rounded-xl">⏱️ ${X('Chiudi il round ora', 'Close the round now')}</button>`
+      : ''
+  }<button onclick="hostAbort()" class="w-full text-[11px] font-bold bg-slate-900 border border-rose-500/30 text-rose-400 py-2 rounded-xl">⏹ ${X('Termina partita', 'End game')}</button></div>`;
+}
+function hostAbort() {
+  if (!NET.host || !NET.game) return;
+  if (
+    !confirm(
+      X(
+        'Terminare la partita e tornare alla lobby? I punti già assegnati restano.',
+        'End the game and go back to the lobby? Points already scored are kept.'
+      )
+    )
+  )
+    return;
+  ncStopTimer();
+  toLobby();
+}
 function viewOnline() {
   const err = NET.err ? `<p class="text-xs text-rose-400 text-center">${esc(NET.err)}</p>` : '',
     inp =
@@ -2101,7 +2226,9 @@ function viewOnline() {
     return `<div class="space-y-4 text-center py-10"><p class="text-slate-300 text-sm">${X('Connessione in corso…', 'Connecting…')}</p>${back}</div>`;
   if (NET.st === 'elect')
     return `<div class="space-y-4 text-center py-10"><p class="text-slate-200 text-sm font-bold">🔄 ${X('Host disconnesso: scelgo il nuovo host…', 'Host disconnected: electing a new host…')}</p><p class="text-xs text-slate-500 px-6">${X('La stanza continua da sola. Aspetta qualche secondo senza chiudere la pagina.', 'The room carries on by itself. Wait a few seconds without closing the page.')}</p>${back}</div>`;
-  if (NET.st === 'lobby' && NET.view) return offBan + viewNetGame();
+  if (NET.st === 'recover')
+    return `<div class="space-y-4 text-center py-10"><p class="text-slate-200 text-sm font-bold">🔄 ${X('Connessione persa: riprovo…', 'Connection lost: retrying…')}</p><p class="text-xs text-slate-500 px-6">${X('Se non torna subito, un altro giocatore prende il comando della stanza.', 'If it does not come back at once, another player takes over the room.')}</p>${back}</div>`;
+  if (NET.st === 'lobby' && NET.view) return offBan + viewNetGame() + hostBar();
   if (NET.st === 'lobby')
     return `<div class="space-y-4 py-2"><div class="text-center"><p class="text-xs text-slate-400">${X('Codice stanza', 'Room code')}</p><h2 class="text-4xl font-extrabold tracking-widest gtext">${esc(NET.code)}</h2><p class="text-[11px] text-slate-500 mt-1">${X('Gli altri aprono la stessa pagina, scelgono Online e inseriscono il codice.', 'Others open the same page, choose Online and enter the code.')}</p><p class="text-[11px] text-slate-500 mt-1">${X('Se ricarichi la pagina, rientra con lo stesso nome entro 25 secondi.', 'If you reload, rejoin with the same name within 25 seconds.')}</p></div>
   ${NET.err ? `<p class="text-[11px] text-amber-300 text-center">${esc(NET.err)}</p>` : ''}
@@ -2169,12 +2296,12 @@ function cOpen() {
   render();
 }
 function cSave() {
-  const n = CF.n.trim();
+  const n = cleanName(CF.n, 24);
   if (!n) {
     alert(X('Inserisci un nome', 'Enter a name'));
     return;
   }
-  const c = { id: 'cx' + ++CN, name: n, desc: CF.d.trim(), fac: CF.f };
+  const c = { id: 'cx' + ++CN, name: n, desc: cleanText(CF.d, 200), fac: CF.f };
   CUST.push(c);
   cReg(c);
   if (lCap(c.id)) L().must.add(c.id);
@@ -4133,6 +4260,16 @@ const esc = (s) =>
     /[&<>"']/g,
     (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]
   );
+// Taglia per code point (non spezza emoji/surrogati) e toglie i caratteri di controllo.
+const clip = (s, max) => Array.from(String(s == null ? '' : s)).slice(0, max).join('');
+const cleanText = (s, max) => {
+  const v = String(s == null ? '' : s)
+    .replace(/[\u0000-\u001f\u007f\u200b-\u200f\u202a-\u202e]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return clip(v, max);
+};
+const cleanName = (s, max) => cleanText(s, max || 16);
 const t = (k) => I[S.lang][k] ?? I.it[k] ?? k;
 const PLAYABLE = ['mrwhite', 'impostore', 'who_said', 'preferisci', 'lupus'];
 const ONLY_ONLINE = ['nomicose'];
@@ -4146,9 +4283,20 @@ const norm = (s) =>
 
 // --- timer di discussione (facoltativo, solo locale al telefono) ---
 // Sempre visibile nell'angolo nei giochi testuali (tutti tranne Lupus).
-const TMR = { left: 0, total: 0, iv: null, done: false };
+// Il timer conta su una scadenza assoluta (Date.now), non sui tick: cosi' non
+// perde secondi quando il telefono va in standby o la scheda in background.
+const TMR = { left: 0, total: 0, end: 0, iv: null, done: false, ui: '' };
 function tmFmt(s) {
   return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+function tmLeft() {
+  return TMR.end ? Math.max(0, Math.ceil((TMR.end - Date.now()) / 1000)) : TMR.left;
+}
+// Secondi rimasti del timer di round ricevuto dall'host (se porta la scadenza).
+function tmAutoLeft() {
+  const v = NET.view || {};
+  if (v.end) return Math.max(0, Math.ceil((v.end - Date.now()) / 1000));
+  return Math.max(0, +v.left || 0);
 }
 function tmAllowed() {
   if (S.screen === 'play') return !!S.game && S.game !== 'lupus';
@@ -4162,6 +4310,7 @@ function tmClear() {
   if (TMR.iv) clearInterval(TMR.iv);
   TMR.iv = null;
   TMR.left = 0;
+  TMR.end = 0;
   TMR.done = false;
 }
 function tmDraw() {
@@ -4171,29 +4320,32 @@ function tmDraw() {
   el.className = on ? 'on' : '';
   if (document.body && document.body.classList) document.body.classList.toggle('tmon', on);
   if (!on) {
-    el.innerHTML = '';
+    if (TMR.ui !== '') {
+      TMR.ui = '';
+      el.innerHTML = '';
+    }
     return;
   }
+  let html;
   if (tmAuto()) {
-    const left = Math.max(0, +(NET.view.left || 0));
-    el.innerHTML =
+    const left = tmAutoLeft();
+    html =
       `<div class="tmr-box auto${left <= 30 ? ' fin' : ''}"><span aria-hidden="true">⏱️</span>` +
       `<span aria-label="${X('Tempo rimasto', 'Time left')}">${tmFmt(left)}</span></div>`;
-    return;
-  }
-  if (TMR.iv) {
-    el.innerHTML =
+  } else if (TMR.iv) {
+    TMR.left = tmLeft();
+    html =
       `<div class="tmr-box${TMR.left <= 10 ? ' fin' : ''}"><span aria-hidden="true">⏱️</span>` +
       `<span aria-label="${X('Tempo rimasto', 'Time left')}">${tmFmt(TMR.left)}</span>` +
       `<button onclick="tmAdd(60)" aria-label="${X('Aggiungi un minuto', 'Add one minute')}" title="+1′">+1′</button>` +
       `<button onclick="tmStop()" aria-label="${X('Ferma il timer', 'Stop the timer')}" title="${X('Ferma', 'Stop')}">✕</button></div>`;
   } else if (TMR.done) {
-    el.innerHTML =
+    html =
       `<div class="tmr-box fin"><span aria-hidden="true">⏱️</span>` +
       `<span aria-label="${X('Tempo scaduto', 'Time is up')}">0:00</span>` +
       `<button onclick="tmDismiss()" aria-label="${X('Chiudi il timer', 'Dismiss the timer')}">✕</button></div>`;
   } else {
-    el.innerHTML =
+    html =
       `<div class="tmr-box" role="group" aria-label="${X('Timer di discussione', 'Discussion timer')}"><span aria-hidden="true">⏱️</span>` +
       [60, 120, 180, 300]
         .map(
@@ -4203,27 +4355,35 @@ function tmDraw() {
         .join('') +
       `</div>`;
   }
+  if (html === TMR.ui) return;
+  TMR.ui = html;
+  el.innerHTML = html;
+}
+function tmTick() {
+  if (!TMR.iv) return;
+  TMR.left = tmLeft();
+  if (TMR.left <= 0) {
+    clearInterval(TMR.iv);
+    TMR.iv = null;
+    TMR.end = 0;
+    TMR.left = 0;
+    TMR.done = true;
+    tmRing();
+  }
+  tmDraw();
 }
 function tmStart(sec) {
   tmClear();
-  TMR.total = TMR.left = Math.max(1, +sec || 60);
-  TMR.iv = setInterval(() => {
-    TMR.left--;
-    if (TMR.left <= 0) {
-      clearInterval(TMR.iv);
-      TMR.iv = null;
-      TMR.left = 0;
-      TMR.done = true;
-      tmRing();
-      tmDraw();
-    } else tmDraw();
-  }, 1000);
+  TMR.total = Math.max(1, +sec || 60);
+  TMR.left = TMR.total;
+  TMR.end = Date.now() + TMR.total * 1000;
+  TMR.iv = setInterval(tmTick, 500);
   tmDraw();
 }
 function tmAdd(sec) {
   if (!TMR.iv) return;
-  TMR.left += Math.max(1, +sec || 60);
-  tmDraw();
+  TMR.end += Math.max(1, +sec || 60) * 1000;
+  tmTick();
 }
 function tmDismiss() {
   TMR.done = false;
@@ -4364,7 +4524,7 @@ function setLang(l) {
 // --- giocatori ---
 function addPlayer() {
   const i = $('pn'),
-    n = i.value.trim().slice(0, 20);
+    n = cleanName(i.value, 20);
   if (!n) return;
   if (S.players.some((p) => p.toLowerCase() === n.toLowerCase())) {
     alert(t('dup'));
@@ -4523,7 +4683,7 @@ function hideNext() {
 }
 function submitClue() {
   const G = S.G,
-    v = $('clue-in').value.trim().slice(0, 40) || '—';
+    v = cleanText($('clue-in').value, 40) || '—';
   G.clues.push({ r: G.round, p: G.cluePlayers[G.cIdx], c: v });
   G.cIdx++;
   render();
@@ -6450,8 +6610,8 @@ function pvOnlineStart() {
   NET.game = {
     g: 'pv',
     ph: 'vote',
-    a: NET.pvA.trim().slice(0, 80),
-    b: NET.pvB.trim().slice(0, 80),
+    a: cleanText(NET.pvA, 80),
+    b: cleanText(NET.pvB, 80),
     votes: {}
   };
   S.screen = 'online';
@@ -6548,7 +6708,8 @@ const NC_TIME = 300;
 const NC_CUT = 60;
 const NC_MIN = 60;
 let NCC = {},
-  NC_IV = null;
+  NC_IV = null,
+  NC_SENT = -1;
 const ncNorm = (x) =>
   norm(String(x || ''))
     .replace(/[^a-z0-9]/g, '')
@@ -6591,7 +6752,7 @@ function ncAddCustom() {
   if (!NET.host) return;
   const el = $('nc-new');
   if (!el) return;
-  const name = el.value.trim().slice(0, 18);
+  const name = cleanName(el.value, 18);
   if (!name) return;
   const d = ncDraft().slice();
   if (d.length >= NC_MAX) return;
@@ -6627,6 +6788,7 @@ function ncStart() {
     a: {},
     d: {},
     left: NC_TIME,
+    end: Date.now() + NC_TIME * 1000,
     timeup: false
   };
   NCC = {};
@@ -6652,6 +6814,7 @@ function ncAgain() {
     a: {},
     d: {},
     left: NC_TIME,
+    end: Date.now() + NC_TIME * 1000,
     timeup: false
   };
   NCC = {};
@@ -6664,6 +6827,13 @@ function ncBack() {
   ncStopTimer();
   toLobby();
 }
+function ncLeft(G) {
+  return G.end ? Math.max(0, Math.ceil((G.end - Date.now()) / 1000)) : Math.max(0, +(G.left || 0));
+}
+function ncSetLeft(G, sec) {
+  G.end = Date.now() + Math.max(0, +sec || 0) * 1000;
+  G.left = ncLeft(G);
+}
 function ncApply(n, m) {
   const G = NET.game,
     P = NET.players;
@@ -6672,14 +6842,18 @@ function ncApply(n, m) {
   if (m.t === 'nc') {
     const c = G.cats[+m.i];
     if (!c) return;
-    (G.a[n] = G.a[n] || {})[c.k] = String(m.v == null ? '' : m.v).slice(0, 40);
+    (G.a[n] = G.a[n] || {})[c.k] = cleanText(m.v, 40);
     return;
   }
   if (m.t === 'ncd') {
     G.d[n] = true;
-    G.left = Math.max(NC_MIN, (G.left || 0) - NC_CUT);
-    ncBroadcast({ t: 'nct', left: G.left });
-    if (NET.view && NET.view.t === 'nc') NET.view.left = G.left;
+    ncSetLeft(G, Math.max(NC_MIN, ncLeft(G) - NC_CUT));
+    NC_SENT = G.left;
+    ncBroadcast({ t: 'nct', left: G.left, end: G.end });
+    if (NET.view && NET.view.t === 'nc') {
+      NET.view.left = G.left;
+      NET.view.end = G.end;
+    }
     ncDoneBc();
     if (P.every((p) => G.d[p])) ncFinish();
   }
@@ -6733,22 +6907,33 @@ function ncStartTimer() {
   ncStopTimer();
   const G = NET.game;
   if (!NET.host || !G || G.g !== 'nc' || G.ph !== 'play') return;
-  NC_IV = setInterval(() => {
-    const g = NET.game;
-    if (!g || g.g !== 'nc' || g.ph !== 'play') return ncStopTimer();
-    g.left = Math.max(0, (g.left || 0) - 1);
-    if (g.left <= 0) {
-      g.timeup = true;
-      return ncFinish();
-    }
-    if (NET.view && NET.view.t === 'nc') NET.view.left = g.left;
-    tmDraw();
-    ncBroadcast({ t: 'nct', left: g.left });
-  }, 1000);
+  // Dopo un cambio host la partita porta gia' la scadenza: la rispetto.
+  if (!G.end) ncSetLeft(G, G.left);
+  NC_SENT = -1;
+  NC_IV = setInterval(ncTick, 500);
+  ncTick();
+}
+function ncTick() {
+  const g = NET.game;
+  if (!g || g.g !== 'nc' || g.ph !== 'play' || !NET.host) return ncStopTimer();
+  g.left = ncLeft(g);
+  if (g.left <= 0) {
+    g.timeup = true;
+    return ncFinish();
+  }
+  if (NET.view && NET.view.t === 'nc') {
+    NET.view.left = g.left;
+    NET.view.end = g.end;
+  }
+  if (g.left === NC_SENT) return;
+  NC_SENT = g.left;
+  tmDraw();
+  ncBroadcast({ t: 'nct', left: g.left, end: g.end });
 }
 function ncStopTimer() {
   if (NC_IV) clearInterval(NC_IV);
   NC_IV = null;
+  NC_SENT = -1;
 }
 function ncBroadcast(m) {
   Object.values(NET.conns).forEach((c) => {
@@ -6778,6 +6963,7 @@ function ncBc() {
       letter: G.letter,
       round: G.round,
       left: G.left,
+      end: G.end,
       cats: cats,
       done: Object.keys(G.d || {}).filter((p) => P.includes(p)),
       n: P.length,
@@ -6801,8 +6987,9 @@ function ncBc() {
 function ncSend(i, v) {
   const c = NET.view && NET.view.cats && NET.view.cats[i];
   if (!c) return;
-  NCC[c.k] = v;
-  netAct({ t: 'nc', i: i, v: String(v).slice(0, 40) });
+  const s = clip(v, 40);
+  NCC[c.k] = s;
+  netAct({ t: 'nc', i: i, v: s });
 }
 function ncDone() {
   const v = NET.view;
@@ -6860,7 +7047,7 @@ function loadLocal() {
         const v = +d.scores[k];
         if (isFinite(v) && v > 0) S.scores[k] = v;
       });
-    if (typeof d.name === 'string') NET.name = d.name.slice(0, 16);
+    if (typeof d.name === 'string') NET.name = cleanName(d.name, 16);
     if (typeof d.lastCode === 'string') NET.lastCode = d.lastCode.slice(0, 5);
   } catch (e) {}
 }
@@ -6904,6 +7091,26 @@ function render() {
   netMirror();
 }
 loadLocal();
+// Rientro in primo piano o rete tornata: ricalcolo i timer e richiedo lo stato.
+function netWake() {
+  if (TMR.iv) tmTick();
+  if (NET.host && NET.game && NET.game.g === 'nc' && NET.game.ph === 'play') ncTick();
+  if (!NET.host && NET.conn) netSync();
+  if (NET.peer && NET.peer.disconnected && !NET.peer.destroyed) {
+    try {
+      NET.peer.reconnect();
+    } catch (e) {}
+  }
+  render();
+}
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) netWake();
+});
+if (window.addEventListener) window.addEventListener('online', netWake);
+// Il timer automatico del round si aggiorna da solo anche senza messaggi.
+setInterval(() => {
+  if (tmAuto() && tmAllowed()) tmDraw();
+}, 500);
 render();
 </script>
 </body>
