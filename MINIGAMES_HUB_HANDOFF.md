@@ -11,7 +11,7 @@
 1. **Passa‑telefono (offline)**: si gioca su un solo telefono che gira tra i giocatori. È la modalità principale e completa.
 2. **Online (beta)**: ogni giocatore usa il proprio telefono, con una stanza e un codice. È un bonus, non sostituisce l'offline. **Nomi, Cose e Città, Parole vietate e Chi sono io? esistono solo online.**
 
-È un **unico file HTML** (`Minigames Hub.html`, ~398 KB, ~9.070 righe totali di cui ~8.900 di JavaScript) senza backend. C'è uno script `build-min.js` che minifica il sorgente e scrive **sia `Minigames Hub.min.html` sia `index.html`** (~328 KB, −17%): il file HTML resta la fonte di verità, la build serve solo per distribuire un file più leggero. `index.html` è il file che GitHub Pages pubblica sulla home del sito: va rigenerato a ogni modifica. Il CSS di Tailwind è **compilato inline** dentro il file (non c'è più il CDN di Tailwind): se servono classi nuove, vanno aggiunte a mano nel blocco CSS in cima. Dipendenze esterne: font Google *Plus Jakarta Sans*, **PeerJS 1.5.4** da jsDelivr (solo per l'online) e **qrcode-generator 1.4.4** (MIT) incorporato inline per il QR d'invito.
+È un **unico file HTML** (`Minigames Hub.html`, ~409 KB, ~9.380 righe totali di cui ~9.200 di JavaScript) senza backend. C'è uno script `build-min.js` che minifica il sorgente e scrive **sia `Minigames Hub.min.html` sia `index.html`** (~328 KB, −17%): il file HTML resta la fonte di verità, la build serve solo per distribuire un file più leggero. `index.html` è il file che GitHub Pages pubblica sulla home del sito: va rigenerato a ogni modifica. Il CSS di Tailwind è **compilato inline** dentro il file (non c'è più il CDN di Tailwind): se servono classi nuove, vanno aggiunte a mano nel blocco CSS in cima. Dipendenze esterne: font Google *Plus Jakarta Sans*, **PeerJS 1.5.4** da jsDelivr (solo per l'online) e **qrcode-generator 1.4.4** (MIT) incorporato inline per il QR d'invito.
 
 Giochi:
 1. **Mister White** (stile Undercover)
@@ -242,6 +242,15 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 
 ## 11. Cosa è stato corretto nell'ultima revisione
 
+### Versione 1.7.0
+- **PWA installabile**: `manifest.webmanifest`, `sw.js` e icone in `icons/` (generate da `tools/make-icons.js`). Il service worker precarica la shell, usa rete-prima per la navigazione (con timeout 4 s e fallback alla cache anche quando la rete risponde 5xx/502, non solo offline) e cache-prima per gli asset, e cancella le cache vecchie; il nome della cache segue `APP_VERSION`. Registrazione solo su http(s), non da `file://`.
+- **Ripresa dopo reload/standby**: sessione salvata in `mgh_session_v1` (`saveSession`/`loadSession`, TTL 2 ore, salvataggio anche su `pagehide`/`visibilitychange`). La home mostra una card con il codice e due azioni: `resumeGuest()` rientra come client, `resumeHost()` ricrea la stanza con `claimHost`/`restoreState` (giocatori, punteggi, `NET.game`, `S.G` e timer NC/TB riavviati dalle scadenze). Se il codice non è più libero dopo i retry si apre un codice nuovo con lo stesso stato e un avviso. `dismissResume()` cancella la sessione; uscita volontaria, kick e stanza chiusa la cancellano da soli.
+- **Rientro client più paziente**: `netRecover` ritenta il codice stanza una seconda volta (~7 s) prima di eleggere un nuovo host, così un host che ricarica non fa perdere il comando.
+- **Lobby più chiara**: pallino online/offline, host badge, conteggio connessi, versione app, pulsante "Copia codice", avviso quando il codice cambia.
+- **Riepilogo condivisibile**: `summaryText()` e `shareSummary()` (Web Share o copia) dal modale 🏆, con gioco e classifica ordinata.
+- **Test**: nuova suite `pwa.test.js` (22 test su manifest, icone, service worker e allineamento versione); `features.test.js` sale a 45 (ripresa sessione, card home, lobby, riepilogo). Totale **12 suite** verdi su sorgente e build.
+- `APP_VERSION` portata a `1.7.0`; ricostruire `Minigames Hub.min.html` e `index.html` e aggiornare `VERSION` in `sw.js` a ogni bump.
+
 ### Versione 1.6.0
 - **Nomi, Cose e Città — revisione host**: quando tutti consegnano (o scade il timer) le risposte **uniche** non vengono più accettate in automatico: si passa a `ph:'review'`, l'host tocca ogni cella (`ncToggleAt`) per ✓ +10 / ✗ 0 e conferma con `ncScore`. I doppioni restano +5 automatici, vuote/lettera sbagliata 0. Se non ci sono uniche si va dritti ai risultati. Vedi §8.
 - **Nuovo gioco Parole vietate** (🚫, solo online, min 4): due squadre bilanciate, guesser casuale, la squadra vede parola + 4 parole vietate, gli avversari votano indovinata/vietata, maggioranza stretta, parità decisa dall'host, timer 60 s per turno, +100 a ogni membro della squadra che indovina. Vedi §8b.
@@ -342,7 +351,7 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 - Le stringhe che contengono HTML o database vanno lasciate su una riga: spezzarle non serve e rischia errori.
 - Attenzione all'encoding: leggere/scrivere con Node (`fs.readFileSync(path,'utf8')`), **non** con `Get-Content`/`Set-Content` di PowerShell (rischio mojibake su emoji e accenti). I file sono a fine riga LF.
 - Test headless in Node: si estrae lo script, si stubbano `window`, `document`, `crypto`, `localStorage`, `alert`, e si fanno girare partite con bot. Mantenere questo approccio.
-- **Build minificata**: `node build-min.js` rigenera **`Minigames Hub.min.html` e `index.html`** dal file HTML. Usa terser (`compress`, **`mangle:false`**) sull'unico `<script>`, compatta il CSS personalizzato e gli spazi tra i tag HTML, **senza toccare le stringhe JS**. Richiede terser: `npm i terser` in `%TEMP%\mgast` (percorso usato dallo script) oppure adattare il require. Dopo ogni modifica al sorgente, rigenerarla e rilanciare i test.
+- **Build minificata**: `node build-min.js` rigenera **`Minigames Hub.min.html` e `index.html`** dal file HTML. Usa terser (`compress`, **`mangle:false`**) sull'unico `<script>`, compatta il CSS personalizzato e gli spazi tra i tag HTML, **senza toccare le stringhe JS**. Cerca terser in `node_modules`, poi in `%TEMP%\mgast`, poi globalmente (`npm i terser` oppure `npm i terser --prefix "%TEMP%\mgast"`). Dopo ogni modifica al sorgente, rigenerarla e rilanciare i test.
 - **Test** (tutti in `tests/`, con `MG_FILE` per puntare a un file alternativo):
   - `node tests/run-all.js` esegue tutte le suite sul sorgente; `node tests/run-all.js --min` sulla build minificata (`index.html`/`Minigames Hub.min.html`). Se una suite fallisce, il comando esce con codice 1.
   - `tests/smoke.test.js` — 20 test offline (regole, persistenza).
@@ -352,7 +361,8 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
   - `tests/nomicose.test.js` — 47 test su Nomi, Cose e Città (setup, categorie, lettera, punteggi, revisione host, taglio e scadenza del timer, nuovo round, cambio host).
   - `tests/taboo.test.js` — 33 test su Parole vietate (squadre, ruoli/visibilità carta, maggioranze, parità, chiusura host, timeout, punteggi, annulla round, minimo giocatori).
   - `tests/chisono.test.js` — 27 test su Chi sono io? (parole nascoste, turni, voti, vite/uscita, parità, fine e rivelazione, minimo giocatori).
-  - `tests/features.test.js` — 31 test su QR/link, backup/ripristino, annulla round, correzione punteggi, pacchetti Preferiresti e attesa offline 60 s.
+  - `tests/features.test.js` — 45 test su QR/link, backup/ripristino, annulla round, correzione punteggi, pacchetti Preferiresti, attesa offline 60 s, ripresa sessione, lobby e riepilogo condivisibile.
+  - `tests/pwa.test.js` — 22 test su manifest, icone PNG/SVG, service worker, precache e allineamento versione cache/`APP_VERSION`.
   - `tests/i18n.test.js` — lunghezze e qualità dei database EN.
   - `tests/ui-en.test.js` — scansione delle schermate EN (falsi positivi noti: "Impostor", "eliminate", "civilians").
   - `tests/ui-diff.test.js` — 24 schermate identiche tra sorgente e build minificata (incluse revisione e risultati di Nomi, Cose e Città). Salta se la build non esiste.
