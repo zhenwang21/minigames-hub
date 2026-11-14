@@ -4,7 +4,22 @@
 // Uso: node build-min.js
 const fs = require('fs');
 const path = require('path');
-const { minify } = require(path.join(process.env.TEMP || '/tmp', 'mgast', 'node_modules', 'terser'));
+
+// terser può stare nel repo (node_modules) o in una cartella temporanea di build.
+function loadTerser() {
+  const tries = [
+    path.join(__dirname, 'node_modules', 'terser'),
+    path.join(process.env.TEMP || '/tmp', 'mgast', 'node_modules', 'terser'),
+    'terser'
+  ];
+  for (const t of tries) {
+    try {
+      return require(t);
+    } catch (e) {}
+  }
+  throw new Error('terser non trovato: npm i -D terser (oppure npm i terser --prefix "%TEMP%\\mgast")');
+}
+const { minify } = loadTerser();
 
 const ROOT = __dirname;
 const SRC = path.join(ROOT, 'Minigames Hub.html');

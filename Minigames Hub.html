@@ -42,6 +42,20 @@ body.tmon main{padding-bottom:3.2rem}
 .bg-emerald-600\/30{background-color:rgba(5,150,105,.3)}
 .border-emerald-500\/30{border-color:rgba(16,185,129,.3)}
 .border-rose-500\/30{border-color:rgba(244,63,94,.3)}
+/* accessibilità */
+:focus-visible{outline:3px solid #facc15;outline-offset:2px}
+button,a,input,select,textarea{touch-action:manipulation}
+.gbtn{min-height:44px}
+.text-slate-500{color:#94a3b8}
+.text-slate-400{color:#cbd5e1}
+@media (prefers-reduced-motion:reduce){*,:before,:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+#modal svg{width:100%;height:auto;display:block}
+.bg-orange-600\/20{background-color:rgba(234,88,12,.2)}
+.border-orange-500\/40{border-color:rgba(249,115,22,.4)}
+.bg-sky-600\/20{background-color:rgba(2,132,199,.2)}
+.border-sky-500\/40{border-color:rgba(14,165,233,.4)}
+.border-sky-500\/30{border-color:rgba(14,165,233,.3)}
+.bg-rose-600\/20{background-color:rgba(225,29,72,.2)}
 </style>
 </head>
 <body class="min-h-screen flex flex-col p-2.5 select-none">
@@ -61,6 +75,16 @@ body.tmon main{padding-bottom:3.2rem}
 <div id="modal" style="display:none" class="fixed inset-0 z-50 bg-black/80 items-center justify-center p-4" onclick="if(event.target===this)closeModal()"></div>
 
 <script>
+/*! qrcode-generator v1.4.4 | (c) Kazuhiko Arase | MIT License | https://github.com/kazuhikoarase/qrcode-generator */
+/**
+ * Minified by jsDelivr using Terser v5.37.0.
+ * Original file: /npm/qrcode-generator@1.4.4/qrcode.js
+ *
+ * Do NOT use SRI with dynamically generated files! More information: https://www.jsdelivr.com/using-sri-with-dynamic-files
+ */
+var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,(function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1}))},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(n*r,o*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(){var t=n("友");if(2!=t.length||38726!=(t[0]<<8|t[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}((function(){return qrcode}));
+//# sourceMappingURL=/sm/26b4b0d0b1e283d6b3ec9857ac597d7a60c76ac17be1ef4c965f03086de426bb.map
+
 const I = {
   it: {
     pickGame: 'Scegli il gioco',
@@ -229,8 +253,90 @@ const I = {
     ncLobby: 'Torna alla lobby',
     ncHint: 'Nomi, Cose e Città si gioca solo online: crea una stanza o entra con un codice.',
     ncEmpty: 'Scrivi almeno una risposta per consegnare.',
+    g_taboo: 'Parole vietate',
+    d_taboo: 'Solo online: a squadre, una persona indovina e la sua squadra dà indizi senza dire le parole proibite.',
+    g_chisono: 'Chi sono io?',
+    d_chisono: 'Solo online: vedi le parole degli altri ma non la tua. Fai domande e prova a indovinare.',
+    inviteTitle: 'Invita nella stanza',
+    inviteHint: 'Inquadra il QR con la fotocamera oppure condividi il link: si apre la pagina con il codice già inserito. Poi scegli il nome e tocca Entra.',
+    copyLink: 'Copia link',
+    share: 'Condividi',
+    copied: 'Link copiato!',
+    joinInvite: 'Sei stato invitato nella stanza',
+    joinInviteHint: 'Scrivi il tuo nome e tocca Entra per partecipare.',
+    backupTitle: 'Backup impostazioni',
+    exportBtn: 'Esporta',
+    importBtn: 'Importa',
+    exportOk: 'Backup scaricato.',
+    importBad: 'File di backup non valido.',
+    importOk: 'Impostazioni ripristinate.',
+    importConfirm: 'Sostituire giocatori, punteggi, ruoli e categorie con quelli del backup?',
+    scoreEdit: 'Correggi punteggi',
+    scoreSaved: 'Punteggi aggiornati.',
+    undoRound: 'Annulla ultimo round',
+    undoDone: 'Ultimo round annullato.',
+    undoNone: 'Nessun round da annullare.',
+    accuse: 'Accusa',
+    tabooTeams: 'Squadre',
+    tabooAuto: 'Equilibra',
+    tabooStart: 'Avvia la partita',
+    tabooNeed: 'Servono almeno 4 giocatori, con almeno 2 per squadra.',
+    tabooTurn: 'Turno della squadra',
+    tabooGuesser: 'Deve indovinare',
+    tabooYourWord: 'La tua squadra vede la parola e le parole vietate',
+    tabooHint: 'Dai indizi a voce senza dire le parole vietate.',
+    tabooBans: 'Parole vietate',
+    tabooVoteWin: 'Ha indovinato',
+    tabooVoteFoul: 'Parola vietata',
+    tabooVoted: 'Voto inviato. In attesa della maggioranza',
+    tabooWin: 'Parola indovinata!',
+    tabooFoul: 'Parola vietata: nessun punto.',
+    tabooNext: 'Prossimo turno',
+    tabooScore: 'Punti squadre',
+    tabooWatch: 'Squadra avversaria: votate per chiudere il turno.',
+    tbSetupHint: 'Scegli chi sta in quale squadra. Servono almeno 2 giocatori per squadra.',
+    tbTapTeam: 'Tocca un nome per cambiare squadra',
+    tbTeamA: 'Squadra A',
+    tbTeamB: 'Squadra B',
+    tbCloseTurn: 'Chiudi il turno ora',
+    tbTie: 'Parità: decide l’host',
+    tbTimeUp: 'Tempo scaduto',
+    tbRoleGuess: 'Sei tu a indovinare: ascolta gli indizi della tua squadra!',
+    tbRoleClue: 'La tua squadra dà gli indizi: non dire le parole vietate.',
+    tbRoleVote: 'Squadra avversaria: votate se ha indovinato o ha detto una parola vietata.',
+    tbTime: 'Tempo',
+    chiContinue: 'Continua',
+    chiRevealEnd: 'Termina e rivela',
+    chiWaiting: 'In attesa…',
+    chiYes: 'Ha indovinato',
+    chiNo: 'Non ha indovinato',
+    chiAllWords: 'Tutte le parole',
+    chiNew: 'Nuova partita',
+    chiTie: 'Parità: decide l’host',
+    chiWaitTurn: 'In attesa del suo turno',
+    chiLivesLeft: 'Vite rimaste',
+    pvPackClassic: 'Classici',
+    pvPackHot: 'Hot takes',
+    pvPackAbsurd: 'Assurdi',
+    pvRandom: 'Casuale',
+    pvPreset: 'Pacchetti pronti',
+    chiLives: 'Vite',
+    chiTurn: 'Turno di',
+    chiYouTurn: 'Tocca a te: fai domande a voce. Quando vuoi indovinare, premi il pulsante.',
+    chiGuessBtn: 'Indovino!',
+    chiWaitingVote: 'In attesa del voto degli altri…',
+    chiVoteTitle: 'Ha indovinato la sua parola?',
+    chiVoted: 'Voto inviato. In attesa degli altri',
+    chiCorrect: 'Indovinata! +100',
+    chiWrong: 'Sbagliata: perde una vita.',
+    chiYourWord: 'La tua parola',
+    chiOthers: 'Le parole degli altri',
+    chiOut: 'Fuori',
+    chiDone: 'Indovinata',
+    chiEnd: 'Partita conclusa',
+    chiNoWords: 'Nessuna parola disponibile.',
     ncAuto:
-      'Il timer parte da 5 minuti: ogni consegna toglie 1 minuto (minimo 1). A zero il round si chiude e chi non ha risposto prende 0.',
+      'Il timer parte da 5 minuti: ogni consegna toglie 1 minuto (minimo 1). A zero il round si chiude e chi non ha risposto prende 0. Le risposte uniche vengono poi accettate o rifiutate dall’host.',
     points: 'Punti',
     back: 'Indietro',
     players: 'Giocatori',
@@ -441,8 +547,90 @@ const I = {
     ncLobby: 'Back to the lobby',
     ncHint: 'Names, Things and Cities is online only: create a room or join with a code.',
     ncEmpty: 'Write at least one answer to submit.',
+    g_taboo: 'Forbidden Words',
+    d_taboo: 'Online only: teams, one player guesses and their team gives clues without saying the forbidden words.',
+    g_chisono: 'Who Am I?',
+    d_chisono: 'Online only: you see everyone else’s words but not your own. Ask questions and try to guess.',
+    inviteTitle: 'Invite to the room',
+    inviteHint: 'Scan the QR with your camera or share the link: the page opens with the code already filled in. Then pick a name and tap Join.',
+    copyLink: 'Copy link',
+    share: 'Share',
+    copied: 'Link copied!',
+    joinInvite: 'You were invited to the room',
+    joinInviteHint: 'Type your name and tap Join to take part.',
+    backupTitle: 'Settings backup',
+    exportBtn: 'Export',
+    importBtn: 'Import',
+    exportOk: 'Backup downloaded.',
+    importBad: 'Invalid backup file.',
+    importOk: 'Settings restored.',
+    importConfirm: 'Replace players, scores, roles and categories with the backup ones?',
+    scoreEdit: 'Edit scores',
+    scoreSaved: 'Scores updated.',
+    undoRound: 'Undo last round',
+    undoDone: 'Last round undone.',
+    undoNone: 'No round to undo.',
+    accuse: 'Accuse',
+    tabooTeams: 'Teams',
+    tabooAuto: 'Balance',
+    tabooStart: 'Start game',
+    tabooNeed: 'At least 4 players needed, with at least 2 per team.',
+    tabooTurn: 'Team turn',
+    tabooGuesser: 'Must guess',
+    tabooYourWord: 'Your team sees the word and the forbidden words',
+    tabooHint: 'Give spoken clues without saying the forbidden words.',
+    tabooBans: 'Forbidden words',
+    tabooVoteWin: 'Guessed it',
+    tabooVoteFoul: 'Forbidden word',
+    tabooVoted: 'Vote sent. Waiting for the majority',
+    tabooWin: 'Word guessed!',
+    tabooFoul: 'Forbidden word: no points.',
+    tabooNext: 'Next turn',
+    tabooScore: 'Team scores',
+    tabooWatch: 'Opposing team: vote to close the turn.',
+    tbSetupHint: 'Pick who is on each team. At least 2 players per team are needed.',
+    tbTapTeam: 'Tap a name to switch teams',
+    tbTeamA: 'Team A',
+    tbTeamB: 'Team B',
+    tbCloseTurn: 'Close the turn now',
+    tbTie: 'Tie: the host decides',
+    tbTimeUp: 'Time’s up',
+    tbRoleGuess: 'You are guessing: listen to your team’s clues!',
+    tbRoleClue: 'Your team gives the clues: do not say the forbidden words.',
+    tbRoleVote: 'Opposing team: vote whether they guessed it or said a forbidden word.',
+    tbTime: 'Time',
+    chiContinue: 'Continue',
+    chiRevealEnd: 'End and reveal',
+    chiWaiting: 'Waiting…',
+    chiYes: 'Guessed it',
+    chiNo: 'Did not guess it',
+    chiAllWords: 'All the words',
+    chiNew: 'New game',
+    chiTie: 'Tie: the host decides',
+    chiWaitTurn: 'Waiting for their turn',
+    chiLivesLeft: 'Lives left',
+    pvPackClassic: 'Classics',
+    pvPackHot: 'Hot takes',
+    pvPackAbsurd: 'Absurd',
+    pvRandom: 'Random',
+    pvPreset: 'Ready-made packs',
+    chiLives: 'Lives',
+    chiTurn: 'Turn of',
+    chiYouTurn: 'Your turn: ask questions out loud. Tap the button when you want to guess.',
+    chiGuessBtn: 'I know it!',
+    chiWaitingVote: 'Waiting for the others to vote…',
+    chiVoteTitle: 'Did they guess their word?',
+    chiVoted: 'Vote sent. Waiting for the others',
+    chiCorrect: 'Correct! +100',
+    chiWrong: 'Wrong: lose one life.',
+    chiYourWord: 'Your word',
+    chiOthers: 'Other players’ words',
+    chiOut: 'Out',
+    chiDone: 'Guessed',
+    chiEnd: 'Game over',
+    chiNoWords: 'No words available.',
     ncAuto:
-      "The timer starts at 5 minutes: every submission removes 1 minute (minimum 1). At zero the round closes and anyone who hasn't answered scores 0.",
+      "The timer starts at 5 minutes: every submission removes 1 minute (minimum 1). At zero the round closes and anyone who hasn't answered scores 0. The host then accepts or rejects the unique answers.",
     points: 'Points',
     back: 'Back',
     players: 'Players',
@@ -579,7 +767,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.5.0';
+const APP_VERSION = '1.6.0';
 function netLoad(cb) {
   if (window.Peer) return cb();
   const s = document.createElement('script');
@@ -827,6 +1015,8 @@ function netResync(n) {
   if (G.g === 'mw') return mwBc();
   if (G.g === 'pv') return pvBc();
   if (G.g === 'nc') return ncBc();
+  if (G.g === 'tb') return tbBc();
+  if (G.g === 'chi') return chiBc();
   if (G.g === 'who') return checkW();
 }
 function netPrune() {
@@ -881,11 +1071,13 @@ function hostLeft(c) {
   NET.offline[n] = 1;
   NET.lastSnap = '';
   netPresence();
-  NET.offT[n] = setTimeout(() => hostDrop(n), 25000);
+  NET.offT[n] = setTimeout(() => hostDrop(n), 60000);
 }
 function toLobby() {
   NET.game = null;
   S.G = null;
+  ncStopTimer();
+  tbStopTimer();
   netPrune();
   netSend({ t: 'toLobby' });
   hostBc();
@@ -1058,6 +1250,11 @@ function netClientMsg(m, c) {
     NET.err = X("L'host ha chiuso la stanza.", 'The host closed the room.');
     return render();
   }
+  if (m.t === 'kick') {
+    netReset();
+    NET.err = X('Sei stato espulso dalla stanza.', 'You were kicked from the room.');
+    return render();
+  }
   if (m.t === 'rej') {
     netReset();
     NET.err =
@@ -1074,6 +1271,12 @@ function netClientMsg(m, c) {
                 'Outdated version. Reload the page!'
               )
             : X('Nome già usato o non valido.', 'Name already used or invalid.');
+    return render();
+  }
+  if (m.t === 'undo') {
+    NET.scores = { ...(m.scores || {}) };
+    S.scores = { ...(m.scores || {}) };
+    if (NET.view) NET.view.scores = { ...NET.scores };
     return render();
   }
   if (m.t === 'nct') {
@@ -1302,7 +1505,14 @@ function netPromote(snap, conn) {
     NET.ncStamp = '';
     if (NET.game.ph === 'play') ncStartTimer();
     else ncStopTimer();
+    ncBc();
   }
+  if (NET.game && NET.game.g === 'tb') {
+    if (NET.game.ph === 'play') tbStartTimer();
+    else tbStopTimer();
+    tbBc();
+  }
+  if (NET.game && NET.game.g === 'chi') chiBc();
   render();
 }
 // Tiene vivo il codice stanza anche dopo un cambio host (nuovi ingressi e rientro dell'host originale).
@@ -1422,6 +1632,8 @@ function hostApply(n, m) {
   if (G.g === 'mw') return mwApply(n, m);
   if (G.g === 'pv') return pvApply(n, m);
   if (G.g === 'nc') return ncApply(n, m);
+  if (G.g === 'tb') return tbApply(n, m);
+  if (G.g === 'chi') return chiApply(n, m);
   if (m.t === 'ans' && G.ph === 'a') {
     const v = cleanText(m.text, 60);
     if (v && NET.players.includes(n)) {
@@ -1451,12 +1663,45 @@ function checkG() {
   if (G.g === 'lupus') return;
   if (G.g === 'pv') return pvChk();
   if (G.g === 'nc') return ncCheck();
+  if (G.g === 'tb') return tbCheckTeams();
+  if (G.g === 'chi') return chiCheckTeams();
   if (NET.players.length < 3) return toLobby();
   G.g === 'imp' ? iChk() : G.g === 'mw' ? mwChk() : checkW();
 }
 function netScore(p, n) {
   NET.scores[p] = (NET.scores[p] || 0) + n;
   S.scores[p] = (S.scores[p] || 0) + n;
+}
+// Stack limitato di snapshot: "Annulla ultimo round" riporta i punteggi a prima dell'ultima assegnazione.
+const UNDO = [];
+function scoreSnap() {
+  const s = { ...S.scores },
+    n = { ...NET.scores },
+    last = UNDO[UNDO.length - 1];
+  if (last && JSON.stringify(last.s) === JSON.stringify(s) && JSON.stringify(last.n) === JSON.stringify(n)) return;
+  UNDO.push({ s: s, n: n });
+  if (UNDO.length > 20) UNDO.shift();
+}
+function netPushScores() {
+  if (!NET.host) return;
+  Object.values(NET.conns).forEach((c) => {
+    try {
+      c.send({ t: 'undo', scores: { ...NET.scores } });
+    } catch (e) {}
+  });
+  if (NET.view) NET.view.scores = { ...NET.scores };
+}
+function undoRound() {
+  const u = UNDO.pop();
+  if (!u) {
+    alert(t('undoNone'));
+    return;
+  }
+  S.scores = { ...u.s };
+  NET.scores = { ...u.n };
+  netPushScores();
+  render();
+  alert(t('undoDone'));
 }
 function netTo(n, m) {
   n === NET.name ? netView(m) : NET.conns[n] && NET.conns[n].send(m);
@@ -1475,7 +1720,11 @@ function netAgain() {
         ? pvAgain()
         : g === 'nc'
           ? ncAgain()
-          : wNew();
+          : g === 'tb'
+            ? tbNext()
+            : g === 'chi'
+              ? chiRestart()
+              : wNew();
 }
 function wNew() {
   netPrune();
@@ -1507,6 +1756,7 @@ function checkW() {
     P.forEach((p) => {
       aw[p] = p !== G.pick && G.votes[p] === G.pick ? 100 : 0;
     });
+    scoreSnap();
     P.forEach((p) => netScore(p, aw[p]));
     G.aw = aw;
     G.ph = 'r';
@@ -1593,6 +1843,7 @@ function iChk() {
       if (all && G.roles[p] === 'civ') aw[p] = 100;
       if (!all && G.roles[p] === 'imp' && !picked.includes(p)) aw[p] = 150;
     });
+    scoreSnap();
     P.forEach((p) => netScore(p, aw[p]));
     Object.assign(G, { ph: 'r', picked, all, aw });
   }
@@ -1728,6 +1979,7 @@ function mwWin(w, g) {
     const r = G.roles[p];
     aw[p] = w === 'civ' && r === 'civ' ? 100 : w === 'imp' && r !== 'civ' ? 150 : 0;
   });
+  scoreSnap();
   NET.players.forEach((p) => netScore(p, aw[p]));
   Object.assign(G, { ph: 'r', winner: w, aw, guessed: !!g });
   mwBc();
@@ -2079,6 +2331,8 @@ document.addEventListener('click', (e) => {
 function viewNetGame() {
   const v = NET.view;
   if (v.t === 'lh') return v.html;
+  if (v.t === 'tb') return viewTb(v);
+  if (v.t === 'chi') return viewChi(v);
   const me = NET.name,
     P = (x) => `<p class="text-sm text-slate-300 text-center">${x}</p>`,
     Q = `<p class="text-xs text-slate-400 text-center">${t('question')}</p><h2 class="text-lg font-extrabold text-white text-center">${esc(v.q)}</h2>`;
@@ -2163,21 +2417,50 @@ function viewNetGame() {
     ${sent ? `<p class="text-xs font-bold text-emerald-300 text-center">${t('ncSubmitted')}</p>` : `<button onclick="ncDone()" class="${BTN}">${t('ncSubmit')}</button>`}
     <p class="text-[11px] text-slate-500 text-center"><span id="nc-done">${v.done.length}/${v.n}</span> ${X('hanno consegnato', 'submitted')}</p></div>`;
   }
-  if (v.t === 'ncres')
-    return `<div class="space-y-3 py-2"><p class="text-xs text-slate-400 text-center">${t('ncRound')} ${v.round} · ${t('ncLetter')} ${esc(v.letter)}</p>${v.timeup ? `<p class="text-xs font-bold text-rose-400 text-center">${t('ncTimeUp')}</p>` : ''}${v.players
+  if (v.t === 'ncres') {
+    const review = v.ph === 'review',
+      letter = String(v.letter || '').toLowerCase(),
+      cnt = {};
+    v.cats.forEach((c) => {
+      const m = {};
+      v.players.forEach((p) => {
+        const q = ncNorm((v.a[p] || {})[c.k]);
+        if (q && q[0] === letter) (m[q] = m[q] || []).push(p);
+      });
+      cnt[c.k] = m;
+    });
+    const cell = (p, c, pi, ci) => {
+      const a = (v.a[p] || {})[c.k] || '',
+        q = ncNorm(a);
+      if (!q || q[0] !== letter) return `<span class="text-rose-400">${a ? '✗' : '—'}</span>`;
+      if ((cnt[c.k][q] || []).length > 1) return `<span class="text-amber-400">+5</span>`;
+      const ok = !(v.ok && v.ok[p] && v.ok[p][c.k] === false);
+      if (!review) {
+        const s = (v.aw[p] || {})[c.k] || 0;
+        return `<span class="${s ? 'text-emerald-400' : 'text-rose-400'}">${s ? '+' + s : '✗'}</span>`;
+      }
+      if (NET.host)
+        return `<button onclick="ncToggleAt(${pi},${ci})" class="px-2 py-0.5 rounded-lg text-[11px] font-bold ${ok ? 'bg-emerald-600/20 text-emerald-300' : 'bg-rose-600/20 text-rose-300'}">${ok ? '✓ +10' : '✗ 0'}</button>`;
+      return `<span class="${ok ? 'text-emerald-400' : 'text-rose-400'}">${ok ? '✓' : '✗'}</span>`;
+    };
+    return `<div class="space-y-3 py-2"><p class="text-xs text-slate-400 text-center">${t('ncRound')} ${v.round} · ${t('ncLetter')} ${esc(v.letter)}</p>${v.timeup && !review ? `<p class="text-xs font-bold text-rose-400 text-center">${t('ncTimeUp')}</p>` : ''}${
+      review
+        ? NET.host
+          ? `<p class="text-[11px] text-amber-300 text-center">${X('Tocca una risposta unica per accettarla (✓ +10) o rifiutarla (✗ 0). I doppioni valgono +5, vuote o lettera sbagliata 0.', 'Tap a unique answer to accept (✓ +10) or reject (✗ 0). Duplicates are +5, blank or wrong letter 0.')}</p>`
+          : `<p class="text-xs font-bold text-amber-300 text-center">${X("L'host sta verificando le risposte…", 'The host is reviewing the answers…')}</p>`
+        : ''
+    }${v.players
       .map(
-        (p) =>
-          `<div class="bg-slate-900 rounded-xl p-3"><div class="flex justify-between text-xs font-bold"><span>${esc(p)}</span><span class="${v.pts[p] ? 'text-emerald-400' : 'text-slate-500'}">${v.pts[p] ? '+' + v.pts[p] : '—'}</span></div>${v.cats
-            .map((c) => {
-              const a = (v.a[p] || {})[c.k] || '',
-                s = (v.aw[p] || {})[c.k] || 0;
-              return `<div class="flex justify-between text-[11px] mt-1"><span class="text-slate-400">${esc(ncLab(c))}: <b class="text-slate-200">${a ? esc(a) : '—'}</b></span><span class="${s === 10 ? 'text-emerald-400' : s === 5 ? 'text-amber-400' : 'text-rose-400'}">${s ? '+' + s : '✗'}</span></div>`;
+        (p, pi) =>
+          `<div class="bg-slate-900 rounded-xl p-3"><div class="flex justify-between text-xs font-bold"><span>${esc(p)}</span>${review ? '' : `<span class="${v.pts[p] ? 'text-emerald-400' : 'text-slate-500'}">${v.pts[p] ? '+' + v.pts[p] : '—'}</span>`}</div>${v.cats
+            .map((c, ci) => {
+              const a = (v.a[p] || {})[c.k] || '';
+              return `<div class="flex justify-between items-center text-[11px] mt-1"><span class="text-slate-400">${esc(ncLab(c))}: <b class="text-slate-200">${a ? esc(a) : '—'}</b></span>${cell(p, c, pi, ci)}</div>`;
             })
             .join('')}</div>`
       )
-      .join(
-        ''
-      )}${SC(v.scores)}${NET.host ? `<button onclick="netAgain()" class="${BTN}">${t('ncNewLetter')}</button><button onclick="ncBack()" class="w-full bg-slate-800 py-3 rounded-xl text-sm font-bold">${t('ncLobby')}</button>` : W}</div>`;
+      .join('')}${review ? (NET.host ? `<button onclick="ncScore()" class="${BTN}">${X('Conferma punteggi', 'Confirm scores')}</button>` : W) : `${SC(v.scores)}${NET.host ? `<button onclick="netAgain()" class="${BTN}">${t('ncNewLetter')}</button><button onclick="ncBack()" class="w-full bg-slate-800 py-3 rounded-xl text-sm font-bold">${t('ncLobby')}</button>` : W}`}</div>`;
+  }
   const sc = Object.entries(v.scores || {}).sort((a, b) => b[1] - a[1]);
   return `<div class="space-y-3 py-2">${Q}<div class="bg-slate-900 rounded-xl p-4 text-center text-lg font-extrabold text-white">“${esc(v.text)}”</div>${P(X("L'ha scritta ", 'Written by ') + '<b class="gtext">' + esc(v.author) + '</b>')}${v.players
     .filter((p) => p !== v.author)
@@ -2192,10 +2475,21 @@ function viewNetGame() {
 // Barra di controllo riservata all'host durante una partita online.
 function hostBar() {
   if (!NET.host || !NET.game) return '';
-  const nc = NET.game.g === 'nc' && NET.game.ph === 'play';
+  const G = NET.game,
+    nc = G.g === 'nc' && G.ph === 'play',
+    tb = G.g === 'tb' && G.ph === 'play',
+    chi = G.g === 'chi' && G.ph !== 'end';
   return `<div class="pt-1 space-y-1.5">${
     nc
       ? `<button onclick="ncFinish()" class="w-full text-[11px] font-bold bg-emerald-600/10 border border-emerald-500/30 text-emerald-300 py-2 rounded-xl">⏱️ ${X('Chiudi il round ora', 'Close the round now')}</button>`
+      : ''
+  }${
+    tb
+      ? `<button onclick="tbClose()" class="w-full text-[11px] font-bold bg-emerald-600/10 border border-emerald-500/30 text-emerald-300 py-2 rounded-xl">⏱️ ${t('tbCloseTurn')}</button>`
+      : ''
+  }${
+    chi
+      ? `<button onclick="chiEnd()" class="w-full text-[11px] font-bold bg-emerald-600/10 border border-emerald-500/30 text-emerald-300 py-2 rounded-xl">${t('chiRevealEnd')}</button>`
       : ''
   }<button onclick="hostAbort()" class="w-full text-[11px] font-bold bg-slate-900 border border-rose-500/30 text-rose-400 py-2 rounded-xl">⏹ ${X('Termina partita', 'End game')}</button></div>`;
 }
@@ -2211,7 +2505,245 @@ function hostAbort() {
   )
     return;
   ncStopTimer();
+  tbStopTimer();
   toLobby();
+}
+// Espulsione dalla lobby (solo host, solo prima della partita).
+function netKick(i) {
+  if (!NET.host || NET.game) return;
+  const n = NET.players[i];
+  if (!n || n === NET.hostName) return;
+  if (!confirm(X('Espellere ' + n + ' dalla stanza?', 'Kick ' + n + ' from the room?'))) return;
+  const c = NET.conns[n];
+  try {
+    c && c.send({ t: 'kick' });
+  } catch (e) {}
+  setTimeout(() => {
+    try {
+      c && c.close();
+    } catch (e) {}
+  }, 150);
+  if (NET.offT[n]) {
+    clearTimeout(NET.offT[n]);
+    delete NET.offT[n];
+  }
+  delete NET.conns[n];
+  delete NET.peers[n];
+  delete NET.offline[n];
+  delete NET.gone[n];
+  NET.players = NET.players.filter((x) => x !== n);
+  NET.order = NET.order.filter((x) => x !== n);
+  NET.off = [...Object.keys(NET.offline), ...Object.keys(NET.gone)];
+  NET.lastSnap = '';
+  hostBc();
+  netPresence();
+}
+function appBase() {
+  let base = '';
+  try {
+    const proto = String(location.protocol || 'https:').toLowerCase();
+    if (proto === 'http:' || proto === 'https:') base = location.origin + location.pathname;
+  } catch (e) {}
+  // Aperto da file:// il link non sarebbe raggiungibile dagli altri telefoni.
+  return base || 'https://zhenwang21.github.io/minigames-hub/';
+}
+function inviteLink() {
+  return appBase() + '#room=' + encodeURIComponent(NET.code || '');
+}
+function inviteQr() {
+  try {
+    const q = qrcode(0, 'M');
+    q.addData(inviteLink());
+    q.make();
+    return q.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+  } catch (e) {
+    return '';
+  }
+}
+function showInvite() {
+  const m = $('modal'),
+    link = inviteLink(),
+    qr = inviteQr();
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">📤 ${t('inviteTitle')}</h3>
+  <p class="text-xs text-slate-400">${t('inviteHint')}</p>
+  ${qr ? `<div class="bg-white p-2 rounded-xl" style="max-width:220px;margin:0 auto">${qr}</div>` : ''}
+  <p class="text-center text-lg font-extrabold tracking-widest gtext">${esc(NET.code)}</p>
+  <div class="bg-slate-900 rounded-xl p-2 text-[10px] text-slate-400 break-all select-text">${esc(link)}</div>
+  <div class="grid grid-cols-2 gap-2"><button onclick="copyInvite()" class="bg-slate-800 py-2.5 rounded-xl text-xs font-bold">📋 ${t('copyLink')}</button><button onclick="shareInvite()" class="gbtn py-2.5 rounded-xl text-xs font-bold">${t('share')}</button></div>
+  <button onclick="closeModal()" class="w-full bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
+  m.style.display = 'flex';
+}
+function copyInvite() {
+  const txt = inviteLink();
+  const done = () => alert(t('copied'));
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText)
+      navigator.clipboard.writeText(txt).then(done, () => fallbackCopy(txt, done));
+    else fallbackCopy(txt, done);
+  } catch (e) {
+    fallbackCopy(txt, done);
+  }
+}
+function fallbackCopy(txt, done) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = txt;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    done();
+  } catch (e) {}
+}
+function shareInvite() {
+  const url = inviteLink();
+  if (navigator.share)
+    navigator
+      .share({ title: 'Minigames Hub', text: t('inviteTitle'), url: url })
+      .catch(() => {});
+  else copyInvite();
+}
+function parseInvite() {
+  let hash = '';
+  try {
+    hash = (location.hash || '').toString();
+  } catch (e) {}
+  const m = hash.match(/room=([A-Z0-9]{5})/i);
+  if (!m) return;
+  NET.lastCode = m[1].toUpperCase();
+  NET.err = '';
+  S.hint = 'invite';
+  S.screen = 'online';
+  try {
+    setTimeout(() => {
+      const el = $('on-name');
+      if (el) {
+        el.focus();
+        el.select && el.select();
+      }
+    }, 120);
+  } catch (e) {}
+}
+function backupData() {
+  return {
+    app: 'minigames-hub',
+    v: APP_VERSION,
+    exportedAt: new Date().toISOString(),
+    players: S.players.slice(0, 40),
+    scores: { ...S.scores },
+    name: NET.name,
+    lastCode: NET.lastCode,
+    cust: CUST.map((c) => ({ id: c.id, name: c.name, desc: c.desc, fac: c.fac })),
+    cn: CN,
+    ncCats: NC_CATS.filter((c) => String(c.k).indexOf('cu') === 0).map((c) => ({ k: c.k, it: c.it, en: c.en }))
+  };
+}
+function exportBackup() {
+  try {
+    const blob = new Blob([JSON.stringify(backupData(), null, 2)], { type: 'application/json' }),
+      url = URL.createObjectURL(blob),
+      a = document.createElement('a');
+    a.href = url;
+    a.download = 'minigames-hub-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+    alert(t('exportOk'));
+  } catch (e) {}
+}
+function importBackup() {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'application/json,.json';
+  inp.style.display = 'none';
+  inp.onchange = () => {
+    const f = inp.files && inp.files[0];
+    inp.remove();
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      let d = null;
+      try {
+        d = JSON.parse(String(r.result || ''));
+      } catch (e) {}
+      if (!d || typeof d !== 'object' || (d.app !== 'minigames-hub' && !Array.isArray(d.players) && !d.scores)) {
+        alert(t('importBad'));
+        return;
+      }
+      if (!confirm(t('importConfirm'))) return;
+      applyBackup(d);
+      alert(t('importOk'));
+      render();
+    };
+    r.onerror = () => alert(t('importBad'));
+    r.readAsText(f);
+  };
+  document.body.appendChild(inp);
+  inp.click();
+}
+function resetCustomRoles() {
+  CUST.slice().forEach((c) => {
+    [SPEC_C, SPEC_W, SPEC_T].forEach((a) => {
+      const i = a.indexOf(c.id);
+      if (i >= 0) a.splice(i, 1);
+    });
+    delete LT[c.id];
+    const l = L();
+    l.on.delete(c.id);
+    l.must.delete(c.id);
+    lClr(c.id);
+  });
+  CUST = [];
+  CF = null;
+  CN = 0;
+}
+function applyBackup(d) {
+  const P = [];
+  (Array.isArray(d.players) ? d.players : []).slice(0, 40).forEach((x) => {
+    const n = cleanName(x, 20);
+    if (n && !P.some((p) => p.toLowerCase() === n.toLowerCase())) P.push(n);
+  });
+  S.players = P;
+  const sc = {};
+  if (d.scores && typeof d.scores === 'object')
+    Object.keys(d.scores).forEach((k) => {
+      const n = cleanName(k, 20),
+        v = +d.scores[k];
+      if (n && isFinite(v)) sc[n] = Math.round(v);
+    });
+  S.scores = sc;
+  if (typeof d.name === 'string') NET.name = cleanName(d.name, 16);
+  if (typeof d.lastCode === 'string') NET.lastCode = String(d.lastCode).slice(0, 5).toUpperCase();
+  resetCustomRoles();
+  (Array.isArray(d.cust) ? d.cust : []).slice(0, 40).forEach((x) => {
+    const id = x && typeof x.id === 'string' ? x.id : '';
+    const name = cleanName(x && x.name, 24);
+    if (!id || !/^cx\d+$/.test(id) || !name || CUST.some((c) => c.id === id)) return;
+    const fac = ['civ', 'wolf', 'third'].includes(x.fac) ? x.fac : 'civ';
+    const c = { id: id, name: name, desc: cleanText(x.desc, 200), fac: fac };
+    CUST.push(c);
+    cReg(c);
+    CN = Math.max(CN, +id.slice(2) || 0);
+  });
+  if (Number.isFinite(+d.cn)) CN = Math.max(CN, +d.cn);
+  for (let i = NC_CATS.length - 1; i >= 0; i--)
+    if (String(NC_CATS[i].k).indexOf('cu') === 0) NC_CATS.splice(i, 1);
+  (Array.isArray(d.ncCats) ? d.ncCats : []).slice(0, 20).forEach((x) => {
+    const name = cleanName(x && (x.it || x.en), 18);
+    if (!name) return;
+    if (NC_CATS.some((c) => ncLab(c).toLowerCase() === name.toLowerCase())) return;
+    const k =
+      x && typeof x.k === 'string' && /^cu[a-z0-9]{1,20}$/.test(x.k) && !NC_CATS.some((c) => c.k === x.k)
+        ? x.k
+        : 'cu' + Date.now().toString(36) + NC_CATS.length;
+    NC_CATS.push({ k: k, it: name, en: name });
+  });
+  UNDO.length = 0;
+  saveLocal();
 }
 function viewOnline() {
   const err = NET.err ? `<p class="text-xs text-rose-400 text-center">${esc(NET.err)}</p>` : '',
@@ -2230,9 +2762,9 @@ function viewOnline() {
     return `<div class="space-y-4 text-center py-10"><p class="text-slate-200 text-sm font-bold">🔄 ${X('Connessione persa: riprovo…', 'Connection lost: retrying…')}</p><p class="text-xs text-slate-500 px-6">${X('Se non torna subito, un altro giocatore prende il comando della stanza.', 'If it does not come back at once, another player takes over the room.')}</p>${back}</div>`;
   if (NET.st === 'lobby' && NET.view) return offBan + viewNetGame() + hostBar();
   if (NET.st === 'lobby')
-    return `<div class="space-y-4 py-2"><div class="text-center"><p class="text-xs text-slate-400">${X('Codice stanza', 'Room code')}</p><h2 class="text-4xl font-extrabold tracking-widest gtext">${esc(NET.code)}</h2><p class="text-[11px] text-slate-500 mt-1">${X('Gli altri aprono la stessa pagina, scelgono Online e inseriscono il codice.', 'Others open the same page, choose Online and enter the code.')}</p><p class="text-[11px] text-slate-500 mt-1">${X('Se ricarichi la pagina, rientra con lo stesso nome entro 25 secondi.', 'If you reload, rejoin with the same name within 25 seconds.')}</p></div>
+    return `<div class="space-y-4 py-2"><div class="text-center"><p class="text-xs text-slate-400">${X('Codice stanza', 'Room code')}</p><h2 class="text-4xl font-extrabold tracking-widest gtext">${esc(NET.code)}</h2><p class="text-[11px] text-slate-500 mt-1">${X('Gli altri aprono la stessa pagina, scelgono Online e inseriscono il codice.', 'Others open the same page, choose Online and enter the code.')}</p><p class="text-[11px] text-slate-500 mt-1">${X('Se ricarichi la pagina, rientra con lo stesso nome entro 60 secondi.', 'If you reload, rejoin with the same name within 60 seconds.')}</p><button onclick="showInvite()" class="mt-2 w-full bg-slate-800 py-2.5 rounded-xl text-xs font-bold">📤 ${t('inviteTitle')}</button></div>
   ${NET.err ? `<p class="text-[11px] text-amber-300 text-center">${esc(NET.err)}</p>` : ''}
-  <div class="space-y-1.5">${NET.players.map((p) => `<div class="flex justify-between bg-slate-900 px-3 py-2 rounded-xl text-sm"><b>${esc(p)}${p === NET.name ? ' (' + X('tu', 'you') + ')' : ''}</b><span>${p === NET.hostName ? '👑' : ''}${off.includes(p) ? ' 📴' : ''}</span></div>`).join('')}</div>
+  <div class="space-y-1.5">${NET.players.map((p, i) => `<div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl text-sm"><b>${esc(p)}${p === NET.name ? ' (' + X('tu', 'you') + ')' : ''}</b><span class="flex items-center gap-2">${p === NET.hostName ? '👑' : ''}${off.includes(p) ? ' 📴' : ''}${NET.host && p !== NET.hostName ? `<button onclick="netKick(${i})" class="text-rose-400/80 hover:text-rose-300 text-xs px-1" aria-label="${X('Espelli', 'Kick')} ${esc(p)}" title="${X('Espelli', 'Kick')}">✕</button>` : ''}</span></div>`).join('')}</div>
   ${
     NET.host
       ? `${[
@@ -2241,7 +2773,9 @@ function viewOnline() {
           ['wStart()', '💬', 'g_who_said', 3],
           ['pvHostOpen()', '🤔', 'g_preferisci', 2],
           ['lupNew()', '🐺', 'g_lupus', 4],
-          ['ncHostOpen()', '📝', 'g_nomicose', 2]
+          ['ncHostOpen()', '📝', 'g_nomicose', 2],
+          ['tbHostOpen()', '🚫', 'g_taboo', 4],
+          ['chiStart()', '👤', 'g_chisono', 3]
         ]
           .map(
             ([f, ic, k, min]) =>
@@ -2249,12 +2783,13 @@ function viewOnline() {
           )
           .join(
             ''
-          )}<p class="text-[11px] text-slate-500 text-center">${X('Servono almeno 3 giocatori (4 per Lupus, 2 per Preferiresti e Nomi Cose e Città).', 'At least 3 players needed (4 for Werewolf, 2 for Would You Rather and Names, Things and Cities).')}</p>`
+          )}<p class="text-[11px] text-slate-500 text-center">${X('Servono almeno 3 giocatori (4 per Lupus e Parole vietate, 2 per Preferiresti e Nomi Cose e Città).', 'At least 3 players needed (4 for Werewolf and Forbidden Words, 2 for Would You Rather and Names, Things and Cities).')}</p>`
       : `<p class="text-xs text-slate-500 text-center">${X("In attesa dell'host…", 'Waiting for the host…')}</p>`
   }
   <button onclick="netClose();home()" class="w-full bg-slate-800 py-3 rounded-xl text-sm font-bold">${X('Esci dalla stanza', 'Leave the room')}</button></div>`;
   return `<div class="space-y-4 py-2">${back}<h2 class="text-xl font-extrabold text-center">🌐 Online <span class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full align-middle">beta</span></h2>
   ${S.hint === 'nomicose' ? `<p class="text-[11px] text-emerald-300 bg-emerald-600/10 border border-emerald-500/30 rounded-xl px-3 py-2 text-center">${t('ncHint')}</p>` : ''}
+  ${S.hint === 'invite' ? `<p class="text-[11px] text-emerald-300 bg-emerald-600/10 border border-emerald-500/30 rounded-xl px-3 py-2 text-center"><b>${t('joinInvite')}</b><br>${t('joinInviteHint')}</p>` : ''}
   <input id="on-name" autocomplete="off" maxlength="16" value="${esc(NET.name)}" placeholder="${X('Il tuo nome', 'Your name')}" class="w-full ${inp}">${err}
   <button onclick="netHost()" class="${BTN}">${X('Crea stanza', 'Create room')}</button>
   <div class="flex gap-2"><input id="on-code" autocomplete="off" maxlength="5" value="${esc(NET.lastCode || '')}" placeholder="${X('Codice', 'Code')}" class="flex-1 uppercase tracking-widest text-center ${inp}"><button onclick="netJoin()" class="px-5 rounded-xl bg-slate-800 text-sm font-bold">${X('Entra', 'Join')}</button></div></div>`;
@@ -2329,7 +2864,7 @@ function cBlock() {
   const form = CF
     ? `<div class="bg-slate-900 rounded-xl p-3 space-y-2"><input autocomplete="off" maxlength="24" value="${esc(CF.n)}" oninput="CF.n=this.value" placeholder="${X('Nome del ruolo', 'Role name')}" class="w-full bg-slate-800 rounded-lg px-3 py-2 text-sm"><textarea autocomplete="off" maxlength="200" rows="3" oninput="CF.d=this.value" placeholder="${X('Descrizione / skill', 'Description / skill')}" class="w-full bg-slate-800 rounded-lg px-3 py-2 text-sm">${esc(CF.d)}</textarea><div class="flex gap-1.5">${['civ', 'wolf', 'third'].map((f) => `<button onclick="CF.f='${f}';render()" class="flex-1 py-2 rounded-lg text-[11px] font-bold ${CF.f === f ? 'bg-purple-600' : 'bg-slate-800 text-slate-400'}">${t('tm_' + f)}</button>`).join('')}</div><div class="flex gap-2"><button onclick="CF=null;render()" class="flex-1 bg-slate-800 py-2 rounded-lg text-xs font-bold">${t('back')}</button><button onclick="cSave()" class="flex-1 gbtn py-2 rounded-lg text-xs font-bold">${X('Crea', 'Create')}</button></div></div>`
     : `<button onclick="cOpen()" class="w-full bg-slate-800 py-2.5 rounded-xl text-xs font-bold">➕ ${X('Crea un ruolo', 'Create a role')}</button>`;
-  return `<div class="space-y-2">${list}${form}<p class="text-[10px] text-slate-500">${X('I ruoli creati valgono solo nella partita veloce (nella completa non hanno skill) e restano finché la pagina è aperta.', 'Created roles only work in the quick game (they have no skills in the full game) and last while the page stays open.')}</p></div>`;
+  return `<div class="space-y-2">${list}${form}<p class="text-[10px] text-slate-500">${X('I ruoli creati valgono solo nella partita veloce (nella completa non hanno skill) e restano salvati su questo telefono.', 'Created roles only work in the quick game (they have no skills in the full game) and are saved on this device.')}</p></div>`;
 }
 function showHelp(ctx) {
   const m = $('modal'),
@@ -2345,7 +2880,9 @@ function showHelp(ctx) {
       "<p><b>💬 Chi l'ha detto?</b>: tutti rispondono in segreto a una domanda; le risposte vengono lette in anonimo e si prova a indovinare chi ha scritto cosa.</p>",
       '<p><b>🤔 Preferiresti…</b>: due opzioni scritte dal GM, ognuno vota in segreto. Vince la maggioranza, pareggio = punti a tutti.</p>',
       "<p><b>🐺 Lupus</b>: partita completa (l'app gestisce notti, voti e vittorie) o veloce (l'app distribuisce solo i ruoli e si gioca a voce).</p>",
-      '<p><b>📝 Nomi, Cose e Città</b> (solo online): il telefono dà una lettera e delle categorie, ognuno scrive le sue risposte dal proprio telefono. Il timer parte da 5 minuti e cala a ogni consegna. Risposta unica +10, doppione +5, vuota o con la lettera sbagliata 0.</p>'
+      '<p><b>📝 Nomi, Cose e Città</b> (solo online): il telefono dà una lettera e delle categorie, ognuno scrive le sue risposte dal proprio telefono. Il timer parte da 5 minuti e cala a ogni consegna. Risposta unica: l’host decide (+10 se valida, 0 se no); doppione +5; vuota o con la lettera sbagliata 0.</p>',
+      '<p><b>🚫 Parole vietate</b> (solo online): due squadre. A turno uno della squadra indovina e i compagni danno indizi senza dire le parole proibite, che vedono solo loro. Gli avversari votano «indovinata» o «parola vietata»: appena c’è la maggioranza il turno si chiude e passa all’altra squadra. +100 a ogni membro della squadra che indovina.</p>',
+      '<p><b>👤 Chi sono io?</b> (solo online): ognuno vede le parole degli altri ma non la propria. A turno si fanno domande a voce; quando vuoi indovinare premi «Indovino!» e gli altri votano sì o no. 5 vite a testa: ogni risposta sbagliata ne toglie una, quella giusta vale +100.</p>'
     ].join(''),
 
     [
@@ -2354,7 +2891,9 @@ function showHelp(ctx) {
       '<p><b>💬 Who Said That?</b>: everyone secretly answers a question; the answers are read anonymously and you try to guess who wrote what.</p>',
       '<p><b>🤔 Would You Rather…</b>: two options typed by the GM, everyone votes secretly. The majority wins; a tie gives points to everyone.</p>',
       '<p><b>🐺 Werewolf</b>: full game (the app runs nights, votes and wins) or quick game (the app only deals roles, you play out loud).</p>',
-      '<p><b>📝 Names, Things and Cities</b> (online only): the phone gives a letter and some categories, everyone types their answers on their own phone. The timer starts at 5 minutes and drops with every submission. Unique answer +10, duplicate +5, empty or wrong letter 0.</p>'
+      '<p><b>📝 Names, Things and Cities</b> (online only): the phone gives a letter and some categories, everyone types their answers on their own phone. The timer starts at 5 minutes and drops with every submission. Unique answer: the host decides (+10 if valid, 0 if not); duplicate +5; empty or wrong letter 0.</p>',
+      '<p><b>🚫 Forbidden Words</b> (online only): two teams. In turn one player guesses while their teammates give clues without saying the forbidden words, which only they can see. The opponents vote “guessed it” or “forbidden word”: as soon as there is a majority the turn closes and passes to the other team. +100 to every member of the team that guesses.</p>',
+      '<p><b>👤 Who Am I?</b> (online only): everyone sees the others’ words but not their own. In turn you ask questions out loud; when you want to guess, tap “I know it!” and the others vote yes or no. 5 lives each: a wrong answer costs one, a correct one is worth +100.</p>'
     ].join('')
   );
   const score = X(
@@ -2367,7 +2906,8 @@ function showHelp(ctx) {
       '<p>• Kamikaze o Sindaco che eliminano un lupo con il loro potere: 50 (non vale per il Mannaro non trasformato).</p>',
       '<p>• Dottore: 25 per ogni persona attaccata dai lupi e protetta correttamente.</p>',
       '<p>• Preferiresti: +100 a chi ha votato l’opzione più scelta; pareggio = +50 a tutti.</p>',
-      '<p>• Nomi, Cose e Città: +10 a ogni risposta valida e unica, +5 se un altro giocatore ha scritto la stessa cosa (anche con maiuscole o accenti diversi), 0 se vuota o con la lettera sbagliata.</p>',
+      '<p>• Nomi, Cose e Città: +10 a ogni risposta unica accettata dall’host (0 se rifiutata), +5 se un altro giocatore ha scritto la stessa cosa (anche con maiuscole o accenti diversi), 0 se vuota o con la lettera sbagliata.</p>',
+      '<p>• Parole vietate: +100 a ogni membro della squadra che indovina; parola vietata o tempo scaduto = 0. Chi sono io?: +100 per ogni parola indovinata; risposta sbagliata = −1 vita (5 vite a testa).</p>',
       '<p>• Tutti i punti di Lupus valgono ×10 (le partite durano molto di più).</p>'
     ].join(''),
 
@@ -2380,7 +2920,8 @@ function showHelp(ctx) {
       '<p>• Kamikaze or Mayor eliminating a wolf with their power: 50 (does not apply to an untransformed Cursed).</p>',
       '<p>• Doctor: 25 for every person attacked by the wolves and correctly protected.</p>',
       '<p>• Would You Rather: +100 to those who picked the most voted option; a tie gives +50 to everyone.</p>',
-      '<p>• Names, Things and Cities: +10 for every valid, unique answer, +5 if another player wrote the same thing (even with different capitals or accents), 0 if empty or wrong letter.</p>',
+      '<p>• Names, Things and Cities: +10 for every unique answer the host accepts (0 if rejected), +5 if another player wrote the same thing (even with different capitals or accents), 0 if empty or wrong letter.</p>',
+      '<p>• Forbidden Words: +100 to every member of the team that guesses; forbidden word or time up = 0. Who Am I?: +100 for every guessed word; a wrong answer costs 1 life (5 lives each).</p>',
       '<p>• All Werewolf points are ×10 (games last much longer).</p>'
     ].join('')
   );
@@ -2453,28 +2994,28 @@ const WORDS = {
 const K = (s) => s.split('|').map((x) => x.split(','));
 const CL = {
   food: K(
-    'Pizza,Focaccia,Calzone,Piadina,Pane,Panino,Tramezzino,Bruschetta|Pasta,Risotto,Gnocchi,Lasagna,Ravioli,Polenta,Couscous,Riso,Zuppa|Gelato,Sorbetto,Granita,Yogurt,Panna cotta,Tiramisù,Cheesecake,Budino,Semifreddo|Caffè,Cappuccino,Tè,Cioccolata calda,Latte,Succo,Frullato,Spremuta,Tisana|Vino,Birra,Spritz,Prosecco,Whisky,Vodka,Rum,Gin,Amaro|Mela,Pera,Pesca,Albicocca,Arancia,Mandarino,Limone,Pompelmo,Fragola|Prosciutto,Salame,Mortadella,Bresaola,Pancetta,Speck,Salsiccia,Wurstel|Sushi,Sashimi,Ramen,Tempura,Gyoza,Kebab,Falafel,Tacos,Burrito|Hamburger,Hot dog,Patatine fritte,Nuggets,Sandwich,Toast,Club sandwich|Cornetto,Brioche,Croissant,Ciambella,Muffin,Pancake,Waffle,Crepes,Biscotto|Formaggio,Mozzarella,Ricotta,Parmigiano,Gorgonzola,Burrata,Pecorino,Provola|Cioccolato,Nutella,Caramello,Marshmallow,Zucchero filato,Liquirizia,Caramella,Torrone'
+    'Pizza,Focaccia,Calzone,Piadina,Pane,Panino,Tramezzino,Bruschetta|Pasta,Risotto,Gnocchi,Lasagna,Ravioli,Polenta,Couscous,Riso,Zuppa|Gelato,Sorbetto,Granita,Yogurt,Panna cotta,Tiramisù,Cheesecake,Budino,Semifreddo|Caffè,Cappuccino,Tè,Cioccolata calda,Latte,Succo,Frullato,Spremuta,Tisana|Vino,Birra,Spritz,Prosecco,Whisky,Vodka,Rum,Gin,Amaro|Mela,Pera,Pesca,Albicocca,Arancia,Mandarino,Limone,Pompelmo,Fragola|Prosciutto,Salame,Mortadella,Bresaola,Pancetta,Speck,Salsiccia,Wurstel|Sushi,Sashimi,Ramen,Tempura,Gyoza,Kebab,Falafel,Tacos,Burrito|Hamburger,Hot dog,Patatine fritte,Nuggets,Sandwich,Toast,Club sandwich|Cornetto,Brioche,Croissant,Ciambella,Muffin,Pancake,Waffle,Crepes,Biscotto|Formaggio,Mozzarella,Ricotta,Parmigiano,Gorgonzola,Burrata,Pecorino,Provola|Cioccolato,Nutella,Caramello,Marshmallow,Zucchero filato,Liquirizia,Caramella,Torrone|Pizza margherita,Pizza marinara,Pizza capricciosa,Pizza quattro formaggi,Pizza diavola,Pizza bianca|Arancino,Supplì,Crocchetta,Frittatina,Zeppola,Panzerotto|Smoothie,Frullato,Milkshake,Frappè,Centrifugato,Estratto'
   ),
   countries: K(
-    'Italia,Spagna,Portogallo,Francia,Grecia,Malta,Croazia,Turchia|Giappone,Cina,Corea,Thailandia,Vietnam,India,Indonesia,Singapore|Germania,Austria,Svizzera,Olanda,Belgio,Polonia,Danimarca,Svezia|USA,Canada,Messico,Cuba,Brasile,Argentina,Colombia,Cile|Egitto,Marocco,Tunisia,Kenya,Sudafrica,Nigeria,Etiopia,Tanzania|Parigi,Roma,Londra,Madrid,Berlino,Vienna,Praga,Amsterdam,Lisbona|New York,Los Angeles,Miami,Las Vegas,Chicago,San Francisco,Toronto|Venezia,Firenze,Napoli,Milano,Torino,Bologna,Palermo,Genova|Tokyo,Seoul,Pechino,Bangkok,Dubai,Hong Kong,Shanghai,Mumbai|Australia,Nuova Zelanda,Fiji,Hawaii,Bali,Maldive,Tahiti,Seychelles|Alpi,Dolomiti,Appennini,Pirenei,Himalaya,Ande,Montagne Rocciose|Mar Rosso,Mediterraneo,Atlantico,Pacifico,Mar Nero,Baltico,Adriatico'
+    'Italia,Spagna,Portogallo,Francia,Grecia,Malta,Croazia,Turchia|Giappone,Cina,Corea,Thailandia,Vietnam,India,Indonesia,Singapore|Germania,Austria,Svizzera,Olanda,Belgio,Polonia,Danimarca,Svezia|USA,Canada,Messico,Cuba,Brasile,Argentina,Colombia,Cile|Egitto,Marocco,Tunisia,Kenya,Sudafrica,Nigeria,Etiopia,Tanzania|Parigi,Roma,Londra,Madrid,Berlino,Vienna,Praga,Amsterdam,Lisbona|New York,Los Angeles,Miami,Las Vegas,Chicago,San Francisco,Toronto|Venezia,Firenze,Napoli,Milano,Torino,Bologna,Palermo,Genova|Tokyo,Seoul,Pechino,Bangkok,Dubai,Hong Kong,Shanghai,Mumbai|Australia,Nuova Zelanda,Fiji,Hawaii,Bali,Maldive,Tahiti,Seychelles|Alpi,Dolomiti,Appennini,Pirenei,Himalaya,Ande,Montagne Rocciose|Mar Rosso,Mediterraneo,Atlantico,Pacifico,Mar Nero,Baltico,Adriatico|Barcellona,Valencia,Siviglia,Bilbao,Granada,Malaga|Città del Messico,Rio de Janeiro,Buenos Aires,Lima,Bogotá,Santiago|Islanda,Norvegia,Finlandia,Irlanda,Scozia,Estonia'
   ),
   sport: K(
-    'Calcio,Calcetto,Futsal,Rugby,Football americano,Hockey,Pallamano|Tennis,Padel,Badminton,Ping pong,Squash,Pickleball,Golf|Basket,Pallavolo,Beach volley,Pallanuoto,Baseball,Softball|Sci,Snowboard,Pattinaggio,Hockey su ghiaccio,Curling,Biathlon,Slittino|Nuoto,Tuffi,Surf,Windsurf,Canottaggio,Canoa,Vela,Kitesurf|Corsa,Maratona,Ciclismo,Triathlon,Marcia,Trail,Spinning,Camminata|Boxe,Judo,Karate,Taekwondo,MMA,Lotta,Kickboxing,Scherma|Formula 1,MotoGP,Rally,Karting,NASCAR,Motocross,Superbike|Scacchi,Dama,Poker,Backgammon,Monopoli,Risiko,Scopa,Briscola|Yoga,Pilates,Crossfit,Palestra,Zumba,Calisthenics,Danza,Arrampicata'
+    'Calcio,Calcetto,Futsal,Rugby,Football americano,Hockey,Pallamano|Tennis,Padel,Badminton,Ping pong,Squash,Pickleball,Golf|Basket,Pallavolo,Beach volley,Pallanuoto,Baseball,Softball|Sci,Snowboard,Pattinaggio,Hockey su ghiaccio,Curling,Biathlon,Slittino|Nuoto,Tuffi,Surf,Windsurf,Canottaggio,Canoa,Vela,Kitesurf|Corsa,Maratona,Ciclismo,Triathlon,Marcia,Trail,Spinning,Camminata|Boxe,Judo,Karate,Taekwondo,MMA,Lotta,Kickboxing,Scherma|Formula 1,MotoGP,Rally,Karting,NASCAR,Motocross,Superbike|Scacchi,Dama,Poker,Backgammon,Monopoli,Risiko,Scopa,Briscola|Yoga,Pilates,Crossfit,Palestra,Zumba,Calisthenics,Danza,Arrampicata|Pallavolo,Beach volley,Pallanuoto,Pallamano,Dodgeball,Korfball|Maratona,Mezza maratona,Diecimila metri,Staffetta,Corsa campestre,Ultramaratona|Tennis tavolo,Badminton,Squash,Padel,Pickleball,Racquetball'
   ),
   tech: K(
-    'Smartphone,Tablet,Laptop,Smartwatch,Kindle,Console,Fotocamera|PlayStation,Xbox,Nintendo Switch,PC gaming,Steam Deck,Game Boy|iPhone,Samsung,Pixel,Xiaomi,Huawei,OnePlus|Windows,macOS,Linux,Android,iOS,Chrome OS|WhatsApp,Telegram,Instagram,TikTok,Snapchat,Facebook,Discord|Netflix,Prime Video,Disney+,YouTube,Twitch,Spotify,Apple Music|Google,Bing,Wikipedia,Reddit,Amazon,eBay,Pinterest|Cuffie,Auricolari,Cassa bluetooth,Altoparlante,Microfono,Soundbar|Mouse,Tastiera,Monitor,Stampante,Webcam,Chiavetta USB,Hard disk|Drone,Robot aspirapolvere,Smart TV,Alexa,Cuffie VR,Stampante 3D,Router|ChatGPT,Siri,Alexa,Google Assistant,Cortana,Copilot'
+    'Smartphone,Tablet,Laptop,Smartwatch,Kindle,Console,Fotocamera|PlayStation,Xbox,Nintendo Switch,PC gaming,Steam Deck,Game Boy|iPhone,Samsung,Pixel,Xiaomi,Huawei,OnePlus|Windows,macOS,Linux,Android,iOS,Chrome OS|WhatsApp,Telegram,Instagram,TikTok,Snapchat,Facebook,Discord|Netflix,Prime Video,Disney+,YouTube,Twitch,Spotify,Apple Music|Google,Bing,Wikipedia,Reddit,Amazon,eBay,Pinterest|Cuffie,Auricolari,Cassa bluetooth,Altoparlante,Microfono,Soundbar|Mouse,Tastiera,Monitor,Stampante,Webcam,Chiavetta USB,Hard disk|Drone,Robot aspirapolvere,Smart TV,Alexa,Cuffie VR,Stampante 3D,Router|ChatGPT,Siri,Alexa,Google Assistant,Cortana,Copilot|ChatGPT,Claude,Gemini,Copilot,Perplexity,Grok|AirDrop,Bluetooth,Wi-Fi,NFC,Hotspot,GPS|Fotocamera,Videocamera,Webcam,GoPro,Drone,Action cam'
   ),
   objects: K(
-    'Zaino,Borsa,Valigia,Trolley,Marsupio,Tracolla,Borsone|Cucchiaio,Forchetta,Coltello,Bacchette,Mestolo,Cucchiaino|Matita,Penna,Pennarello,Evidenziatore,Gomma,Righello,Temperino|Divano,Poltrona,Sedia,Sgabello,Pouf,Panchina,Amaca|Tazza,Bicchiere,Bottiglia,Borraccia,Thermos,Calice,Boccale|Letto,Materasso,Cuscino,Coperta,Piumone,Lenzuolo,Sacco a pelo|Occhiali,Lenti a contatto,Cappello,Sciarpa,Guanti,Cintura,Orologio|Bicicletta,Monopattino,Skateboard,Moto,Scooter,Pattini,Hoverboard|Spazzolino,Dentifricio,Filo interdentale,Collutorio,Rasoio,Pettine|Ombrello,Impermeabile,K-way,Poncho,Stivali di gomma|Candela,Lampada,Torcia,Lanterna,Lampadina,Faretto|Libro,Fumetto,Rivista,Giornale,Quaderno,Agenda,Diario|Fiammiferi,Accendino,Stufa,Camino,Barbecue,Fornello,Falò|Chiave,Lucchetto,Cancello,Serratura,Catena,Citofono,Campanello'
+    'Zaino,Borsa,Valigia,Trolley,Marsupio,Tracolla,Borsone|Cucchiaio,Forchetta,Coltello,Bacchette,Mestolo,Cucchiaino|Matita,Penna,Pennarello,Evidenziatore,Gomma,Righello,Temperino|Divano,Poltrona,Sedia,Sgabello,Pouf,Panchina,Amaca|Tazza,Bicchiere,Bottiglia,Borraccia,Thermos,Calice,Boccale|Letto,Materasso,Cuscino,Coperta,Piumone,Lenzuolo,Sacco a pelo|Occhiali,Lenti a contatto,Cappello,Sciarpa,Guanti,Cintura,Orologio|Bicicletta,Monopattino,Skateboard,Moto,Scooter,Pattini,Hoverboard|Spazzolino,Dentifricio,Filo interdentale,Collutorio,Rasoio,Pettine|Ombrello,Impermeabile,K-way,Poncho,Stivali di gomma|Candela,Lampada,Torcia,Lanterna,Lampadina,Faretto|Libro,Fumetto,Rivista,Giornale,Quaderno,Agenda,Diario|Fiammiferi,Accendino,Stufa,Camino,Barbecue,Fornello,Falò|Chiave,Lucchetto,Cancello,Serratura,Catena,Citofono,Campanello|Sedia,Sgabello,Poltrona,Divano,Pouf,Panchina|Padella,Pentola,Teglia,Wok,Casseruola,Gratella|Asciugamano,Accappatoio,Telo mare,Salvietta,Fazzoletto,Strofinaccio'
   ),
   science: K(
-    'Sole,Luna,Marte,Giove,Saturno,Venere,Mercurio,Nettuno|Galassia,Nebulosa,Buco nero,Cometa,Asteroide,Supernova,Pulsar|Atomo,Molecola,Cellula,Elettrone,Protone,Neutrone,Particella|Vulcano,Terremoto,Tsunami,Uragano,Tornado,Alluvione,Valanga|Telescopio,Microscopio,Binocolo,Periscopio,Radar,Sonar|Astronauta,Astronave,Razzo,Satellite,Stazione spaziale,Shuttle|Dinosauro,Mammut,Trilobite,Tirannosauro,Fossile,Ambra|Elettricità,Magnetismo,Gravità,Luce,Suono,Calore,Energia|DNA,Gene,Virus,Batterio,Vaccino,Antibiotico,Proteina|Oro,Argento,Platino,Rame,Ferro,Bronzo,Titanio,Diamante|Fisica,Chimica,Biologia,Matematica,Geologia,Astronomia,Medicina'
+    'Sole,Luna,Marte,Giove,Saturno,Venere,Mercurio,Nettuno|Galassia,Nebulosa,Buco nero,Cometa,Asteroide,Supernova,Pulsar|Atomo,Molecola,Cellula,Elettrone,Protone,Neutrone,Particella|Vulcano,Terremoto,Tsunami,Uragano,Tornado,Alluvione,Valanga|Telescopio,Microscopio,Binocolo,Periscopio,Radar,Sonar|Astronauta,Astronave,Razzo,Satellite,Stazione spaziale,Shuttle|Dinosauro,Mammut,Trilobite,Tirannosauro,Fossile,Ambra|Elettricità,Magnetismo,Gravità,Luce,Suono,Calore,Energia|DNA,Gene,Virus,Batterio,Vaccino,Antibiotico,Proteina|Oro,Argento,Platino,Rame,Ferro,Bronzo,Titanio,Diamante|Fisica,Chimica,Biologia,Matematica,Geologia,Astronomia,Medicina|Sole,Luna,Stella,Pianeta,Cometa,Asteroide|Polmone,Cuore,Fegato,Rene,Stomaco,Cervello|Ossigeno,Idrogeno,Azoto,Carbonio,Elio,Zolfo'
   ),
   animals: K(
-    'Leone,Tigre,Leopardo,Giaguaro,Puma,Ghepardo,Lince,Pantera|Delfino,Balena,Squalo,Orca,Foca,Tricheco,Polpo,Medusa|Cane,Lupo,Volpe,Sciacallo,Coyote,Dingo,Iena|Gatto,Criceto,Coniglio,Cavia,Furetto,Tartaruga,Pesce rosso|Aquila,Falco,Gufo,Avvoltoio,Corvo,Pappagallo,Colibrì,Cigno|Cavallo,Asino,Zebra,Mulo,Pony,Cammello,Lama,Alpaca|Elefante,Rinoceronte,Ippopotamo,Giraffa,Bufalo,Gnu,Bisonte|Pinguino,Pellicano,Fenicottero,Struzzo,Gabbiano,Tucano,Pavone|Coccodrillo,Alligatore,Serpente,Lucertola,Iguana,Camaleonte,Geco|Orso,Panda,Koala,Scimmia,Gorilla,Scimpanzé,Bradipo,Canguro|Ape,Vespa,Formica,Zanzara,Mosca,Ragno,Scorpione,Farfalla|Mucca,Maiale,Pecora,Capra,Gallina,Anatra,Oca,Tacchino'
+    'Leone,Tigre,Leopardo,Giaguaro,Puma,Ghepardo,Lince,Pantera|Delfino,Balena,Squalo,Orca,Foca,Tricheco,Polpo,Medusa|Cane,Lupo,Volpe,Sciacallo,Coyote,Dingo,Iena|Gatto,Criceto,Coniglio,Cavia,Furetto,Tartaruga,Pesce rosso|Aquila,Falco,Gufo,Avvoltoio,Corvo,Pappagallo,Colibrì,Cigno|Cavallo,Asino,Zebra,Mulo,Pony,Cammello,Lama,Alpaca|Elefante,Rinoceronte,Ippopotamo,Giraffa,Bufalo,Gnu,Bisonte|Pinguino,Pellicano,Fenicottero,Struzzo,Gabbiano,Tucano,Pavone|Coccodrillo,Alligatore,Serpente,Lucertola,Iguana,Camaleonte,Geco|Orso,Panda,Koala,Scimmia,Gorilla,Scimpanzé,Bradipo,Canguro|Ape,Vespa,Formica,Zanzara,Mosca,Ragno,Scorpione,Farfalla|Mucca,Maiale,Pecora,Capra,Gallina,Anatra,Oca,Tacchino|Giraffa,Elefante,Rinoceronte,Ippopotamo,Cammello,Bisonte|Granchio,Aragosta,Gambero,Gamberetto,Astice,Paguro|Corvo,Gazza,Piccione,Passero,Merlo,Rondine'
   ),
   cinema: K(
-    'Harry Potter,Il Signore degli Anelli,Narnia,Hunger Games,Twilight,Percy Jackson|Marvel,DC,Avengers,Justice League,X-Men,Guardiani della Galassia|Batman,Superman,Spider-Man,Iron Man,Capitan America,Thor,Hulk,Flash|Star Wars,Star Trek,Dune,Matrix,Avatar,Interstellar,Blade Runner|Lionel Messi,Cristiano Ronaldo,Neymar,Mbappé,LeBron James,Michael Jordan|Taylor Swift,Lady Gaga,Beyoncé,Rihanna,Adele,Ariana Grande,Dua Lipa|Leonardo DiCaprio,Brad Pitt,Tom Cruise,Keanu Reeves,Johnny Depp,Will Smith|Elon Musk,Bill Gates,Steve Jobs,Mark Zuckerberg,Jeff Bezos|Breaking Bad,Game of Thrones,Stranger Things,Friends,The Office,Squid Game|Shrek,Toy Story,Frozen,Il Re Leone,Cars,Nemo,Up,Madagascar,Minions|Mario,Sonic,Zelda,Pokémon,Minecraft,Fortnite,GTA,FIFA'
+    'Harry Potter,Il Signore degli Anelli,Narnia,Hunger Games,Twilight,Percy Jackson|Marvel,DC,Avengers,Justice League,X-Men,Guardiani della Galassia|Batman,Superman,Spider-Man,Iron Man,Capitan America,Thor,Hulk,Flash|Star Wars,Star Trek,Dune,Matrix,Avatar,Interstellar,Blade Runner|Lionel Messi,Cristiano Ronaldo,Neymar,Mbappé,LeBron James,Michael Jordan|Taylor Swift,Lady Gaga,Beyoncé,Rihanna,Adele,Ariana Grande,Dua Lipa|Leonardo DiCaprio,Brad Pitt,Tom Cruise,Keanu Reeves,Johnny Depp,Will Smith|Elon Musk,Bill Gates,Steve Jobs,Mark Zuckerberg,Jeff Bezos|Breaking Bad,Game of Thrones,Stranger Things,Friends,The Office,Squid Game|Shrek,Toy Story,Frozen,Il Re Leone,Cars,Nemo,Up,Madagascar,Minions|Mario,Sonic,Zelda,Pokémon,Minecraft,Fortnite,GTA,FIFA|Il Padrino,Pulp Fiction,Fight Club,Il Buono il Brutto e il Cattivo,Quei bravi ragazzi,Casino|Homer Simpson,Bart Simpson,Peter Griffin,Stewie Griffin,Fry,Bender|Zelda,Mario,Luigi,Peach,Bowser,Kirby'
   )
 };
 const CATS = Object.keys(CL);
@@ -2496,7 +3037,9 @@ const GAMES = [
   ['who_said', '💬', 'border-indigo-500/30'],
   ['preferisci', '🤔', 'border-cyan-500/30'],
   ['lupus', '🐺', 'border-blue-500/30'],
-  ['nomicose', '📝', 'border-emerald-500/50']
+  ['nomicose', '📝', 'border-emerald-500/50'],
+  ['taboo', '🚫', 'border-orange-500/50'],
+  ['chisono', '👤', 'border-sky-500/50']
 ];
 
 // Minigames Hub: database domande (IT)
@@ -3281,6 +3824,253 @@ const WHO_DB = {
   Object.entries(W).forEach(([k, v]) => WHO_DB[k].push(...v.split('|')));
 })();
 
+// Espansione manuale IT: domande extra per "Chi l'ha detto?" (stesse categorie dell'EN).
+[
+  [
+    'classic',
+    [
+      'Qual è la cosa più preziosa che possiedi e che non vale niente per gli altri?',
+      'Quale piccolo gesto ti cambia subito la giornata in meglio?',
+      'Qual è il posto in cui ti senti davvero al sicuro?',
+      'Cosa fai quando hai bisogno di staccare da tutto per un’ora?',
+      'Quale consiglio daresti al te stesso di domani mattina?',
+      'Qual è la cosa che hai imparato troppo tardi?'
+    ]
+  ],
+  [
+    'hot',
+    [
+      'Quale cosa che tutti amano trovi profondamente noiosa?',
+      'Quale moda del passato dovrebbe tornare subito?',
+      'Quale cibo tutti ordinano ma nessuno apprezza davvero?',
+      'Quale regola scolastica aveva più senso di quanto ammettiamo?',
+      'Quale attore recita sempre lo stesso personaggio?',
+      'Quale cosa gratis è diventata di moda senza motivo?'
+    ]
+  ],
+  [
+    'present',
+    [
+      'Chi tra i presenti racconterebbe meglio la tua vita in un film?',
+      'Chi tra i presenti sarebbe il peggior compagno di stanza?',
+      'Con chi tra i presenti apriresti un’attività domani?',
+      'Chi tra i presenti ha il gusto musicale più discutibile?',
+      'Chi tra i presenti si perderebbe per primo in una città nuova?',
+      'A chi tra i presenti chiederesti un consiglio importante?'
+    ]
+  ],
+  [
+    'flirty',
+    [
+      'Qual è la frase più romantica che ti hanno detto senza rendersene conto?',
+      'Quale canzone metteresti come sottofondo a un bacio perfetto?',
+      'Qual è il posto più strano in cui hai pensato “qui sarebbe bello baciarsi”?',
+      'Quale dettaglio ti colpisce per primo in una persona?',
+      'Qual è il modo migliore per rovinare un appuntamento perfetto?',
+      'Quale scusa useresti per rivedere qualcuno il giorno dopo?'
+    ]
+  ],
+  [
+    'dark',
+    [
+      'Qual è il modo più stupido in cui potresti finire in ospedale?',
+      'Cosa faresti se sapessi che domani nessuno se ne ricorderebbe?',
+      'Qual è il segreto che riveleresti sotto tortura?',
+      'Quale situazione ti farebbe perdere completamente la calma?',
+      'Qual è la cosa più inquietante che hai visto in una casa altrui?',
+      'Quale regola sociale infrangeresti se fossi invisibile per un giorno?'
+    ]
+  ]
+].forEach(([k, v]) => WHO_DB[k].push(...v));
+
+// Espansione manuale IT: prompt Impostore (5 per categoria).
+[
+  [
+    'classic',
+    'Qual è il posto migliore per nascondersi da tutti?',
+    'Qual è il posto peggiore in cui nascondersi?',
+    'Scrivi un nascondiglio',
+    'Sotto il letto'
+  ],
+  [
+    'classic',
+    'Qual è il talento più inutile che vorresti avere?',
+    'Quale talento ti serve davvero nella vita?',
+    'Scrivi un talento',
+    'Fare le bolle'
+  ],
+  [
+    'classic',
+    'Qual è la cosa più strana che tieni in tasca?',
+    'Cosa non porteresti mai in tasca?',
+    'Scrivi un oggetto piccolo',
+    'Un sasso'
+  ],
+  [
+    'classic',
+    'Quale animale sarebbe il peggior coinquilino?',
+    'Quale animale sarebbe il migliore coinquilino?',
+    'Scrivi un animale',
+    'Un castoro'
+  ],
+  [
+    'classic',
+    'Qual è la scusa più credibile per arrivare in ritardo?',
+    'Qual è la scusa più assurda per arrivare in ritardo?',
+    'Scrivi un motivo',
+    'Il traffico'
+  ],
+  [
+    'hot',
+    'Quale cibo è migliorato solo dal ketchup?',
+    'Quale cibo rovina il ketchup?',
+    'Scrivi un cibo',
+    'Le patatine'
+  ],
+  [
+    'hot',
+    'Quale serie tv ha il finale più deludente?',
+    'Quale serie tv ha il finale perfetto?',
+    'Scrivi il titolo di una serie',
+    'Lost'
+  ],
+  [
+    'hot',
+    'Quale invenzione moderna è sopravvalutata?',
+    'Quale invenzione moderna non potresti perdere?',
+    'Scrivi un’invenzione',
+    'Il metaverso'
+  ],
+  [
+    'hot',
+    'Quale festa merita più giorni di vacanza?',
+    'Quale festa andrebbe cancellata?',
+    'Scrivi una festa',
+    'Il compleanno'
+  ],
+  [
+    'hot',
+    'Quale trend alimentare è solo una moda?',
+    'Quale trend alimentare è davvero utile?',
+    'Scrivi una dieta o un cibo di moda',
+    'Il detox'
+  ],
+  [
+    'flirty',
+    'Qual è il complimento più strano che ti hanno fatto?',
+    'Qual è il complimento più bello che ti hanno fatto?',
+    'Scrivi un complimento',
+    'Hai una bella faccia'
+  ],
+  [
+    'flirty',
+    'Qual è la cosa più imbarazzante da dire al primo appuntamento?',
+    'Qual è la cosa migliore da dire al primo appuntamento?',
+    'Scrivi una frase',
+    'Pago io'
+  ],
+  [
+    'flirty',
+    'Quale film guarderesti per conquistare qualcuno?',
+    'Quale film non metteresti mai in un appuntamento?',
+    'Scrivi un film',
+    'Titanic'
+  ],
+  [
+    'flirty',
+    'Qual è il posto peggiore per un bacio a sorpresa?',
+    'Qual è il posto migliore per un bacio a sorpresa?',
+    'Scrivi un luogo',
+    'In ascensore'
+  ],
+  [
+    'flirty',
+    'Quale messaggio non dovresti mai mandare alle 3 di notte?',
+    'Quale messaggio dovresti mandare alle 3 di notte?',
+    'Scrivi un messaggio breve',
+    'Sei sveglio?'
+  ],
+  [
+    'dark',
+    'Qual è la cosa più inquietante che può succedere in un ascensore?',
+    'Qual è la cosa più bella che può succedere in un ascensore?',
+    'Scrivi un evento',
+    'Si blocca'
+  ],
+  [
+    'dark',
+    'Quale rumore notturno ti spaventa di più?',
+    'Quale rumore notturno ti calma?',
+    'Scrivi un rumore',
+    'Un cigolio'
+  ],
+  [
+    'dark',
+    'Qual è il posto in cui non cammineresti mai da solo?',
+    'Qual è il posto in cui cammineresti volentieri da solo?',
+    'Scrivi un luogo',
+    'Un cimitero'
+  ],
+  [
+    'dark',
+    'Quale oggetto useresti per difenderti in un film horror?',
+    'Quale oggetto sarebbe inutile in un film horror?',
+    'Scrivi un oggetto',
+    'Una padella'
+  ],
+  [
+    'dark',
+    'Qual è la cosa più sinistra che può dire un bambino?',
+    'Qual è la cosa più dolce che può dire un bambino?',
+    'Scrivi una frase',
+    'Non sei mio padre'
+  ],
+  [
+    'present',
+    'Chi tra i presenti sceglieresti come complice per un colpo?',
+    'Chi tra i presenti ti tradirebbe subito?',
+    'Scrivi il nome di uno dei presenti',
+    'Io'
+  ],
+  [
+    'present',
+    'Chi tra i presenti sarebbe il migliore a raccontare barzellette?',
+    'Chi tra i presenti le racconta peggio?',
+    'Scrivi il nome di uno dei presenti',
+    'Nessuno'
+  ],
+  [
+    'present',
+    'A chi tra i presenti presteresti la tua macchina?',
+    'A chi tra i presenti non presteresti nemmeno una penna?',
+    'Scrivi il nome di uno dei presenti',
+    'A me stesso'
+  ],
+  [
+    'present',
+    'Chi tra i presenti organizzerebbe la vacanza migliore?',
+    'Chi tra i presenti rovinerebbe il viaggio?',
+    'Scrivi il nome di uno dei presenti',
+    'Io'
+  ],
+  [
+    'present',
+    'Chi tra i presenti sarebbe il peggior vicino di casa?',
+    'Chi tra i presenti sarebbe il vicino perfetto?',
+    'Scrivi il nome di uno dei presenti',
+    'Nessuno'
+  ]
+].forEach(([k, q, i, r, f]) =>
+  IMPOSTORE_DB[k].push({
+    q,
+    alt: [
+      ['inv', i],
+      ['rng', r],
+      ['fix', f]
+    ]
+  })
+);
+
 delete IMPOSTORE_DB.nsfw;
 delete WHO_DB.nsfw;
 const IMP_GEN = IMPOSTORE_DB.gen,
@@ -4032,6 +4822,254 @@ const IMPOSTORE_DB_EN = {
     )
   );
 })();
+
+// Espansione manuale EN: domande extra per "Chi l'ha detto?" (stesse categorie dell'IT).
+[
+  [
+    'classic',
+    [
+      "What's the most valuable thing you own that is worthless to others?",
+      'Which small gesture instantly improves your mood?',
+      'Where do you feel truly safe?',
+      'What do you do when you need to switch off for an hour?',
+      'What advice would you give yourself tomorrow morning?',
+      'What did you learn too late?'
+    ]
+  ],
+  [
+    'hot',
+    [
+      'Which thing that everyone loves do you find deeply boring?',
+      'Which fashion from the past should come back right now?',
+      'Which food does everyone order but nobody truly enjoys?',
+      'Which school rule made more sense than we admit?',
+      'Which actor plays the same character every time?',
+      'Which free thing became trendy for no reason?'
+    ]
+  ],
+  [
+    'present',
+    [
+      'Who here would tell your life story best in a film?',
+      'Who here would be the worst roommate?',
+      'Who here would you start a business with tomorrow?',
+      'Who here has the most questionable music taste?',
+      'Who here would get lost first in a new city?',
+      'Who here would you ask for important advice?'
+    ]
+  ],
+  [
+    'flirty',
+    [
+      "What's the most romantic thing someone said to you without realising?",
+      'Which song would you play behind a perfect kiss?',
+      "What's the strangest place where you thought 'this would be a nice spot to kiss'?",
+      'Which detail do you notice first in a person?',
+      "What's the best way to ruin a perfect date?",
+      'Which excuse would you use to see someone again the next day?'
+    ]
+  ],
+  [
+    'dark',
+    [
+      "What's the stupidest way you could end up in hospital?",
+      'What would you do if you knew nobody would remember tomorrow?',
+      "What's the secret you'd reveal under torture?",
+      'Which situation would make you completely lose your cool?',
+      "What's the most disturbing thing you've seen in someone else's house?",
+      'Which social rule would you break if you were invisible for a day?'
+    ]
+  ]
+].forEach(([k, v]) => WHO_DB_EN[k].push(...v));
+
+// Espansione manuale EN: prompt Impostore (5 per categoria).
+[
+  [
+    'classic',
+    'What is the best place to hide from everyone?',
+    'What is the worst place to hide?',
+    'Write a hiding place',
+    'Under the bed'
+  ],
+  [
+    'classic',
+    'Which useless talent would you like to have?',
+    'Which talent do you actually need in life?',
+    'Write a talent',
+    'Blowing bubbles'
+  ],
+  [
+    'classic',
+    "What's the strangest thing in your pocket?",
+    'What would you never carry in your pocket?',
+    'Write a small object',
+    'A pebble'
+  ],
+  [
+    'classic',
+    'Which animal would be the worst roommate?',
+    'Which animal would be the best roommate?',
+    'Write an animal',
+    'A beaver'
+  ],
+  [
+    'classic',
+    "What's the most believable excuse for being late?",
+    "What's the most ridiculous excuse for being late?",
+    'Write a reason',
+    'Traffic'
+  ],
+  [
+    'hot',
+    'Which food is only improved by ketchup?',
+    'Which food ruins ketchup?',
+    'Write a food',
+    'Fries'
+  ],
+  [
+    'hot',
+    'Which TV series has the most disappointing ending?',
+    'Which TV series has the perfect ending?',
+    'Write the title of a series',
+    'Lost'
+  ],
+  [
+    'hot',
+    'Which modern invention is overrated?',
+    'Which modern invention could you not lose?',
+    'Write an invention',
+    'The metaverse'
+  ],
+  [
+    'hot',
+    'Which holiday deserves more days off?',
+    'Which holiday should be cancelled?',
+    'Write a holiday',
+    'Your birthday'
+  ],
+  [
+    'hot',
+    'Which food trend is just a fad?',
+    'Which food trend is actually useful?',
+    'Write a trendy diet or food',
+    'Detox'
+  ],
+  [
+    'flirty',
+    "What's the strangest compliment you've ever received?",
+    "What's the nicest compliment you've ever received?",
+    'Write a compliment',
+    'You have a nice face'
+  ],
+  [
+    'flirty',
+    "What's the most embarrassing thing to say on a first date?",
+    "What's the best thing to say on a first date?",
+    'Write a sentence',
+    "I'll pay"
+  ],
+  [
+    'flirty',
+    'Which film would you watch to win someone over?',
+    'Which film would you never put on a date?',
+    'Write a film',
+    'Titanic'
+  ],
+  [
+    'flirty',
+    "What's the worst place for a surprise kiss?",
+    "What's the best place for a surprise kiss?",
+    'Write a place',
+    'In a lift'
+  ],
+  [
+    'flirty',
+    'Which message should you never send at 3 a.m.?',
+    'Which message should you send at 3 a.m.?',
+    'Write a short message',
+    'Are you awake?'
+  ],
+  [
+    'dark',
+    "What's the most unsettling thing that can happen in a lift?",
+    "What's the best thing that can happen in a lift?",
+    'Write an event',
+    'It breaks down'
+  ],
+  [
+    'dark',
+    'Which night noise scares you the most?',
+    'Which night noise calms you down?',
+    'Write a noise',
+    'A creak'
+  ],
+  [
+    'dark',
+    'Where would you never walk alone?',
+    'Where would you happily walk alone?',
+    'Write a place',
+    'A graveyard'
+  ],
+  [
+    'dark',
+    'Which object would you use to defend yourself in a horror film?',
+    'Which object would be useless in a horror film?',
+    'Write an object',
+    'A frying pan'
+  ],
+  [
+    'dark',
+    "What's the most sinister thing a child can say?",
+    "What's the sweetest thing a child can say?",
+    'Write a sentence',
+    "You're not my dad"
+  ],
+  [
+    'present',
+    'Who here would you pick as an accomplice for a heist?',
+    'Who here would betray you straight away?',
+    'Write the name of one of the players',
+    'Me'
+  ],
+  [
+    'present',
+    'Who here would tell jokes best?',
+    'Who here tells them worst?',
+    'Write the name of one of the players',
+    'Nobody'
+  ],
+  [
+    'present',
+    'Who here would you lend your car to?',
+    'Who here would you not lend even a pen to?',
+    'Write the name of one of the players',
+    'Myself'
+  ],
+  [
+    'present',
+    'Who here would organise the best holiday?',
+    'Who here would ruin the trip?',
+    'Write the name of one of the players',
+    'Me'
+  ],
+  [
+    'present',
+    'Who here would be the worst neighbour?',
+    'Who here would be the perfect neighbour?',
+    'Write the name of one of the players',
+    'Nobody'
+  ]
+].forEach(([k, q, i, r, f]) =>
+  IMPOSTORE_DB_EN[k].push({
+    q,
+    alt: [
+      ['inv', i],
+      ['rng', r],
+      ['fix', f]
+    ]
+  })
+);
+
 const IMP_GEN_EN = IMPOSTORE_DB_EN.gen,
   IMP_HAND_EN = Object.entries(IMPOSTORE_DB_EN)
     .filter((e) => e[0] !== 'gen')
@@ -4104,7 +5142,10 @@ const CL_EN = {
       'Liquorice',
       'Candy',
       'Nougat'
-    ]
+    ],
+    ['Margherita pizza', 'Marinara pizza', 'Capricciosa pizza', 'Four cheese pizza', 'Diavola pizza', 'White pizza'],
+    ['Arancino', 'Supplì', 'Croquette', 'Frittatina', 'Zeppola', 'Panzerotto'],
+    ['Smoothie', 'Milkshake', 'Frappé', 'Juice', 'Cold-pressed juice', 'Extract']
   ],
   countries: [
     ['Italy', 'Spain', 'Portugal', 'France', 'Greece', 'Malta', 'Croatia', 'Turkey'],
@@ -4118,7 +5159,10 @@ const CL_EN = {
     ['Tokyo', 'Seoul', 'Beijing', 'Bangkok', 'Dubai', 'Hong Kong', 'Shanghai', 'Mumbai'],
     ['Australia', 'New Zealand', 'Fiji', 'Hawaii', 'Bali', 'Maldives', 'Tahiti', 'Seychelles'],
     ['Alps', 'Dolomites', 'Apennines', 'Pyrenees', 'Himalayas', 'Andes', 'Rocky Mountains'],
-    ['Red Sea', 'Mediterranean', 'Atlantic', 'Pacific', 'Black Sea', 'Baltic', 'Adriatic']
+    ['Red Sea', 'Mediterranean', 'Atlantic', 'Pacific', 'Black Sea', 'Baltic', 'Adriatic'],
+    ['Barcelona', 'Valencia', 'Seville', 'Bilbao', 'Granada', 'Malaga'],
+    ['Mexico City', 'Rio de Janeiro', 'Buenos Aires', 'Lima', 'Bogotá', 'Santiago'],
+    ['Iceland', 'Norway', 'Finland', 'Ireland', 'Scotland', 'Estonia']
   ],
   sport: [
     ['Football', 'Five-a-side', 'Futsal', 'Rugby', 'American football', 'Hockey', 'Handball'],
@@ -4148,7 +5192,10 @@ const CL_EN = {
     ['Boxing', 'Judo', 'Karate', 'Taekwondo', 'MMA', 'Wrestling', 'Kickboxing', 'Fencing'],
     ['Formula 1', 'MotoGP', 'Rally', 'Karting', 'NASCAR', 'Motocross', 'Superbike'],
     ['Chess', 'Draughts', 'Poker', 'Backgammon', 'Monopoly', 'Risk', 'Scopa', 'Briscola'],
-    ['Yoga', 'Pilates', 'Crossfit', 'Gym', 'Zumba', 'Calisthenics', 'Dance', 'Climbing']
+    ['Yoga', 'Pilates', 'Crossfit', 'Gym', 'Zumba', 'Calisthenics', 'Dance', 'Climbing'],
+    ['Volleyball', 'Beach volley', 'Water polo', 'Handball', 'Dodgeball', 'Korfball'],
+    ['Marathon', 'Half marathon', '10,000 m', 'Relay', 'Cross country', 'Ultramarathon'],
+    ['Table tennis', 'Badminton', 'Squash', 'Padel', 'Pickleball', 'Racquetball']
   ],
   tech: [
     ['Smartphone', 'Tablet', 'Laptop', 'Smartwatch', 'Kindle', 'Console', 'Camera'],
@@ -4161,7 +5208,10 @@ const CL_EN = {
     ['Headphones', 'Earbuds', 'Bluetooth speaker', 'Loudspeaker', 'Microphone', 'Soundbar'],
     ['Mouse', 'Keyboard', 'Monitor', 'Printer', 'Webcam', 'USB stick', 'Hard drive'],
     ['Drone', 'Robot vacuum', 'Smart TV', 'Alexa', 'VR headset', '3D printer', 'Router'],
-    ['ChatGPT', 'Siri', 'Alexa', 'Google Assistant', 'Cortana', 'Copilot']
+    ['ChatGPT', 'Siri', 'Alexa', 'Google Assistant', 'Cortana', 'Copilot'],
+    ['ChatGPT', 'Claude', 'Gemini', 'Copilot', 'Perplexity', 'Grok'],
+    ['AirDrop', 'Bluetooth', 'Wi-Fi', 'NFC', 'Hotspot', 'GPS'],
+    ['Camera', 'Video camera', 'Webcam', 'GoPro', 'Drone', 'Action cam']
   ],
   objects: [
     ['Backpack', 'Bag', 'Suitcase', 'Trolley', 'Bum bag', 'Shoulder bag', 'Duffel bag'],
@@ -4177,7 +5227,10 @@ const CL_EN = {
     ['Candle', 'Lamp', 'Torch', 'Lantern', 'Light bulb', 'Spotlight'],
     ['Book', 'Comic', 'Magazine', 'Newspaper', 'Notebook', 'Planner', 'Diary'],
     ['Matches', 'Lighter', 'Stove', 'Fireplace', 'Barbecue', 'Camping stove', 'Bonfire'],
-    ['Key', 'Padlock', 'Gate', 'Lock', 'Chain', 'Intercom', 'Doorbell']
+    ['Key', 'Padlock', 'Gate', 'Lock', 'Chain', 'Intercom', 'Doorbell'],
+    ['Chair', 'Stool', 'Armchair', 'Sofa', 'Pouf', 'Bench'],
+    ['Pan', 'Pot', 'Baking tray', 'Wok', 'Casserole', 'Grill'],
+    ['Towel', 'Bathrobe', 'Beach towel', 'Napkin', 'Tissue', 'Dishcloth']
   ],
   science: [
     ['Sun', 'Moon', 'Mars', 'Jupiter', 'Saturn', 'Venus', 'Mercury', 'Neptune'],
@@ -4190,7 +5243,10 @@ const CL_EN = {
     ['Electricity', 'Magnetism', 'Gravity', 'Light', 'Sound', 'Heat', 'Energy'],
     ['DNA', 'Gene', 'Virus', 'Bacterium', 'Vaccine', 'Antibiotic', 'Protein'],
     ['Gold', 'Silver', 'Platinum', 'Copper', 'Iron', 'Bronze', 'Titanium', 'Diamond'],
-    ['Physics', 'Chemistry', 'Biology', 'Maths', 'Geology', 'Astronomy', 'Medicine']
+    ['Physics', 'Chemistry', 'Biology', 'Maths', 'Geology', 'Astronomy', 'Medicine'],
+    ['Sun', 'Moon', 'Star', 'Planet', 'Comet', 'Asteroid'],
+    ['Lung', 'Heart', 'Liver', 'Kidney', 'Stomach', 'Brain'],
+    ['Oxygen', 'Hydrogen', 'Nitrogen', 'Carbon', 'Helium', 'Sulphur']
   ],
   animals: [
     ['Lion', 'Tiger', 'Leopard', 'Jaguar', 'Puma', 'Cheetah', 'Lynx', 'Panther'],
@@ -4204,7 +5260,10 @@ const CL_EN = {
     ['Crocodile', 'Alligator', 'Snake', 'Lizard', 'Iguana', 'Chameleon', 'Gecko'],
     ['Bear', 'Panda', 'Koala', 'Monkey', 'Gorilla', 'Chimpanzee', 'Sloth', 'Kangaroo'],
     ['Bee', 'Wasp', 'Ant', 'Mosquito', 'Fly', 'Spider', 'Scorpion', 'Butterfly'],
-    ['Cow', 'Pig', 'Sheep', 'Goat', 'Hen', 'Duck', 'Goose', 'Turkey']
+    ['Cow', 'Pig', 'Sheep', 'Goat', 'Hen', 'Duck', 'Goose', 'Turkey'],
+    ['Giraffe', 'Elephant', 'Rhino', 'Hippo', 'Camel', 'Bison'],
+    ['Crab', 'Lobster', 'Prawn', 'Shrimp', 'Crayfish', 'Hermit crab'],
+    ['Crow', 'Magpie', 'Pigeon', 'Sparrow', 'Blackbird', 'Swallow']
   ],
   cinema: [
     [
@@ -4234,7 +5293,17 @@ const CL_EN = {
       'Madagascar',
       'Minions'
     ],
-    ['Mario', 'Sonic', 'Zelda', 'Pokémon', 'Minecraft', 'Fortnite', 'GTA', 'FIFA']
+    ['Mario', 'Sonic', 'Zelda', 'Pokémon', 'Minecraft', 'Fortnite', 'GTA', 'FIFA'],
+    [
+      'The Godfather',
+      'Pulp Fiction',
+      'Fight Club',
+      'The Good the Bad and the Ugly',
+      'Goodfellas',
+      'Casino'
+    ],
+    ['Homer Simpson', 'Bart Simpson', 'Peter Griffin', 'Stewie Griffin', 'Fry', 'Bender'],
+    ['Zelda', 'Mario', 'Luigi', 'Peach', 'Bowser', 'Kirby']
   ]
 };
 const S = {
@@ -4272,7 +5341,7 @@ const cleanText = (s, max) => {
 const cleanName = (s, max) => cleanText(s, max || 16);
 const t = (k) => I[S.lang][k] ?? I.it[k] ?? k;
 const PLAYABLE = ['mrwhite', 'impostore', 'who_said', 'preferisci', 'lupus'];
-const ONLY_ONLINE = ['nomicose'];
+const ONLY_ONLINE = ['nomicose', 'taboo', 'chisono'];
 const BTN = 'gbtn w-full py-3.5 rounded-xl font-extrabold text-sm';
 const norm = (s) =>
   s
@@ -4300,7 +5369,7 @@ function tmAutoLeft() {
 }
 function tmAllowed() {
   if (S.screen === 'play') return !!S.game && S.game !== 'lupus';
-  if (S.screen === 'online' && NET.view) return NET.view.t !== 'lh' && NET.view.t !== 'ncres';
+  if (S.screen === 'online' && NET.view) return !['lh', 'ncres', 'tb', 'chi'].includes(NET.view.t);
   return false;
 }
 function tmAuto() {
@@ -4393,6 +5462,21 @@ function tmStop() {
   tmClear();
   tmDraw();
 }
+let AC = null;
+// iOS blocca l'audio finché non nasce da un gesto: sblocco al primo tocco e riuso il contesto.
+function audioUnlock() {
+  try {
+    const A = window.AudioContext || window.webkitAudioContext;
+    if (!A) return;
+    if (!AC) AC = new A();
+    if (AC.state === 'suspended') AC.resume();
+    const b = AC.createBuffer(1, 1, 22050),
+      s = AC.createBufferSource();
+    s.buffer = b;
+    s.connect(AC.destination);
+    s.start(0);
+  } catch (e) {}
+}
 function tmRing() {
   try {
     navigator.vibrate && navigator.vibrate([240, 120, 240]);
@@ -4400,7 +5484,8 @@ function tmRing() {
   try {
     const A = window.AudioContext || window.webkitAudioContext;
     if (!A) return;
-    const c = new A();
+    const c = AC || new A();
+    if (c.state === 'suspended') c.resume();
     [0, 0.28, 0.56].forEach((off) => {
       const o = c.createOscillator(),
         g = c.createGain(),
@@ -4414,11 +5499,12 @@ function tmRing() {
       o.start(at);
       o.stop(at + 0.24);
     });
-    setTimeout(() => {
-      try {
-        c.close();
-      } catch (e) {}
-    }, 1200);
+    if (!AC)
+      setTimeout(() => {
+        try {
+          c.close();
+        } catch (e) {}
+      }, 1200);
   } catch (e) {}
 }
 function discRow() {
@@ -4455,6 +5541,7 @@ function smartSwap(asg, p, role, limits) {
 function home() {
   tmStop();
   if (typeof ncStopTimer === 'function') ncStopTimer();
+  if (typeof tbStopTimer === 'function') tbStopTimer();
   S.screen = 'home';
   S.game = null;
   S.G = null;
@@ -4488,7 +5575,7 @@ function back() {
     toLobby();
     return;
   }
-  if (S.screen === 'pvsetup' || S.screen === 'ncsetup') {
+  if (S.screen === 'pvsetup' || S.screen === 'ncsetup' || S.screen === 'tbsetup') {
     S.screen = 'online';
     toLobby();
     return;
@@ -4584,18 +5671,67 @@ function toggleCat(c) {
 // --- punteggi ---
 function showScores() {
   const m = $('modal'),
-    rows = Object.entries(S.scores).sort((a, b) => b[1] - a[1]);
+    rows = Object.entries(S.scores).sort((a, b) => b[1] - a[1]),
+    canEdit = !NET.conn || NET.host;
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-4"><h3 class="font-bold text-white">🏆 ${t('scoresTitle')}</h3>
   <div class="space-y-2 max-h-56 overflow-y-auto">${rows.length ? rows.map(([n, p], i) => `<div class="flex justify-between bg-slate-900 px-3 py-2.5 rounded-xl text-xs font-bold"><span>#${i + 1} ${esc(n)}</span><span class="text-amber-400">${p} PT</span></div>`).join('') : `<p class="text-xs text-slate-500 italic text-center py-3">${t('noScores')}</p>`}</div>
+  ${canEdit ? `<div class="grid grid-cols-2 gap-2"><button onclick="editScores()" class="bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">✏️ ${t('scoreEdit')}</button><button onclick="undoRound()" class="bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">↩️ ${t('undoRound')}</button></div>` : ''}
   <div class="flex justify-between items-center"><button onclick="resetScores()" class="text-[11px] text-rose-400 font-bold">↺ ${t('resetScores')}</button><button onclick="closeModal()" class="gbtn px-4 py-2 rounded-xl text-xs font-bold">${t('close')}</button></div></div>`;
   m.style.display = 'flex';
 }
 function closeModal() {
   $('modal').style.display = 'none';
 }
+function scoreKeys() {
+  const seen = new Set(),
+    out = [];
+  [...S.players, ...Object.keys(S.scores)].forEach((p) => {
+    if (p && !seen.has(p)) {
+      seen.add(p);
+      out.push(p);
+    }
+  });
+  return out;
+}
+function editScores() {
+  if (NET.conn && !NET.host) return;
+  const m = $('modal'),
+    keys = scoreKeys();
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-4"><h3 class="font-bold text-white">✏️ ${t('scoreEdit')}</h3>
+  <div class="space-y-2 max-h-64 overflow-y-auto">${keys
+    .map(
+      (p, i) =>
+        `<label class="flex items-center justify-between gap-2 bg-slate-900 px-3 py-2 rounded-xl text-xs font-bold"><span class="truncate">${esc(p)}</span><input id="scv-${i}" type="number" inputmode="numeric" min="-99999" max="999999" value="${+S.scores[p] || 0}" class="w-24 bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-right text-white"></label>`
+    )
+    .join('')}</div>
+  <div class="flex gap-2"><button onclick="showScores()" class="flex-1 bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${t('back')}</button><button onclick="saveScores()" class="flex-1 gbtn py-2.5 rounded-xl text-xs font-bold">${X('Salva', 'Save')}</button></div></div>`;
+  m.style.display = 'flex';
+}
+function saveScores() {
+  if (NET.conn && !NET.host) return;
+  const keys = scoreKeys(),
+    next = {};
+  keys.forEach((p, i) => {
+    const el = $('scv-' + i),
+      v = el ? Math.round(+el.value) : 0;
+    next[p] = isFinite(v) ? Math.max(-99999, Math.min(999999, v)) : 0;
+  });
+  S.scores = next;
+  if (NET.host) {
+    NET.scores = { ...next };
+    netPushScores();
+  }
+  closeModal();
+  render();
+  alert(t('scoreSaved'));
+}
 function resetScores() {
   if (!confirm(t('resetConfirm'))) return;
   Object.keys(S.scores).forEach((k) => (S.scores[k] = 0));
+  if (NET.host) {
+    NET.scores = {};
+    netPushScores();
+  }
   closeModal();
   render();
 }
@@ -4749,6 +5885,7 @@ function finalize() {
   G.allFound = allFound;
   G.awards = aw;
   G.done = true;
+  scoreSnap();
   Object.keys(aw).forEach((p) => (S.scores[p] = (S.scores[p] || 0) + aw[p]));
 }
 
@@ -4891,6 +6028,7 @@ function mwSkip() {
 function mwEnd() {
   const G = S.G,
     aw = {};
+  scoreSnap();
   S.players.forEach((p) => {
     const r = G.roles[p];
     aw[p] = G.winner === 'civ' && r === 'civ' ? 100 : G.winner === 'imp' && r !== 'civ' ? 150 : 0;
@@ -5315,6 +6453,7 @@ function lEnd(w) {
     } else if (R[p] === w) aw[p] += (base[w] || 0) * LUPUS_MULT;
     if (G.alive.includes(p)) aw[p] += 20 * LUPUS_MULT;
   });
+  scoreSnap();
   Object.keys(aw).forEach((p) => (S.scores[p] = (S.scores[p] || 0) + aw[p]));
   G.awards = aw;
   G.win = w;
@@ -6253,6 +7392,7 @@ function wVote(i) {
   G.vi++;
   if (G.vi >= G.order.length) {
     G.awards = {};
+    scoreSnap();
     PW().forEach((p) => {
       G.awards[p] = p !== G.pick && G.votes[p] === G.pick ? 100 : 0;
       S.scores[p] = (S.scores[p] || 0) + G.awards[p];
@@ -6400,7 +7540,8 @@ function viewHome() {
     <div class="text-3xl">${ic}</div><div class="flex-1"><div class="flex items-center gap-2"><h3 class="font-bold text-white">${t('g_' + id)}</h3>${ONLY_ONLINE.includes(id) ? `<span class="text-[10px] bg-emerald-600/30 text-emerald-300 px-2 py-0.5 rounded-full">Online</span>` : !PLAYABLE.includes(id) ? `<span class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full">${t('soon')}</span>` : ''}</div>
     <p class="text-xs text-slate-400 mt-1">${t('d_' + id)}</p></div></div>`
   ).join('')}
-  <div onclick="S.hint='';S.screen='online';render()" class="glass p-4 rounded-2xl cursor-pointer border border-cyan-500/30 flex items-start gap-3.5"><div class="text-3xl">🌐</div><div class="flex-1"><div class="flex items-center gap-2"><h3 class="font-bold text-white">Online</h3><span class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full">beta</span></div><p class="text-xs text-slate-400 mt-1">${X('Crea una stanza con un codice e gioca da telefoni diversi.', 'Create a room with a code and play from separate phones.')}</p></div></div></div>`;
+  <div onclick="S.hint='';S.screen='online';render()" class="glass p-4 rounded-2xl cursor-pointer border border-cyan-500/30 flex items-start gap-3.5"><div class="text-3xl">🌐</div><div class="flex-1"><div class="flex items-center gap-2"><h3 class="font-bold text-white">Online</h3><span class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full">beta</span></div><p class="text-xs text-slate-400 mt-1">${X('Crea una stanza con un codice e gioca da telefoni diversi.', 'Create a room with a code and play from separate phones.')}</p></div></div>
+  <div class="glass p-4 rounded-2xl border border-slate-600/40 space-y-2"><h3 class="font-bold text-white text-sm">💾 ${t('backupTitle')}</h3><p class="text-[11px] text-slate-400">${X('Salva ruoli personalizzati, categorie di Nomi Cose e Città e punteggi in un file JSON, poi ripristinali su un altro telefono.', 'Save custom roles, Names Things and Cities categories and scores to a JSON file, then restore them on another phone.')}</p><div class="grid grid-cols-2 gap-2"><button onclick="exportBackup()" class="bg-slate-800 py-2.5 rounded-xl text-xs font-bold">⬇️ ${t('exportBtn')}</button><button onclick="importBackup()" class="bg-slate-800 py-2.5 rounded-xl text-xs font-bold">⬆️ ${t('importBtn')}</button></div></div></div>`;
 }
 function viewSetup() {
   const g = S.game,
@@ -6416,6 +7557,12 @@ function viewSetup() {
     <div><p class="text-xs font-bold mb-2">${t('cats')}</p><div class="flex flex-wrap gap-1.5">${CATS.map((c) => `<button onclick="toggleCat('${c}')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold ${S.cfg.cats.has(c) ? 'bg-purple-600' : 'bg-slate-800 text-slate-400'}">${t('cat_' + c)}</button>`).join('')}</div></div></div>`;
   if (g === 'preferisci')
     cfg = `<div class="space-y-2 pt-3 border-t border-slate-700/60">
+    <div><p class="text-[11px] text-slate-400 mb-1">${t('pvPreset')}</p><div class="flex flex-wrap gap-1.5">${['classic', 'hot', 'absurd']
+      .map(
+        (p) =>
+          `<button onclick="pvPreset('${p}')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold ${S.pv.pack === p ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-slate-400'}">${t('pvPack' + p[0].toUpperCase() + p.slice(1))}</button>`
+      )
+      .join('')}<button onclick="pvRandom()" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300">🎲 ${t('pvRandom')}</button></div></div>
     <div><p class="text-[11px] text-slate-400 mb-1">${t('pvA')}</p><input autocomplete="off" maxlength="80" value="${esc(S.pv.a)}" oninput="S.pv.a=this.value;chk()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500"></div>
     <div><p class="text-[11px] text-slate-400 mb-1">${t('pvB')}</p><input autocomplete="off" maxlength="80" value="${esc(S.pv.b)}" oninput="S.pv.b=this.value;chk()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500"></div>
     <p class="text-[11px] text-slate-500">${t('pvPass')} ${X('ogni giocatore, poi si contano i voti.', 'each player, then the votes are counted.')}</p></div>`;
@@ -6543,6 +7690,7 @@ function pvCalc() {
     pts = tie ? 50 : 100,
     aw = {};
   P.forEach((p) => (aw[p] = tie || G.votes[p] === maj ? pts : 0));
+  scoreSnap();
   P.forEach((p) => (S.scores[p] = (S.scores[p] || 0) + aw[p]));
   G.ca = ca;
   G.cb = cb;
@@ -6554,7 +7702,7 @@ function pvCalc() {
 }
 function pvAgainOff() {
   S.G = null;
-  S.pv = { a: '', b: '' };
+  S.pv = { a: '', b: '', i: S.pv.i || 0, pack: S.pv.pack || '' };
   S.screen = 'setup';
   render();
 }
@@ -6585,12 +7733,51 @@ function chkPv() {
   const el = $('pv-go');
   if (el) el.disabled = !canPv();
 }
+function pvPreset(pack) {
+  const d = PV_DB[pack];
+  if (!d || !d.length) return;
+  const i = (S.pv.i || 0) % d.length,
+    r = d[i],
+    en = S.lang === 'en';
+  S.pv.a = r[en ? 2 : 0];
+  S.pv.b = r[en ? 3 : 1];
+  S.pv.i = i + 1;
+  S.pv.pack = pack;
+  render();
+}
+function pvRandom() {
+  const packs = Object.keys(PV_DB),
+    p = packs[rnd(packs.length)];
+  S.pv.i = rnd(PV_DB[p].length);
+  pvPreset(p);
+}
+function pvPresetOnline(pack) {
+  const d = PV_DB[pack];
+  if (!d || !d.length) return;
+  const i = (NET.pvI || 0) % d.length,
+    r = d[i],
+    en = S.lang === 'en';
+  NET.pvA = r[en ? 2 : 0];
+  NET.pvB = r[en ? 3 : 1];
+  NET.pvI = i + 1;
+  NET.pvPack = pack;
+  chkPv();
+  render();
+}
+function pvRandomOnline() {
+  const packs = Object.keys(PV_DB),
+    p = packs[rnd(packs.length)];
+  NET.pvI = rnd(PV_DB[p].length);
+  pvPresetOnline(p);
+}
 function pvHostOpen() {
   if (!NET.host) return;
   netPrune();
   if (NET.players.length < 2) return;
   NET.pvA = '';
   NET.pvB = '';
+  NET.pvPack = '';
+  NET.pvI = 0;
   S.screen = 'pvsetup';
   render();
 }
@@ -6599,6 +7786,12 @@ function viewPvSetup() {
     'w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500';
   return `<section class="glass p-4 rounded-2xl space-y-3"><div class="flex justify-between items-center border-b border-slate-700/60 pb-3"><h2 class="font-bold text-white">🤔 ${t('g_preferisci')}</h2><button onclick="back()" class="text-xs bg-slate-800 px-3 py-1.5 rounded-xl">← ${t('back')}</button></div>
   <p class="text-xs text-slate-400">${X('Scrivi le due opzioni: ognuno voterà in segreto dal proprio telefono.', 'Type the two options: everyone votes secretly from their own phone.')}</p>
+  <div><p class="text-[11px] text-slate-400 mb-1">${t('pvPreset')}</p><div class="flex flex-wrap gap-1.5">${['classic', 'hot', 'absurd']
+    .map(
+      (p) =>
+        `<button onclick="pvPresetOnline('${p}')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold ${NET.pvPack === p ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-slate-400'}">${t('pvPack' + p[0].toUpperCase() + p.slice(1))}</button>`
+    )
+    .join('')}<button onclick="pvRandomOnline()" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300">🎲 ${t('pvRandom')}</button></div></div>
   <div><p class="text-[11px] text-slate-400 mb-1">${t('pvA')}</p><input autocomplete="off" maxlength="80" value="${esc(NET.pvA || '')}" oninput="NET.pvA=this.value;chkPv()" class="${inp}"></div>
   <div><p class="text-[11px] text-slate-400 mb-1">${t('pvB')}</p><input autocomplete="off" maxlength="80" value="${esc(NET.pvB || '')}" oninput="NET.pvB=this.value;chkPv()" class="${inp}"></div>
   <p class="text-[11px] text-slate-500">${NET.players.length} ${t('players').toLowerCase()} · ${X('servono almeno 2 giocatori e due opzioni diverse.', 'at least 2 players and two different options needed.')}</p>
@@ -6638,6 +7831,7 @@ function pvChk() {
       pts = tie ? 50 : 100,
       aw = {};
     P.forEach((p) => (aw[p] = tie || G.votes[p] === maj ? pts : 0));
+    scoreSnap();
     P.forEach((p) => netScore(p, aw[p]));
     G.ca = ca;
     G.cb = cb;
@@ -6686,6 +7880,102 @@ function pvAgain() {
   netSend({ t: 'toLobby' });
 }
 
+// --- Preferiresti: pacchetti pronti (IT/EN, stesso ordine) ---
+const PV_DB = {
+  classic: [
+    ['Non usare mai più il telefono', 'Non mangiare mai più pizza', 'Never use a phone again', 'Never eat pizza again'],
+    ['Vincere 1 milione subito', 'Ricevere 10.000 € al mese per sempre', 'Win 1 million now', 'Get 10,000 € a month forever'],
+    ['Vivere senza musica', 'Vivere senza film e serie TV', 'Live without music', 'Live without films and TV series'],
+    ['Avere sempre 20 anni', 'Avere sempre 40 anni ma 10 milioni in banca', 'Always be 20', 'Always be 40 but with 10 million in the bank'],
+    ['Saper volare', 'Essere invisibile', 'Be able to fly', 'Be invisible'],
+    ['Lavorare 4 giorni a settimana', 'Lavorare da casa per sempre', 'Work four days a week', 'Work from home forever'],
+    ['Un anno di vacanza', 'Un anno di lavoro con stipendio doppio', 'A year of holiday', 'A year of work at double pay'],
+    ['Mangiare solo cibo italiano', 'Mangiare solo cibo asiatico', 'Eat only Italian food', 'Eat only Asian food']
+  ],
+  hot: [
+    ['Il caffè è sopravvalutato', 'Il tè è sopravvalutato', 'Coffee is overrated', 'Tea is overrated'],
+    ['La pizza con l’ananas è buona', 'La pasta con la panna è buona', 'Pineapple pizza is good', 'Pasta with cream is good'],
+    ['I cani sono meglio dei gatti', 'I gatti sono meglio dei cani', 'Dogs are better than cats', 'Cats are better than dogs'],
+    ['Il mare è meglio della montagna', 'La montagna è meglio del mare', 'The sea beats the mountains', 'The mountains beat the sea'],
+    ['Le serie TV sono meglio dei film', 'I film sono meglio delle serie TV', 'TV series are better than films', 'Films are better than TV series'],
+    ['Meglio svegliarsi presto', 'Meglio andare a letto tardi', 'Better to wake up early', 'Better to go to bed late'],
+    ['Meglio un lavoro noioso ma sicuro', 'Meglio un lavoro incerto ma creativo', 'A boring but secure job', 'An uncertain but creative job'],
+    ['Meglio vivere in città', 'Meglio vivere in campagna', 'Better to live in the city', 'Better to live in the countryside']
+  ],
+  absurd: [
+    ['Avere le mani al posto dei piedi', 'Avere i piedi al posto delle mani', 'Hands instead of feet', 'Feet instead of hands'],
+    ['Parlare solo cantando', 'Camminare solo all’indietro', 'Only speak by singing', 'Only walk backwards'],
+    ['Un unicorno domestico', 'Un drago domestico', 'A pet unicorn', 'A pet dragon'],
+    ['Teletrasportarti ma solo in bagno', 'Volare ma solo a 10 cm da terra', 'Teleport but only to a bathroom', 'Fly but only 10 cm off the ground'],
+    ['Avere sempre il solletico', 'Non sentire mai il solletico', 'Always be ticklish', 'Never be ticklish'],
+    ['Mangiare solo cose blu', 'Vedere tutto in bianco e nero', 'Eat only blue food', 'See everything in black and white'],
+    ['Avere un clone che ti sostituisce', 'Avere un clone che ti contraddice', 'A clone who replaces you', 'A clone who contradicts you'],
+    ['Vivere in una casa sull’albero', 'Vivere in una casa galleggiante', 'Live in a treehouse', 'Live in a floating house']
+  ]
+};
+// --- Parole vietate: carta = [parola IT, [vietate IT], parola EN, [vietate EN]] ---
+const TB_DB = [
+  ['Spiaggia', ['sabbia', 'mare', 'ombrellone', 'costume'], 'Beach', ['sand', 'sea', 'umbrella', 'swimsuit']],
+  ['Pizza', ['Italia', 'forno', 'formaggio', 'pomodoro'], 'Pizza', ['Italy', 'oven', 'cheese', 'tomato']],
+  ['Telefono', ['chiamare', 'schermo', 'app', 'batteria'], 'Phone', ['call', 'screen', 'app', 'battery']],
+  ['Cinema', ['film', 'popcorn', 'poltrona', 'schermo'], 'Cinema', ['film', 'popcorn', 'seat', 'screen']],
+  ['Neve', ['freddo', 'bianco', 'pupazzo', 'sci'], 'Snow', ['cold', 'white', 'snowman', 'ski']],
+  ['Gatto', ['miagolare', 'pelo', 'topo', 'zampe'], 'Cat', ['meow', 'fur', 'mouse', 'paws']],
+  ['Automobile', ['ruote', 'motore', 'guidare', 'strada'], 'Car', ['wheels', 'engine', 'drive', 'road']],
+  ['Luna', ['notte', 'spazio', 'astronauta', 'satellite'], 'Moon', ['night', 'space', 'astronaut', 'satellite']],
+  ['Calcio', ['pallone', 'gol', 'porta', 'arbitro'], 'Football', ['ball', 'goal', 'net', 'referee']],
+  ['Caffè', ['mattina', 'tazzina', 'caffeina', 'espresso'], 'Coffee', ['morning', 'cup', 'caffeine', 'espresso']],
+  ['Montagna', ['vetta', 'sci', 'rifugio', 'sentiero'], 'Mountain', ['peak', 'ski', 'hut', 'trail']],
+  ['Compleanno', ['torta', 'candeline', 'regalo', 'auguri'], 'Birthday', ['cake', 'candles', 'gift', 'wishes']],
+  ['Mare', ['onde', 'sabbia', 'sale', 'nuotare'], 'Sea', ['waves', 'sand', 'salt', 'swim']],
+  ['Scuola', ['aula', 'professore', 'compiti', 'lavagna'], 'School', ['classroom', 'teacher', 'homework', 'board']],
+  ['Inverno', ['freddo', 'Natale', 'cappotto', 'neve'], 'Winter', ['cold', 'Christmas', 'coat', 'snow']],
+  ['Musica', ['canzone', 'note', 'cantante', 'orecchie'], 'Music', ['song', 'notes', 'singer', 'ears']],
+  ['Ospedale', ['medico', 'infermiere', 'letto', 'cura'], 'Hospital', ['doctor', 'nurse', 'bed', 'care']],
+  ['Aeroporto', ['aereo', 'valigia', 'gate', 'passaporto'], 'Airport', ['plane', 'suitcase', 'gate', 'passport']],
+  ['Giardino', ['fiori', 'erba', 'annaffiare', 'recinzione'], 'Garden', ['flowers', 'grass', 'water', 'fence']],
+  ['Computer', ['tastiera', 'schermo', 'mouse', 'internet'], 'Computer', ['keyboard', 'screen', 'mouse', 'internet']],
+  ['Bicicletta', ['pedali', 'ruote', 'catena', 'manubrio'], 'Bicycle', ['pedals', 'wheels', 'chain', 'handlebar']],
+  ['Sedia', ['sedersi', 'gambe', 'schienale', 'tavolo'], 'Chair', ['sit', 'legs', 'back', 'table']],
+  ['Ombrello', ['pioggia', 'aprire', 'manico', 'temporale'], 'Umbrella', ['rain', 'open', 'handle', 'storm']],
+  ['Cioccolato', ['dolce', 'cacao', 'barretta', 'Nutella'], 'Chocolate', ['sweet', 'cocoa', 'bar', 'Nutella']],
+  ['Vampiro', ['sangue', 'zanne', 'notte', 'mantello'], 'Vampire', ['blood', 'fangs', 'night', 'cape']],
+  ['Pirata', ['nave', 'tesoro', 'occhio', 'spada'], 'Pirate', ['ship', 'treasure', 'eye', 'sword']],
+  ['Supermercato', ['carrello', 'cassa', 'scaffale', 'spesa'], 'Supermarket', ['trolley', 'till', 'shelf', 'shopping']],
+  ['Doccia', ['acqua', 'sapone', 'bagno', 'asciugamano'], 'Shower', ['water', 'soap', 'bathroom', 'towel']],
+  ['Zanzara', ['puntura', 'estate', 'ronzio', 'sangue'], 'Mosquito', ['bite', 'summer', 'buzz', 'blood']],
+  ['Matrimonio', ['sposa', 'anello', 'chiesa', 'festa'], 'Wedding', ['bride', 'ring', 'church', 'party']],
+  ['Palloncino', ['aria', 'festa', 'gonfiare', 'scoppiare'], 'Balloon', ['air', 'party', 'inflate', 'pop']],
+  ['Dentista', ['denti', 'trapano', 'poltrona', 'bocca'], 'Dentist', ['teeth', 'drill', 'chair', 'mouth']],
+  ['Fantasma', ['paura', 'lenzuolo', 'castello', 'invisibile'], 'Ghost', ['fear', 'sheet', 'castle', 'invisible']],
+  ['Cioccolata calda', ['tazza', 'inverno', 'panna', 'caldo'], 'Hot chocolate', ['mug', 'winter', 'cream', 'hot']],
+  ['Treno', ['binario', 'stazione', 'vagone', 'biglietto'], 'Train', ['track', 'station', 'carriage', 'ticket']],
+  ['Sole', ['giallo', 'caldo', 'estate', 'cielo'], 'Sun', ['yellow', 'hot', 'summer', 'sky']],
+  ['Pallavolo', ['rete', 'palla', 'squadra', 'salto'], 'Volleyball', ['net', 'ball', 'team', 'jump']],
+  ['Biblioteca', ['libri', 'silenzio', 'scaffale', 'leggere'], 'Library', ['books', 'silence', 'shelf', 'read']],
+  ['Pinguino', ['ghiaccio', 'Polo', 'nuotare', 'freddo'], 'Penguin', ['ice', 'pole', 'swim', 'cold']],
+  ['Orologio', ['tempo', 'lancette', 'polso', 'sveglia'], 'Clock', ['time', 'hands', 'wrist', 'alarm']]
+];
+// --- Chi sono io?: parole IT/EN (stesso ordine) ---
+const CHI_DB = [
+  ['Elefante', 'Elephant'], ['Pinguino', 'Penguin'], ['Squalo', 'Shark'], ['Giraffa', 'Giraffe'],
+  ['Panda', 'Panda'], ['Polpo', 'Octopus'], ['Aquila', 'Eagle'], ['Canguro', 'Kangaroo'],
+  ['Pompiere', 'Firefighter'], ['Astronauta', 'Astronaut'], ['Dentista', 'Dentist'], ['Cuoco', 'Chef'],
+  ['Pilota', 'Pilot'], ['Maestra', 'Teacher'], ['Idraulico', 'Plumber'], ['Fotografo', 'Photographer'],
+  ['Batman', 'Batman'], ['Harry Potter', 'Harry Potter'], ['Mario', 'Mario'], ['Sherlock Holmes', 'Sherlock Holmes'],
+  ['Shrek', 'Shrek'], ['Spider-Man', 'Spider-Man'], ['Pikachu', 'Pikachu'], ['Topolino', 'Mickey Mouse'],
+  ['Pizza', 'Pizza'], ['Sushi', 'Sushi'], ['Gelato', 'Ice cream'], ['Lasagna', 'Lasagna'],
+  ['Hamburger', 'Burger'], ['Tiramisù', 'Tiramisu'], ['Popcorn', 'Popcorn'], ['Cioccolato', 'Chocolate'],
+  ['Ombrello', 'Umbrella'], ['Chitarra', 'Guitar'], ['Bicicletta', 'Bicycle'], ['Telefono', 'Phone'],
+  ['Orologio', 'Watch'], ['Valigia', 'Suitcase'], ['Specchio', 'Mirror'], ['Forbici', 'Scissors'],
+  ['Calcio', 'Football'], ['Tennis', 'Tennis'], ['Nuoto', 'Swimming'], ['Basket', 'Basketball'],
+  ['Sci', 'Skiing'], ['Pallavolo', 'Volleyball'], ['Boxe', 'Boxing'], ['Golf', 'Golf'],
+  ['Spiaggia', 'Beach'], ['Montagna', 'Mountain'], ['Cinema', 'Cinema'], ['Aeroporto', 'Airport'],
+  ['Museo', 'Museum'], ['Deserto', 'Desert'], ['Castello', 'Castle'], ['Stazione', 'Station'],
+  ['Titanic', 'Titanic'], ['Il Re Leone', 'The Lion King'], ['Matrix', 'Matrix'], ['Avatar', 'Avatar'],
+  ['Frozen', 'Frozen'], ['Joker', 'Joker'], ['Rocky', 'Rocky'], ['Il Padrino', 'The Godfather']
+];
+
 // --- Nomi, Cose e Città (solo online, timer automatico di round) ---
 const NC_CATS = [
   { k: 'nome', it: 'Nome', en: 'Name' },
@@ -6699,7 +7989,13 @@ const NC_CATS = [
   { k: 'cantante', it: 'Cantante', en: 'Singer' },
   { k: 'sport', it: 'Sport', en: 'Sport' },
   { k: 'marca', it: 'Marca', en: 'Brand' },
-  { k: 'personaggio', it: 'Personaggio', en: 'Character' }
+  { k: 'personaggio', it: 'Personaggio', en: 'Character' },
+  { k: 'cartone', it: 'Cartone animato', en: 'Cartoon' },
+  { k: 'strumento', it: 'Strumento musicale', en: 'Musical instrument' },
+  { k: 'pianta', it: 'Pianta', en: 'Plant' },
+  { k: 'videogioco', it: 'Videogioco', en: 'Video game' },
+  { k: 'bevanda', it: 'Bevanda', en: 'Drink' },
+  { k: 'social', it: 'Social network', en: 'Social network' }
 ];
 const NC_MAX = 10;
 const NC_IT = 'ABCDEFGHILMNOPQRSTUVZ';
@@ -6864,16 +8160,11 @@ function ncCheck() {
   if (NET.players.length < 2) return ncBack();
   if (G.ph === 'play' && NET.players.every((p) => G.d && G.d[p])) ncFinish();
 }
-function ncCalc(G) {
+// Doppioni per categoria: solo le risposte valide e uniche vanno decise a mano.
+function ncCounts(G) {
   const P = NET.players,
     L = String(G.letter || '').toLowerCase(),
-    aw = {},
-    pts = {},
     counts = {};
-  P.forEach((p) => {
-    aw[p] = {};
-    pts[p] = 0;
-  });
   G.cats.forEach((c) => {
     const m = {};
     P.forEach((p) => {
@@ -6882,24 +8173,81 @@ function ncCalc(G) {
       (m[v] = m[v] || []).push(p);
     });
     counts[c.k] = m;
+  });
+  return counts;
+}
+function ncUnique(G) {
+  const P = NET.players,
+    L = String(G.letter || '').toLowerCase(),
+    counts = ncCounts(G),
+    out = [];
+  G.cats.forEach((c) => {
+    P.forEach((p) => {
+      const v = ncNorm((G.a[p] || {})[c.k]);
+      if (v && v[0] === L && (counts[c.k][v] || []).length === 1) out.push([p, c.k]);
+    });
+  });
+  return out;
+}
+function ncCalc(G) {
+  const P = NET.players,
+    L = String(G.letter || '').toLowerCase(),
+    aw = {},
+    pts = {},
+    counts = ncCounts(G);
+  P.forEach((p) => {
+    aw[p] = {};
+    pts[p] = 0;
+  });
+  G.cats.forEach((c) => {
     P.forEach((p) => {
       const v = ncNorm((G.a[p] || {})[c.k]);
       let sc = 0;
-      if (v && v[0] === L) sc = (m[v] || []).length > 1 ? 5 : 10;
+      if (v && v[0] === L) {
+        // Duplicati: +5 automatico. Unica valida: 0 se l'host la rifiuta, +10 altrimenti.
+        sc = (counts[c.k][v] || []).length > 1 ? 5 : G.ok && G.ok[p] && G.ok[p][c.k] === false ? 0 : 10;
+      }
       aw[p][c.k] = sc;
       pts[p] += sc;
     });
   });
   return { aw, pts, counts };
 }
+// Chiude il round: se esistono risposte valide e uniche passa alla revisione dell'host.
 function ncFinish() {
   const G = NET.game;
   if (!G || G.g !== 'nc' || G.ph !== 'play') return;
   ncStopTimer();
+  G.timeup = !!G.timeup;
+  const uniq = ncUnique(G);
+  G.ph = 'review';
+  if (!uniq.length) return ncScore();
+  G.ok = {};
+  uniq.forEach((x) => {
+    (G.ok[x[0]] = G.ok[x[0]] || {})[x[1]] = true;
+  });
+  ncBc();
+}
+// L'host accetta o rifiuta una singola risposta unica (indici = ordine di NET.players/cats).
+function ncToggleAt(pi, ci) {
+  const G = NET.game;
+  if (!NET.host || !G || G.g !== 'nc' || G.ph !== 'review') return;
+  const p = NET.players[pi],
+    c = G.cats[ci];
+  if (!p || !c) return;
+  G.ok = G.ok || {};
+  (G.ok[p] = G.ok[p] || {})[c.k] = G.ok[p][c.k] === false;
+  ncBc();
+}
+// Applica i punti (solo host): unica accettata +10, duplicato +5, resto 0.
+function ncScore() {
+  const G = NET.game;
+  if (!G || G.g !== 'nc' || G.ph !== 'review') return;
   const r = ncCalc(G);
   G.aw = r.aw;
   G.pts = r.pts;
   G.ph = 'end';
+  scoreSnap();
   NET.players.forEach((p) => netScore(p, r.pts[p] || 0));
   ncBc();
 }
@@ -6955,11 +8303,21 @@ function ncBc() {
   const G = NET.game,
     P = NET.players;
   if (!G || G.g !== 'nc') return;
-  const cats = G.cats.map((c) => ({ k: c.k, it: c.it, en: c.en }));
+  const cats = G.cats.map((c) => ({ k: c.k, it: c.it, en: c.en })),
+    base = {
+      stamp: G.letter + '-' + G.round,
+      letter: G.letter,
+      round: G.round,
+      ph: G.ph,
+      cats: cats,
+      players: P,
+      timeup: !!G.timeup,
+      scores: NET.scores
+    };
   if (G.ph === 'play')
     netSend({
       t: 'nc',
-      stamp: G.letter + '-' + G.round,
+      stamp: base.stamp,
       letter: G.letter,
       round: G.round,
       left: G.left,
@@ -6969,19 +8327,22 @@ function ncBc() {
       n: P.length,
       scores: NET.scores
     });
+  else if (G.ph === 'review')
+    netSend({
+      t: 'ncres',
+      ...base,
+      a: G.a,
+      ok: G.ok || {},
+      uniq: ncUnique(G)
+    });
   else
     netSend({
       t: 'ncres',
-      stamp: G.letter + '-' + G.round,
-      letter: G.letter,
-      round: G.round,
-      cats: cats,
+      ...base,
       a: G.a,
       aw: G.aw || {},
-      pts: G.pts || {},
-      players: P,
-      timeup: !!G.timeup,
-      scores: NET.scores
+      ok: G.ok || {},
+      pts: G.pts || {}
     });
 }
 function ncSend(i, v) {
@@ -7021,6 +8382,562 @@ function viewNcSetup() {
   <p class="text-[11px] text-slate-500">${t('ncAuto')}</p>
   <button onclick="ncStart()" ${ncCanStart() ? '' : 'disabled'} class="${BTN} disabled:opacity-40">${t('ncStart')}</button></section>`;
 }
+// --- Parole vietate (solo online) ---
+const TB_TIME = 60;
+const tbLab = (k) => (k === 'A' ? t('tbTeamA') : t('tbTeamB'));
+function tbAuto() {
+  const P = shuffle(NET.players.slice()),
+    A = [],
+    B = [];
+  P.forEach((p, i) => (i % 2 ? B : A).push(p));
+  NET.tbTeams = { A, B };
+}
+function tbHostOpen() {
+  if (!NET.host) return;
+  netPrune();
+  if (NET.players.length < 4) return;
+  if (!NET.tbTeams || !NET.tbTeams.A) tbAuto();
+  else {
+    NET.tbTeams.A = NET.tbTeams.A.filter((p) => NET.players.includes(p));
+    NET.tbTeams.B = NET.tbTeams.B.filter((p) => NET.players.includes(p));
+    NET.players.forEach((p) => {
+      if (!NET.tbTeams.A.includes(p) && !NET.tbTeams.B.includes(p))
+        (NET.tbTeams.A.length <= NET.tbTeams.B.length ? NET.tbTeams.A : NET.tbTeams.B).push(p);
+    });
+  }
+  S.screen = 'tbsetup';
+  render();
+}
+function tbMove(i) {
+  const T = NET.tbTeams,
+    p = NET.players[i];
+  if (!T || !p) return;
+  if (T.A.includes(p)) {
+    T.A = T.A.filter((x) => x !== p);
+    T.B.push(p);
+  } else if (T.B.includes(p)) {
+    T.B = T.B.filter((x) => x !== p);
+    T.A.push(p);
+  }
+  render();
+}
+function tbCanStart() {
+  const T = NET.tbTeams;
+  return !!T && T.A.length >= 2 && T.B.length >= 2;
+}
+function tbStart() {
+  if (!NET.host || !tbCanStart()) return;
+  netPrune();
+  const T = NET.tbTeams,
+    P = NET.players;
+  NET.game = {
+    g: 'tb',
+    ph: 'res',
+    teams: {
+      A: T.A.filter((p) => P.includes(p)),
+      B: T.B.filter((p) => P.includes(p))
+    },
+    turn: 'B',
+    round: 0,
+    used: [],
+    ts: { A: 0, B: 0 },
+    votes: {},
+    res: null,
+    lang: S.lang
+  };
+  S.screen = 'online';
+  tbNext();
+}
+function tbNext() {
+  if (!NET.host) return;
+  netPrune();
+  const G = NET.game;
+  if (!G || G.g !== 'tb') return;
+  G.teams.A = G.teams.A.filter((p) => NET.players.includes(p));
+  G.teams.B = G.teams.B.filter((p) => NET.players.includes(p));
+  if (G.teams.A.length < 1 || G.teams.B.length < 1) return toLobby();
+  G.turn = G.turn === 'A' ? 'B' : 'A';
+  G.round = (+G.round || 0) + 1;
+  const team = G.teams[G.turn];
+  G.guesser = team[rnd(team.length)];
+  G.used = G.used || [];
+  if (G.used.length >= TB_DB.length) G.used = [];
+  let i = rnd(TB_DB.length);
+  while (G.used.includes(i)) i = (i + 1) % TB_DB.length;
+  G.used.push(i);
+  G.cardI = i;
+  G.votes = {};
+  G.res = null;
+  G.ph = 'play';
+  G.end = Date.now() + TB_TIME * 1000;
+  tbBc();
+  tbStartTimer();
+}
+function tbCard() {
+  const G = NET.game,
+    c = TB_DB[G.cardI] || TB_DB[0],
+    en = G.lang === 'en';
+  return { word: en ? c[2] : c[0], bans: (en ? c[3] : c[1]).slice(0, 4) };
+}
+function tbOpponents() {
+  const G = NET.game;
+  return NET.players.filter((p) => !G.teams[G.turn].includes(p));
+}
+function tbTo(p, m) {
+  if (p === NET.name) NET.view = m;
+  else if (NET.conns[p]) {
+    try {
+      NET.conns[p].send(m);
+    } catch (e) {}
+  }
+}
+function tbBc() {
+  const G = NET.game,
+    P = NET.players;
+  if (!G || G.g !== 'tb') return;
+  const card = G.ph === 'play' ? tbCard() : tbCard(),
+    opp = tbOpponents(),
+    voted = Object.keys(G.votes).filter((p) => P.includes(p));
+  P.forEach((p) => {
+    const inTeam = G.teams[G.turn].includes(p),
+      guess = p === G.guesser,
+      role = guess ? 'guess' : inTeam ? 'clue' : 'vote',
+      m = {
+        t: 'tb',
+        ph: G.ph,
+        teams: G.teams,
+        turn: G.turn,
+        guesser: G.guesser,
+        round: G.round,
+        res: G.res,
+        ts: G.ts,
+        scores: NET.scores,
+        players: P,
+        end: G.end,
+        role: role,
+        voted: voted,
+        nv: opp.length
+      };
+    if (G.ph !== 'play' || role === 'clue') {
+      m.word = card.word;
+      m.bans = card.bans;
+    }
+    tbTo(p, m);
+  });
+  render();
+}
+function tbApply(n, m) {
+  const G = NET.game,
+    P = NET.players;
+  if (!G || G.g !== 'tb' || G.ph !== 'play' || !m || !P.includes(n)) return;
+  if (m.t !== 'tbv') return;
+  if (G.teams[G.turn].includes(n) || G.votes[n] !== undefined) return;
+  G.votes[n] = m.v === 'w' ? 'w' : 'f';
+  tbCheck();
+}
+function tbCheck() {
+  const G = NET.game,
+    opp = tbOpponents(),
+    w = opp.filter((p) => G.votes[p] === 'w').length,
+    f = opp.filter((p) => G.votes[p] === 'f').length;
+  if (w > opp.length / 2) return tbResolve('w');
+  if (f > opp.length / 2) return tbResolve('f');
+  if (opp.length && opp.every((p) => G.votes[p] !== undefined)) {
+    G.ph = 'tie';
+    tbStopTimer();
+    return tbBc();
+  }
+  tbBc();
+}
+function tbClose() {
+  const G = NET.game;
+  if (!G || G.g !== 'tb' || G.ph !== 'play' || !NET.host) return;
+  const opp = tbOpponents(),
+    w = opp.filter((p) => G.votes[p] === 'w').length,
+    f = opp.filter((p) => G.votes[p] === 'f').length;
+  tbResolve(w > f ? 'w' : 'f');
+}
+function tbTie(ok) {
+  const G = NET.game;
+  if (!NET.host || !G || G.g !== 'tb' || G.ph !== 'tie') return;
+  tbResolve(ok ? 'w' : 'f');
+}
+function tbResolve(r) {
+  const G = NET.game;
+  if (!G || G.g !== 'tb' || G.ph === 'res') return;
+  tbStopTimer();
+  G.ph = 'res';
+  G.res = r;
+  if (r === 'w') {
+    scoreSnap();
+    G.ts[G.turn] = (G.ts[G.turn] || 0) + 100;
+    G.teams[G.turn].forEach((p) => netScore(p, 100));
+  }
+  tbBc();
+}
+function tbStartTimer() {
+  tbStopTimer();
+  if (!NET.host || !NET.game || NET.game.g !== 'tb' || NET.game.ph !== 'play') return;
+  TB_IV = setInterval(tbTick, 500);
+  tbTick();
+}
+function tbTick() {
+  const G = NET.game;
+  if (!G || G.g !== 'tb' || G.ph !== 'play' || !NET.host) return tbStopTimer();
+  if (!G.end) G.end = Date.now() + TB_TIME * 1000;
+  tbPaintTime();
+  if (G.end - Date.now() <= 0) tbClose();
+}
+function tbStopTimer() {
+  if (TB_IV) clearInterval(TB_IV);
+  TB_IV = null;
+}
+function tbPaintTime() {
+  const el = $('tb-time');
+  if (!el) return;
+  const v = NET.view || {},
+    left = v.end ? Math.max(0, Math.ceil((v.end - Date.now()) / 1000)) : 0;
+  el.textContent = tmFmt(left);
+}
+function tbCheckTeams() {
+  const G = NET.game,
+    P = NET.players;
+  if (!G || G.g !== 'tb') return;
+  G.teams.A = G.teams.A.filter((p) => P.includes(p));
+  G.teams.B = G.teams.B.filter((p) => P.includes(p));
+  Object.keys(G.votes).forEach((p) => {
+    if (!P.includes(p)) delete G.votes[p];
+  });
+  if (P.length < 4 || !G.teams.A.length || !G.teams.B.length) return toLobby();
+  if (G.ph === 'play' && !G.teams[G.turn].includes(G.guesser)) {
+    G.guesser = G.teams[G.turn][rnd(G.teams[G.turn].length)];
+    G.votes = {};
+  }
+  if (G.ph === 'play') tbCheck();
+}
+function viewTbSetup() {
+  const T = NET.tbTeams || { A: [], B: [] },
+    chip = (p, k) =>
+      `<button onclick="tbMove(${NET.players.indexOf(p)})" class="px-3 py-1.5 rounded-xl text-xs font-bold border ${k === 'A' ? 'bg-orange-600/20 border-orange-500/40 text-orange-200' : 'bg-sky-600/20 border-sky-500/40 text-sky-200'}">${esc(p)}</button>`;
+  return `<section class="glass p-4 rounded-2xl space-y-3"><div class="flex justify-between items-center border-b border-slate-700/60 pb-3"><h2 class="font-bold text-white">🚫 ${t('g_taboo')}</h2><button onclick="back()" class="text-xs bg-slate-800 px-3 py-1.5 rounded-xl">← ${t('back')}</button></div>
+  <p class="text-xs text-slate-400">${t('tbSetupHint')}</p>
+  <p class="text-[11px] text-slate-500">${t('tbTapTeam')}</p>
+  <div class="grid grid-cols-2 gap-2">
+    <div class="bg-slate-900 rounded-xl p-2 space-y-1.5"><p class="text-[11px] font-bold text-orange-300">${t('tbTeamA')} (${T.A.length})</p><div class="flex flex-wrap gap-1.5">${T.A.map((p) => chip(p, 'A')).join('')}</div></div>
+    <div class="bg-slate-900 rounded-xl p-2 space-y-1.5"><p class="text-[11px] font-bold text-sky-300">${t('tbTeamB')} (${T.B.length})</p><div class="flex flex-wrap gap-1.5">${T.B.map((p) => chip(p, 'B')).join('')}</div></div>
+  </div>
+  <button onclick="tbAuto();render()" class="w-full bg-slate-800 py-2.5 rounded-xl text-xs font-bold">⚖️ ${t('tabooAuto')}</button>
+  <button onclick="tbStart()" ${tbCanStart() ? '' : 'disabled'} class="${BTN} disabled:opacity-40">${t('tabooStart')}</button></section>`;
+}
+function viewTb(v) {
+  const me = NET.name,
+    tn = tbLab(v.turn),
+    left = v.end ? Math.max(0, Math.ceil((v.end - Date.now()) / 1000)) : 0,
+    head = `<div class="flex justify-between items-center"><p class="text-xs text-slate-400">${t('tabooTurn')} <b class="text-white">${tn}</b>${v.round ? ' · ' + v.round : ''}</p><span class="text-xs font-bold text-emerald-300" aria-label="${t('tbTime')}">⏱️ <span id="tb-time">${tmFmt(left)}</span></span></div>`,
+    scores = `<div class="grid grid-cols-2 gap-2">${['A', 'B']
+      .map(
+        (k) =>
+          `<div class="bg-slate-900 rounded-xl p-2 text-center"><p class="text-[10px] text-slate-400">${tbLab(k)}</p><b class="${k === v.turn ? 'text-emerald-300' : 'text-white'}">${(v.ts && v.ts[k]) || 0}</b></div>`
+      )
+      .join('')}</div>`,
+    teams = `<div class="grid grid-cols-2 gap-2 text-[11px]"><div><p class="font-bold text-orange-300">${t('tbTeamA')}</p><p class="text-slate-400">${v.teams.A.map((p) => esc(p) + (p === v.guesser ? ' 🎯' : '')).join(' · ')}</p></div><div><p class="font-bold text-sky-300">${t('tbTeamB')}</p><p class="text-slate-400">${v.teams.B.map((p) => esc(p) + (p === v.guesser ? ' 🎯' : '')).join(' · ')}</p></div></div>`;
+  let body = '';
+  if (v.ph === 'res') {
+    const ok = v.res === 'w',
+      card = `<div class="bg-slate-900 rounded-xl p-3 text-center"><p class="text-[11px] text-slate-400">${t('tabooGuesser')}: <b class="text-white">${esc(v.guesser)}</b></p><p class="text-2xl font-black text-white mt-1">${esc(v.word || '')}</p><p class="text-[11px] text-rose-300 mt-1">${t('tabooBans')}: ${(v.bans || []).map(esc).join(' · ')}</p></div>`;
+    body = `${card}<p class="text-sm font-bold text-center ${ok ? 'text-emerald-300' : 'text-rose-300'}">${ok ? '🎉 ' + t('tabooWin') : '🚫 ' + t('tabooFoul')}</p>${scores}${
+      NET.host
+        ? `<button onclick="tbNext()" class="${BTN}">${t('tabooNext')}</button><button onclick="ncBack()" class="w-full bg-slate-800 py-3 rounded-xl text-sm font-bold">${t('ncLobby')}</button>`
+        : `<p class="text-xs text-slate-400 text-center">${t('chiWaiting')}</p>`
+    }`;
+    return `<div class="space-y-3 py-2">${head}${body}</div>`;
+  }
+  if (v.ph === 'tie') {
+    const card = `<div class="bg-slate-900 rounded-xl p-3 text-center"><p class="text-2xl font-black text-white">${esc(v.word || '')}</p><p class="text-[11px] text-rose-300 mt-1">${(v.bans || []).map(esc).join(' · ')}</p></div>`;
+    return `<div class="space-y-3 py-2">${head}${card}<p class="text-sm font-bold text-center text-amber-300">${t('tbTie')}</p>${
+      NET.host
+        ? `<button onclick="tbTie(true)" class="${BTN}">✓ ${t('tabooVoteWin')}</button><button onclick="tbTie(false)" class="w-full bg-slate-800 py-3 rounded-xl text-sm font-bold">✗ ${t('tabooVoteFoul')}</button>`
+        : `<p class="text-xs text-slate-400 text-center">${t('chiWaiting')}</p>`
+    }</div>`;
+  }
+  if (v.role === 'clue') {
+    body = `<div class="bg-slate-900 rounded-xl p-4 text-center border border-orange-500/30"><p class="text-[11px] text-slate-400">${t('tabooYourWord')}</p><h2 class="text-3xl font-black text-white mt-1">${esc(v.word || '')}</h2></div>
+    <div class="bg-slate-900 rounded-xl p-3"><p class="text-[11px] font-bold text-rose-300 mb-1">${t('tabooBans')}</p><div class="flex flex-wrap gap-1.5">${(v.bans || []).map((b) => `<span class="px-2 py-1 rounded-lg bg-rose-600/20 text-rose-200 text-xs font-bold">${esc(b)}</span>`).join('')}</div></div>
+    <p class="text-xs text-slate-300 text-center">${t('tabooRoleClue')}</p>`;
+  } else if (v.role === 'guess') {
+    body = `<div class="bg-slate-900 rounded-xl p-4 text-center border border-emerald-500/30"><p class="text-2xl">🎯</p><p class="text-sm font-bold text-white mt-1">${esc(me)}</p><p class="text-xs text-slate-300 mt-1">${t('tabooRoleGuess')}</p><p class="text-[11px] text-slate-500 mt-1">${t('tabooHint')}</p></div>`;
+  } else {
+    const voted = v.voted.includes(me);
+    body = `<div class="bg-slate-900 rounded-xl p-3"><p class="text-xs text-slate-300 text-center">${t('tabooRoleVote')}</p><p class="text-[11px] text-slate-500 text-center mt-1">${t('tabooGuesser')}: <b class="text-white">${esc(v.guesser)}</b></p></div>${
+      voted
+        ? `<p class="text-xs font-bold text-emerald-300 text-center">${t('tabooVoted')} (${v.voted.length}/${v.nv})</p>`
+        : `<button onclick="netAct({t:'tbv',v:'w'})" class="${BTN}">✓ ${t('tabooVoteWin')}</button><button onclick="netAct({t:'tbv',v:'f'})" class="w-full bg-slate-800 py-3 rounded-xl text-sm font-bold">✗ ${t('tabooVoteFoul')}</button>`
+    }<p class="text-[11px] text-slate-500 text-center">${v.voted.length}/${v.nv} ${X('hanno votato', 'voted')}</p>`;
+  }
+  return `<div class="space-y-3 py-2">${head}${teams}${body}${scores}</div>`;
+}
+let TB_IV = null;
+
+// --- Chi sono io? (solo online) ---
+const CHI_LIVES = 5;
+function chiCur() {
+  const G = NET.game;
+  return G && G.g === 'chi' ? G.order[G.idx] : '';
+}
+function chiWord(p) {
+  const G = NET.game;
+  if (!G || !G.w) return '';
+  const i = G.w[p];
+  const row = CHI_DB[i];
+  return row ? row[G.lang === 'en' ? 1 : 0] : '';
+}
+function chiStart() {
+  if (!NET.host) return;
+  netPrune();
+  const P = NET.players;
+  if (P.length < 3) return;
+  const idx = shuffle(CHI_DB.map((x, i) => i)),
+    w = {};
+  P.forEach((p, i) => (w[p] = idx[i % idx.length]));
+  NET.game = {
+    g: 'chi',
+    ph: 'play',
+    order: shuffle(P.slice()),
+    idx: 0,
+    lives: {},
+    done: {},
+    out: {},
+    votes: {},
+    w: w,
+    lang: S.lang,
+    last: null,
+    res: null
+  };
+  P.forEach((p) => (NET.game.lives[p] = CHI_LIVES));
+  S.screen = 'online';
+  chiBc();
+}
+function chiRestart() {
+  if (!NET.host) return;
+  chiStart();
+}
+function chiBc() {
+  const G = NET.game,
+    P = NET.players;
+  if (!G || G.g !== 'chi') return;
+  const cur = chiCur(),
+    voters = P.filter((p) => p !== cur),
+    voted = Object.keys(G.votes).filter((p) => voters.includes(p)),
+    all = {};
+  P.forEach((p) => (all[p] = chiWord(p)));
+  P.forEach((p) => {
+    const others = {};
+    P.forEach((q) => {
+      if (q !== p) others[q] = chiWord(q);
+    });
+    const m = {
+      t: 'chi',
+      ph: G.ph,
+      players: P,
+      order: G.order.filter((x) => P.includes(x)),
+      idx: G.idx,
+      cur: cur,
+      lives: G.lives,
+      done: G.done,
+      out: G.out,
+      scores: NET.scores,
+      others: others,
+      votes: voted,
+      nv: voters.length,
+      last: G.last,
+      res: G.res
+    };
+    if (G.ph === 'end') m.allWords = all;
+    if (G.ph === 'res' || G.ph === 'end') m.word = chiWord(p);
+    if (G.last && (G.ph === 'res' || G.ph === 'end')) m.lastWord = chiWord(G.last);
+    if (p === NET.name) NET.view = m;
+    else if (NET.conns[p]) {
+      try {
+        NET.conns[p].send(m);
+      } catch (e) {}
+    }
+  });
+  render();
+}
+function chiApply(n, m) {
+  const G = NET.game,
+    P = NET.players;
+  if (!G || G.g !== 'chi' || !m || !P.includes(n)) return;
+  const cur = chiCur();
+  if (m.t === 'chig' && G.ph === 'play' && n === cur) {
+    G.ph = 'vote';
+    G.votes = {};
+    G.last = cur;
+    G.res = null;
+    return chiBc();
+  }
+  if (m.t === 'chiv' && G.ph === 'vote' && n !== cur && G.votes[n] === undefined) {
+    G.votes[n] = !!m.v;
+    chiCheck();
+  }
+}
+function chiCheck() {
+  const G = NET.game,
+    P = NET.players,
+    cur = chiCur(),
+    voters = P.filter((p) => p !== cur),
+    yes = voters.filter((p) => G.votes[p] === true).length,
+    no = voters.filter((p) => G.votes[p] === false).length;
+  if (!voters.length) return chiResolve(false);
+  if (!voters.every((p) => G.votes[p] !== undefined)) return chiBc();
+  if (yes > no) return chiResolve(true);
+  if (no > yes) return chiResolve(false);
+  G.ph = 'tie';
+  chiBc();
+}
+function chiResolve(ok) {
+  const G = NET.game,
+    p = G.last || chiCur();
+  if (!G || G.g !== 'chi' || G.ph === 'res' || G.ph === 'end') return;
+  if (ok) {
+    scoreSnap();
+    netScore(p, 100);
+    G.done[p] = true;
+    G.res = 'ok';
+  } else {
+    G.lives[p] = Math.max(0, (G.lives[p] || 0) - 1);
+    if (!G.lives[p]) G.out[p] = true;
+    G.res = 'no';
+  }
+  G.ph = 'res';
+  chiBc();
+}
+function chiTie(ok) {
+  const G = NET.game;
+  if (!NET.host || !G || G.g !== 'chi' || G.ph !== 'tie') return;
+  chiResolve(!!ok);
+}
+function chiNext() {
+  const G = NET.game,
+    P = NET.players;
+  if (!NET.host || !G || G.g !== 'chi' || G.ph !== 'res') return;
+  const playable = (p) => P.includes(p) && !G.done[p] && !G.out[p];
+  let next = -1;
+  for (let k = 1; k <= G.order.length; k++) {
+    const j = (G.idx + k) % G.order.length;
+    if (playable(G.order[j])) {
+      next = j;
+      break;
+    }
+  }
+  if (next < 0) return chiEnd();
+  G.idx = next;
+  G.ph = 'play';
+  G.votes = {};
+  G.last = null;
+  G.res = null;
+  chiBc();
+}
+function chiEnd() {
+  const G = NET.game;
+  if (!NET.host || !G || G.g !== 'chi') return;
+  G.ph = 'end';
+  G.votes = {};
+  chiBc();
+}
+function chiCheckTeams() {
+  const G = NET.game,
+    P = NET.players;
+  if (!G || G.g !== 'chi') return;
+  G.order = G.order.filter((p) => P.includes(p));
+  if (P.length < 3) return toLobby();
+  const cur = chiCur();
+  if (cur && P.includes(cur) && !G.done[cur] && !G.out[cur]) return;
+  const playable = (p) => P.includes(p) && !G.done[p] && !G.out[p];
+  let next = -1;
+  for (let k = 0; k < G.order.length; k++) {
+    if (playable(G.order[k])) {
+      next = k;
+      break;
+    }
+  }
+  if (next < 0) return chiEnd();
+  G.idx = next;
+  G.ph = 'play';
+  G.votes = {};
+  G.last = null;
+  G.res = null;
+  chiBc();
+}
+function chiHearts(n) {
+  const v = Math.max(0, Math.min(CHI_LIVES, +n || 0));
+  return '❤️'.repeat(v) + '🖤'.repeat(CHI_LIVES - v);
+}
+function viewChi(v) {
+  const me = NET.name,
+    cur = v.cur,
+    myTurn = me === cur,
+    lives = (v.lives && v.lives[cur]) || 0,
+    head = `<div class="flex justify-between items-center"><p class="text-xs text-slate-400">${t('chiTurn')} <b class="text-white">${esc(cur)}</b></p><span class="text-xs text-rose-300" aria-label="${t('chiLives')}">${chiHearts(lives)}</span></div>`;
+  if (v.ph === 'end') {
+    const rows = v.players
+        .map(
+          (p) =>
+            `<div class="flex justify-between bg-slate-900 px-3 py-2 rounded-xl text-xs"><span>${esc(p)} ${v.done[p] ? '✅' : v.out[p] ? '💀' : ''}</span><b class="text-sky-300">${esc((v.allWords && v.allWords[p]) || '')}</b></div>`
+        )
+        .join(''),
+      sc = Object.entries(v.scores || {})
+        .sort((a, b) => b[1] - a[1])
+        .map(
+          ([p, n]) =>
+            `<span class="bg-amber-500/10 text-amber-400 text-xs font-bold px-2.5 py-1 rounded-lg">${esc(p)} ${n}</span>`
+        )
+        .join('');
+    return `<div class="space-y-3 py-2"><p class="text-center text-xs text-slate-400">${t('chiEnd')}</p><p class="text-sm font-bold text-white text-center">👤 ${t('g_chisono')}</p><p class="text-[11px] font-bold text-slate-400">${t('chiAllWords')}</p>${rows}<div class="flex flex-wrap gap-1.5 justify-center">${sc}</div>${
+      NET.host
+        ? `<button onclick="chiRestart()" class="${BTN}">${t('chiNew')}</button><button onclick="ncBack()" class="w-full bg-slate-800 py-3 rounded-xl text-sm font-bold">${t('ncLobby')}</button>`
+        : `<p class="text-xs text-slate-400 text-center">${t('chiWaiting')}</p>`
+    }</div>`;
+  }
+  const words = `<div class="space-y-1"><p class="text-[11px] font-bold text-slate-400">${t('chiOthers')}</p>${v.players
+      .filter((p) => p !== me)
+      .map(
+        (p) =>
+          `<div class="flex justify-between bg-slate-900 px-3 py-2 rounded-xl text-xs ${p === cur ? 'border border-sky-500/40' : ''}"><span>${esc(p)}${p === cur ? ' 👈' : ''}</span><b class="text-sky-300">${esc(v.others[p] || '')}</b></div>`
+      )
+      .join('')}</div>`;
+  if (v.ph === 'vote') {
+    const voted = v.votes.includes(me);
+    return `<div class="space-y-3 py-2">${head}<div class="bg-slate-900 rounded-xl p-4 text-center"><p class="text-sm font-bold text-white">${esc(cur)}</p><p class="text-xs text-slate-300 mt-1">${t('chiVoteTitle')}</p></div>${
+      myTurn
+        ? `<p class="text-xs font-bold text-amber-300 text-center">${t('chiWaitingVote')}</p><p class="text-[11px] text-slate-500 text-center">${v.votes.length}/${v.nv}</p>`
+        : voted
+          ? `<p class="text-xs font-bold text-emerald-300 text-center">${t('chiVoted')} (${v.votes.length}/${v.nv})</p>`
+          : `<button onclick="netAct({t:'chiv',v:true})" class="${BTN}">✓ ${t('chiYes')}</button><button onclick="netAct({t:'chiv',v:false})" class="w-full bg-slate-800 py-3 rounded-xl text-sm font-bold">✗ ${t('chiNo')}</button><p class="text-[11px] text-slate-500 text-center">${v.votes.length}/${v.nv} ${X('hanno votato', 'voted')}</p>`
+    }${words}</div>`;
+  }
+  if (v.ph === 'tie') {
+    return `<div class="space-y-3 py-2">${head}<p class="text-sm font-bold text-center text-amber-300">${t('chiTie')}</p>${
+      NET.host
+        ? `<button onclick="chiTie(true)" class="${BTN}">✓ ${t('chiYes')}</button><button onclick="chiTie(false)" class="w-full bg-slate-800 py-3 rounded-xl text-sm font-bold">✗ ${t('chiNo')}</button>`
+        : `<p class="text-xs text-slate-400 text-center">${t('chiWaiting')}</p>`
+    }</div>`;
+  }
+  if (v.ph === 'res') {
+    const ok = v.res === 'ok';
+    return `<div class="space-y-3 py-2">${head}<div class="bg-slate-900 rounded-xl p-4 text-center"><p class="text-sm font-bold ${ok ? 'text-emerald-300' : 'text-rose-300'}">${ok ? '🎉 ' + t('chiCorrect') : '💔 ' + t('chiWrong')}</p><p class="text-[11px] text-slate-400 mt-1">${t('chiYourWord')}: <b class="text-white">${esc(v.lastWord || '')}</b></p></div>${
+      NET.host
+        ? `<button onclick="chiNext()" class="${BTN}">${t('chiContinue')}</button>`
+        : `<p class="text-xs text-slate-400 text-center">${t('chiWaiting')}</p>`
+    }${words}</div>`;
+  }
+  return `<div class="space-y-3 py-2">${head}${
+    myTurn
+      ? `<div class="bg-slate-900 rounded-xl p-4 text-center border border-sky-500/30"><p class="text-2xl">👤</p><p class="text-sm font-bold text-white mt-1">${t('chiYouTurn')}</p><button onclick="netAct({t:'chig'})" class="${BTN} mt-3">🙋 ${t('chiGuessBtn')}</button></div>`
+      : `<p class="text-xs text-slate-400 text-center">${t('chiWaitTurn')} · ${t('chiLivesLeft')} ${chiHearts(lives)}</p>`
+  }${words}</div>`;
+}
+
 function saveLocal() {
   try {
     const data = {
@@ -7029,7 +8946,14 @@ function saveLocal() {
       scores: S.scores,
       lang: S.lang,
       name: NET.name,
-      lastCode: NET.lastCode
+      lastCode: NET.lastCode,
+      cust: CUST.map((c) => ({ id: c.id, name: c.name, desc: c.desc, fac: c.fac })),
+      cn: CN,
+      ncCats: NC_CATS.filter((c) => String(c.k).indexOf('cu') === 0).map((c) => ({
+        k: c.k,
+        it: c.it,
+        en: c.en
+      }))
     };
     localStorage.setItem('mgh_save_v1', JSON.stringify(data));
   } catch (e) {}
@@ -7049,6 +8973,30 @@ function loadLocal() {
       });
     if (typeof d.name === 'string') NET.name = cleanName(d.name, 16);
     if (typeof d.lastCode === 'string') NET.lastCode = d.lastCode.slice(0, 5);
+    // Ruoli e categorie personalizzati: restano su questo telefono.
+    if (Number.isFinite(+d.cn)) CN = Math.max(CN, +d.cn);
+    if (Array.isArray(d.cust))
+      d.cust.slice(0, 40).forEach((x) => {
+        const id = x && typeof x.id === 'string' ? x.id : '';
+        const name = cleanName(x && x.name, 24);
+        if (!id || !/^cx\d+$/.test(id) || !name || CUST.some((c) => c.id === id)) return;
+        const fac = ['civ', 'wolf', 'third'].includes(x.fac) ? x.fac : 'civ';
+        const c = { id: id, name: name, desc: cleanText(x.desc, 200), fac: fac };
+        CUST.push(c);
+        cReg(c);
+        CN = Math.max(CN, +id.slice(2) || 0);
+      });
+    if (Array.isArray(d.ncCats))
+      d.ncCats.slice(0, 20).forEach((x) => {
+        const name = cleanName(x && (x.it || x.en), 18);
+        if (!name) return;
+        if (NC_CATS.some((c) => ncLab(c).toLowerCase() === name.toLowerCase())) return;
+        const k =
+          x && typeof x.k === 'string' && /^cu[a-z0-9]{1,20}$/.test(x.k) && !NC_CATS.some((c) => c.k === x.k)
+            ? x.k
+            : 'cu' + Date.now().toString(36) + NC_CATS.length;
+        NC_CATS.push({ k: k, it: name, en: name });
+      });
   } catch (e) {}
 }
 function render() {
@@ -7083,7 +9031,9 @@ function render() {
                 ? viewPvSetup()
                 : S.screen === 'ncsetup'
                   ? viewNcSetup()
-                  : viewPlay();
+                  : S.screen === 'tbsetup'
+                    ? viewTbSetup()
+                    : viewPlay();
   if (!tmAllowed() && (TMR.iv || TMR.done)) tmClear();
   if (tmAuto() && (TMR.iv || TMR.done)) tmClear();
   tmDraw();
@@ -7091,10 +9041,12 @@ function render() {
   netMirror();
 }
 loadLocal();
+parseInvite();
 // Rientro in primo piano o rete tornata: ricalcolo i timer e richiedo lo stato.
 function netWake() {
   if (TMR.iv) tmTick();
   if (NET.host && NET.game && NET.game.g === 'nc' && NET.game.ph === 'play') ncTick();
+  if (NET.host && NET.game && NET.game.g === 'tb' && NET.game.ph === 'play') tbTick();
   if (!NET.host && NET.conn) netSync();
   if (NET.peer && NET.peer.disconnected && !NET.peer.destroyed) {
     try {
@@ -7107,9 +9059,15 @@ document.addEventListener('visibilitychange', () => {
   if (!document.hidden) netWake();
 });
 if (window.addEventListener) window.addEventListener('online', netWake);
+// Sblocco audio su iOS al primo gesto (timer di discussione).
+if (document.addEventListener)
+  ['pointerdown', 'touchstart', 'keydown'].forEach((ev) =>
+    document.addEventListener(ev, audioUnlock, { passive: true })
+  );
 // Il timer automatico del round si aggiorna da solo anche senza messaggi.
 setInterval(() => {
   if (tmAuto() && tmAllowed()) tmDraw();
+  if (NET.view && NET.view.t === 'tb') tbPaintTime();
 }, 500);
 render();
 </script>
