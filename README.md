@@ -15,7 +15,7 @@ No install, no account, no backend.
 | 🎭 **Impostor** | Impostore | Everyone answers the same question, except the impostor who gets a different one. Discuss, then vote. | Pass & Play · Online |
 | 🕵️ **Mister White** | Mister White | Civilians share a word, Undercovers get a similar one, Mister White gets only a hint. | Pass & Play · Online |
 | 💬 **Who Said That?** | Chi l'ha detto? | Anonymous answers to a question; guess who wrote the one on screen. | Pass & Play · Online |
-| 🤔 **Would You Rather…** | Preferiresti… | The host types two options; everyone votes in secret and the majority scores. | Pass & Play · Online |
+| 🤔 **Would You Rather…** | Preferiresti… | Pick a ready-made pack or type two options; everyone votes in secret and the majority scores. | Pass & Play · Online |
 | 🐺 **Werewolf** | Lupus in Fabula | Full narrator-less game (roles, night phase, stake, win conditions) or quick mode with roles only. | Pass & Play · Online |
 | 📝 **Names, Things and Cities** | Nomi, Cose e Città | A letter plus chosen categories; everyone types answers on their own phone. | **Online only** |
 | 🚫 **Forbidden Words** | Parole vietate | Two teams: one player guesses, teammates give clues without saying the forbidden words; the other team votes. | **Online only** |
