@@ -113,4 +113,70 @@ const src = fs.readFileSync(sourceFile(), 'utf8');
 check(/hostDrop\(n\),\s*(60000|6e4)\)/.test(src), 'attesa offline di 60 secondi nel file in prova');
 check(!/hostDrop\(n\),\s*(25000|2\.5e4)\)/.test(src), 'nessun timeout offline da 25 secondi');
 
+// --- ripresa dopo reload/standby ---
+const resApp = boot();
+const RN = resApp.NET,
+  RS = resApp.S;
+RN.name = 'Anna';
+RN.code = 'ABCDE';
+RN.host = true;
+RN.st = 'lobby';
+RN.players = ['Anna', 'Bruno'];
+RN.order = ['Anna', 'Bruno'];
+RN.hostName = 'Anna';
+RN.scores = { Anna: 100, Bruno: 20 };
+RS.scores = { Anna: 100, Bruno: 20 };
+resApp.run('saveSession(true)');
+const sessRaw = resApp.ctx.localStorage.getItem('mgh_session_v1');
+check(!!sessRaw && sessRaw.includes('ABCDE'), 'sessione stanza salvata in localStorage');
+check(!!JSON.parse(sessRaw).snap && JSON.parse(sessRaw).snap.players.length === 2, 'snapshot host salvato con i giocatori');
+resApp.run("RESUME={room:null,snap:null,savedAt:0,lastKey:''};loadSession()");
+const R2 = resApp.run('RESUME');
+check(R2.room && R2.room.code === 'ABCDE' && R2.room.name === 'Anna', 'loadSession rilegge la stanza');
+check(!!R2.snap && R2.snap.scores.Anna === 100, 'loadSession rilegge lo snapshot host');
+const homeResume = resApp.run('viewHome()');
+check(
+  homeResume.includes('ABCDE') && homeResume.includes('resumeHost()') && homeResume.includes('dismissResume()'),
+  'la home mostra la card per riprendere la stanza host'
+);
+resApp.run('dismissResume()');
+check(!resApp.ctx.localStorage.getItem('mgh_session_v1'), 'Ignora cancella la sessione salvata');
+// sessione scaduta
+resApp.ctx.localStorage.setItem(
+  'mgh_session_v1',
+  JSON.stringify({ at: Date.now() - 3 * 60 * 60 * 1000, room: { code: 'ZZZZZ', name: 'X', host: false } })
+);
+resApp.run("RESUME={room:null,snap:null,savedAt:0,lastKey:''};loadSession()");
+check(!resApp.run('RESUME').room, 'oltre due ore la sessione non viene proposta');
+// card ospite
+resApp.run(
+  "RESUME={room:{code:'ABCDE',name:'Anna',host:false,players:['Anna','Bruno'],n:2,at:Date.now()},snap:null,savedAt:0,lastKey:''}"
+);
+const homeGuest = resApp.run('viewHome()');
+check(
+  homeGuest.includes('resumeGuest()') && homeGuest.includes('Rientra nella stanza'),
+  'la card ospite usa resumeGuest'
+);
+// lobby più chiara
+RN.st = 'lobby';
+RN.code = 'ABCDE';
+RN.host = false;
+RN.name = 'Anna';
+RN.hostName = 'Bruno';
+RN.players = ['Bruno', 'Anna'];
+RN.off = ['Anna'];
+RN.err = '';
+RN.notice = '';
+const lobby = resApp.run('viewOnline()');
+check(lobby.includes('copyCode()'), 'lobby con copia del codice');
+check(lobby.includes('1/2') && lobby.includes('connessi'), 'lobby mostra i giocatori connessi');
+check(lobby.includes('offline') && lobby.includes('host'), 'lobby distingue offline e host');
+check(lobby.includes('1.7.0'), 'lobby mostra la versione');
+// riepilogo condivisibile
+RS.scores = { Anna: 300, Bruno: 100 };
+RN.game = { g: 'impostore' };
+const summary = resApp.run('summaryText()');
+check(summary.includes('Impostore') && summary.indexOf('1. Anna: 300') > 0, 'riepilogo con nome gioco e ordine');
+check(summary.indexOf('Anna: 300') < summary.indexOf('Bruno: 100'), 'riepilogo ordinato per punti');
+
 done();
