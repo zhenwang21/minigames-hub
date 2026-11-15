@@ -56,11 +56,18 @@ function boot(opts = {}) {
     console: { log() {}, error: (...a) => console.error('[page]', ...a) },
     document,
     localStorage: {
+      get length() {
+        return Object.keys(store).length;
+      },
+      key: (i) => Object.keys(store)[i] ?? null,
       getItem: (k) => (k in store ? store[k] : null),
       setItem: (k, v) => (store[k] = String(v)),
       removeItem: (k) => delete store[k]
     },
-    navigator: { vibrate() {}, clipboard: null },
+    navigator: { vibrate() {}, clipboard: null, onLine: true },
+    matchMedia: () => ({ matches: false, addEventListener() {}, addListener() {} }),
+    addEventListener() {},
+    removeEventListener() {},
     alert: (m) => alerts.push(String(m)),
     confirm: () => true,
     crypto: require('crypto').webcrypto,

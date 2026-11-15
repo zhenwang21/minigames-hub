@@ -16,7 +16,7 @@ check(
 check(/<link rel="apple-touch-icon" href="icons\/icon-180\.png">/.test(html), 'apple-touch-icon presente');
 check(/name="theme-color" content="#0b0f19"/.test(html), 'theme-color presente');
 check(/apple-mobile-web-app-capable" content="yes"/.test(html), 'meta iOS standalone presente');
-check(/serviceWorker\.register\(["']sw\.js["']\)/.test(html), 'registrazione del service worker');
+check(/serviceWorker\s*\.register\(\s*["']sw\.js["']\s*\)/.test(html), 'registrazione del service worker');
 check(
   html.includes('/^https?:$/.test(String(location.protocol'),
   'registrazione solo su http(s)'
@@ -50,6 +50,23 @@ check(
 );
 check(sw.includes('./index.html') && sw.includes('manifest.webmanifest'), 'il service worker precarica la shell');
 check(/req\.mode === 'navigate'/.test(sw) && /caches\.match/.test(sw), 'navigazione con fallback offline');
+check(/if \(r && r\.ok\)/.test(sw), 'una risposta 5xx non sostituisce la shell in cache');
 check(/caches\s*\.keys\(\)/.test(sw) && /caches\s*\.delete/.test(sw), 'pulizia delle cache vecchie');
+
+check(/id="upd"/.test(html) && /controllerchange/.test(html), 'banner per la nuova versione');
+check(/updateReady/.test(html) && /updateBtn/.test(html), 'testi del banner di aggiornamento');
+check(/data-theme/.test(html) && /--acc1:/.test(html), 'variabili CSS dei temi');
+
+// --- 1.9.0: installazione, offline e accessibilità ---
+check(/id="off"/.test(html) && /updateOffline\(\)/.test(html), 'badge offline presente e aggiornato');
+check(/beforeinstallprompt/.test(html) && /installApp\(\)/.test(html), 'installazione gestita con beforeinstallprompt');
+check(/display-mode: standalone/.test(html), 'rileva se l’app è già installata');
+check(/html\[data-text="l"\]/.test(html) && /html\[data-text="s"\]/.test(html), 'CSS per testo piccolo/grande');
+check(/html\[data-contrast="high"\]/.test(html) && /html\[data-motion="off"\]/.test(html), 'CSS per contrasto e animazioni');
+check(/function applyA11y/.test(html) && /applyA11y\(\)/.test(html), 'le preferenze di accessibilità sono applicate all’avvio');
+check(/prefers-reduced-motion/.test(html), 'rispetta la preferenza di sistema per le animazioni');
+check(/function storageBytes/.test(html) && /localStorage\.length/.test(html), 'calcolo dello spazio locale usato');
+check(/function showDbTip/.test(html) && /dbAck/.test(html), 'avviso sulle domande automatiche con memoria');
+check(/function startDemo/.test(html) && /S\.demo/.test(html), 'modalità demo non salvata');
 
 done();

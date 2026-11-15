@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Minigames Hub</title>
 <meta name="theme-color" content="#0b0f19">
+<meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Minigames">
@@ -17,10 +18,39 @@
 <style>
 :root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
+:root{--acc1:#a855f7;--acc2:#ec4899;--acc3:#6366f1;--btn1:#7c3aed;--btn2:#d946ef}
+html[data-theme="oceano"]{--acc1:#22d3ee;--acc2:#38bdf8;--acc3:#818cf8;--btn1:#0891b2;--btn2:#2563eb}
+html[data-theme="tramonto"]{--acc1:#fb923c;--acc2:#f43f5e;--acc3:#f59e0b;--btn1:#ea580c;--btn2:#db2777}
+html[data-theme="bosco"]{--acc1:#34d399;--acc2:#84cc16;--acc3:#10b981;--btn1:#059669;--btn2:#16a34a}
 body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#0b0f19;color:#f8fafc;-webkit-tap-highlight-color:transparent}
 .glass{background:rgba(17,24,39,.85);border:1px solid rgba(255,255,255,.08)}
-.gtext{background:linear-gradient(135deg,#a855f7,#ec4899 50%,#6366f1);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.gbtn{background:linear-gradient(135deg,#7c3aed,#d946ef);color:#fff}
+.gtext{background:linear-gradient(135deg,var(--acc1),var(--acc2) 50%,var(--acc3));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.gbtn{background:linear-gradient(135deg,var(--btn1),var(--btn2));color:#fff}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+#upd{position:fixed;left:.6rem;right:.6rem;bottom:calc(env(safe-area-inset-bottom,0px) + .6rem);z-index:70;display:none;align-items:center;gap:.5rem;background:#111827;border:1px solid var(--acc1);border-radius:1rem;padding:.55rem .8rem;box-shadow:0 12px 34px rgba(0,0,0,.55);font-size:.75rem;font-weight:700}
+#upd.on{display:flex}
+#upd span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#upd button{border-radius:.6rem;padding:.35rem .6rem;font-size:.7rem;font-weight:800;background:#1e293b;color:#e2e8f0}
+#upd button.go{background:linear-gradient(135deg,var(--btn1),var(--btn2));color:#fff}
+#off{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + .5rem);transform:translateX(-50%);z-index:75;display:none;align-items:center;gap:.4rem;background:#78350f;border:1px solid #f59e0b;border-radius:999px;padding:.3rem .7rem;font-size:.7rem;font-weight:800;color:#fef3c7;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+#off.on{display:flex}
+/* testo grande/piccolo: le utility in rem scalano con la radice, quelle in px hanno un override */
+html[data-text="l"]{font-size:18px}
+html[data-text="s"]{font-size:15px}
+html[data-text="l"] .text-\[10px\]{font-size:12px}
+html[data-text="l"] .text-\[11px\]{font-size:13px}
+html[data-text="s"] .text-\[10px\]{font-size:9px}
+html[data-text="s"] .text-\[11px\]{font-size:10px}
+/* alto contrasto */
+html[data-contrast="high"] body{background:#000;color:#fff}
+html[data-contrast="high"] .glass{background:#0b1120;border-color:rgba(255,255,255,.45)}
+html[data-contrast="high"] .bg-slate-900{background:#020617}
+html[data-contrast="high"] .text-slate-300,html[data-contrast="high"] .text-slate-400,html[data-contrast="high"] .text-slate-500{color:#e5e7eb!important}
+html[data-contrast="high"] .gbtn{box-shadow:inset 0 0 0 2px #fff}
+html[data-contrast="high"] .gtext{background:none;-webkit-text-fill-color:#fff;color:#fff}
+/* riduci animazioni su richiesta, oltre alla preferenza di sistema */
+html[data-motion="off"] *,html[data-motion="off"] :before,html[data-motion="off"] :after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+@media (max-width:430px){#top{display:none}}
 .gbtn:disabled{opacity:.4}
 .gbtn:active{transform:translateY(1px)}
 .slot{min-height:64px;transition:background .2s}
@@ -73,13 +103,17 @@ button,a,input,select,textarea{touch-action:manipulation}
       <button id="lb-it" onclick="setLang('it')" aria-label="Italiano" class="px-2 py-1 text-[11px] font-bold rounded-lg">🇮🇹 IT</button>
       <button id="lb-en" onclick="setLang('en')" aria-label="English" class="px-2 py-1 text-[11px] font-bold rounded-lg">🇬🇧 EN</button>
     </div>
+    <button id="set" onclick="showSettings()" aria-label="Impostazioni" title="Impostazioni" class="px-2.5 py-1.5 rounded-xl bg-slate-800 font-bold text-[11px]"><span aria-hidden="true">⚙️</span></button>
     <button id="hlp" onclick="showHelp()" aria-label="Aiuto e regole" title="Aiuto e regole" class="px-2.5 py-1.5 rounded-xl bg-slate-800 font-bold text-[11px]"><span aria-hidden="true">❓</span></button>
     <button id="scr" onclick="showScores()" aria-label="Punteggi" title="Punteggi" class="px-2.5 py-1.5 rounded-xl bg-slate-800 text-amber-400 font-bold text-[11px]"><span aria-hidden="true">🏆</span> <span id="top"></span></button>
   </div>
 </header>
 <main id="app" class="w-full max-w-2xl mx-auto flex-1"></main>
 <div id="tmr" role="timer" aria-live="off"></div>
-<div id="modal" style="display:none" class="fixed inset-0 z-50 bg-black/80 items-center justify-center p-4" onclick="if(event.target===this)closeModal()"></div>
+<div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+<div id="off" role="status" aria-live="polite"><span aria-hidden="true">📴</span><span>Offline</span></div>
+<div id="upd" role="status"><span></span><button id="upd-go" class="go" onclick="location.reload()"></button><button id="upd-x" onclick="hideUpd()" aria-label="Chiudi">✕</button></div>
+<div id="modal" role="dialog" aria-modal="true" aria-label="Finestra" style="display:none" class="fixed inset-0 z-50 bg-black/80 items-center justify-center p-4" onclick="if(event.target===this)closeModal()"></div>
 
 <script>
 /*! qrcode-generator v1.4.4 | (c) Kazuhiko Arase | MIT License | https://github.com/kazuhikoarase/qrcode-generator */
@@ -416,7 +450,101 @@ const I = {
     roomPlayers: 'connessi',
     roomCopy: 'Copia codice',
     roomVersion: 'versione',
-    roomNoticeNew: 'Il codice è cambiato: condividi il nuovo invito.'
+    roomNoticeNew: 'Il codice è cambiato: condividi il nuovo invito.',
+    settings: 'Impostazioni',
+    setSound: 'Suoni',
+    setVib: 'Vibrazione',
+    setTheme: 'Tema',
+    setOn: 'Attivo',
+    setOff: 'Spento',
+    thDefault: 'Viola',
+    thOcean: 'Oceano',
+    thSunset: 'Tramonto',
+    thForest: 'Bosco',
+    statsTitle: 'Statistiche',
+    statsGames: 'partite',
+    statsGame1: 'partita',
+    statsWin1: 'vittoria',
+    statsFav: 'Gioco più giocato',
+    statsNone: 'Nessuna partita conclusa su questo telefono.',
+    statsReset: 'Azzera statistiche',
+    statsResetConfirm: 'Azzerare le statistiche di questo telefono?',
+    statsResetOk: 'Statistiche azzerate.',
+    statsWins: 'vittorie',
+    statsPlayed: 'partite',
+    statsStreak: 'serie',
+    statsBest: 'record',
+    rematch: 'Rigioca',
+    updateReady: 'Nuova versione disponibile',
+    updateBtn: 'Aggiorna',
+    timeUp: 'Tempo scaduto',
+    gameOver: 'Partita conclusa',
+    dialog: 'Finestra',
+    onboardTitle: 'Benvenuto!',
+    onboard1: 'Aggiungi i giocatori qui sotto (da 2 a 20).',
+    onboard2: 'Scegli un gioco: quelli testuali funzionano anche con un solo telefono.',
+    onboard3: 'Segui le istruzioni: l’app distribuisce ruoli, domande e punti.',
+    onboardDemo: 'Prova una partita demo',
+    onboardOk: 'Ho capito',
+    onboardAgain: 'Rivedi introduzione',
+    demoBar: 'Modalità demo: i punteggi non vengono salvati.',
+    demoExit: 'Esci dalla demo',
+    dbTitle: 'Domande scritte da voi',
+    dbBody: 'Questi giochi nascono per domande e parole inventate dai giocatori. Il database incluso è solo un punto di partenza: le domande automatiche sono poche, a volte generiche e non conoscono il vostro gruppo. Per partite davvero buone usate la modalità GM e scrivete le vostre domande.',
+    dbNever: 'Non mostrare più',
+    dbOk: 'Ho capito',
+    dbHint: 'Le domande automatiche sono un aiuto: il gioco dà il meglio con domande scritte da voi.',
+    dbWhy: 'Perché le domande automatiche sono limitate?',
+    a11yTitle: 'Accessibilità',
+    setText: 'Dimensione testo',
+    textS: 'Piccolo',
+    textM: 'Normale',
+    textL: 'Grande',
+    setContrast: 'Alto contrasto',
+    setMotion: 'Riduci animazioni',
+    setTimer: 'Timer predefinito',
+    timerMin: 'min',
+    setContent: 'Contenuti',
+    forgetSeen: 'Dimentica domande viste',
+    seenCleared: 'Domande viste azzerate.',
+    favAdd: 'Metti il pacchetto tra i preferiti',
+    favRemove: 'Togli dai preferiti',
+    favRandom: 'Casuale tra i preferiti',
+    setData: 'Dati e backup',
+    backupLast: 'Ultimo backup',
+    backupNever: 'Mai fatto',
+    backupReminder: 'È da un po’ che non salvi un backup: esportalo per non perdere statistiche e ruoli personalizzati.',
+    backupLater: 'Più tardi',
+    backupNow: 'Esporta ora',
+    storageUse: 'Spazio locale usato',
+    clearLocal: 'Cancella tutti i dati locali',
+    clearLocalConfirm: 'Cancellare impostazioni, statistiche, ruoli e categorie da questo telefono? L’operazione non si può annullare.',
+    install: 'Installa l’app',
+    installHint: 'Sul telefono: menu del browser → “Installa app” o “Aggiungi a schermata Home”. Su iPhone: Condividi → Aggiungi a Home.',
+    installed: 'App installata',
+    offline: 'Offline',
+    news: 'Novità',
+    newsTitle: 'Novità 1.9.0',
+    news1: 'Introduzione per i nuovi arrivati e partita demo.',
+    news2: 'Riepilogo di fine partita con vincitore e punti guadagnati.',
+    news3: 'Preferenze ricordate e domande già viste.',
+    news4: 'Accessibilità: testo regolabile, alto contrasto, meno animazioni.',
+    news5: 'Installazione più facile e avviso offline.',
+    news6: 'Backup: promemoria, spazio usato e cancellazione dati.',
+    summaryTitle: 'Riepilogo partita',
+    summaryWinner: 'Vince',
+    summaryNoPoints: 'Nessun punto in questa partita.',
+    summaryRank: 'Classifica',
+    summaryAgain: 'Rigioca',
+    summaryShare: 'Condividi',
+    hostNotes: 'Note host',
+    hostNotesPh: 'Promemoria, regole della casa, ordine dei turni…',
+    hostNotesSave: 'Salva nota',
+    pauseTimer: 'Pausa timer',
+    setGames: 'Preferenze giochi',
+    setGamesHint: 'Modalità, numero di ruoli, categorie e pacchetti restano come li hai lasciati.',
+    resetPrefs: 'Ripristina preferenze giochi',
+    prefsReset: 'Preferenze giochi ripristinate.'
   },
   en: {
     pickGame: 'Choose a game',
@@ -721,7 +849,101 @@ const I = {
     roomPlayers: 'online',
     roomCopy: 'Copy code',
     roomVersion: 'version',
-    roomNoticeNew: 'The code changed: share the new invite.'
+    roomNoticeNew: 'The code changed: share the new invite.',
+    settings: 'Settings',
+    setSound: 'Sounds',
+    setVib: 'Vibration',
+    setTheme: 'Theme',
+    setOn: 'On',
+    setOff: 'Off',
+    thDefault: 'Purple',
+    thOcean: 'Ocean',
+    thSunset: 'Sunset',
+    thForest: 'Forest',
+    statsTitle: 'Statistics',
+    statsGames: 'games',
+    statsGame1: 'game',
+    statsWin1: 'win',
+    statsFav: 'Most played',
+    statsNone: 'No finished games on this phone yet.',
+    statsReset: 'Reset statistics',
+    statsResetConfirm: 'Reset the statistics on this phone?',
+    statsResetOk: 'Statistics reset.',
+    statsWins: 'wins',
+    statsPlayed: 'games',
+    statsStreak: 'streak',
+    statsBest: 'best',
+    rematch: 'Play again',
+    updateReady: 'New version available',
+    updateBtn: 'Update',
+    timeUp: 'Time up',
+    gameOver: 'Game over',
+    dialog: 'Dialog',
+    onboardTitle: 'Welcome!',
+    onboard1: 'Add the players below (2 to 20).',
+    onboard2: 'Pick a game: the text games also work on a single phone.',
+    onboard3: 'Follow the prompts: the app deals roles, questions and points.',
+    onboardDemo: 'Try a demo game',
+    onboardOk: 'Got it',
+    onboardAgain: 'Show the intro again',
+    demoBar: 'Demo mode: scores are not saved.',
+    demoExit: 'Leave the demo',
+    dbTitle: 'Questions written by you',
+    dbBody: 'These games are meant to be played with questions and words invented by the players. The built-in database is only a starting point: automatic questions are few, sometimes generic and they do not know your group. For the best games use GM mode and write your own questions.',
+    dbNever: 'Don’t show again',
+    dbOk: 'Got it',
+    dbHint: 'Automatic questions are a fallback: the game is at its best with questions written by you.',
+    dbWhy: 'Why are automatic questions limited?',
+    a11yTitle: 'Accessibility',
+    setText: 'Text size',
+    textS: 'Small',
+    textM: 'Normal',
+    textL: 'Large',
+    setContrast: 'High contrast',
+    setMotion: 'Reduce animations',
+    setTimer: 'Default timer',
+    timerMin: 'min',
+    setContent: 'Content',
+    forgetSeen: 'Forget seen questions',
+    seenCleared: 'Seen questions cleared.',
+    favAdd: 'Add this pack to favourites',
+    favRemove: 'Remove from favourites',
+    favRandom: 'Random from favourites',
+    setData: 'Data and backup',
+    backupLast: 'Last backup',
+    backupNever: 'Never',
+    backupReminder: 'It has been a while since your last backup: export one to keep stats and custom roles safe.',
+    backupLater: 'Later',
+    backupNow: 'Export now',
+    storageUse: 'Local storage used',
+    clearLocal: 'Clear all local data',
+    clearLocalConfirm: 'Clear settings, statistics, roles and categories from this phone? This cannot be undone.',
+    install: 'Install the app',
+    installHint: 'On Android: browser menu → “Install app” or “Add to Home screen”. On iPhone: Share → Add to Home Screen.',
+    installed: 'App installed',
+    offline: 'Offline',
+    news: 'What’s new',
+    newsTitle: 'What’s new in 1.9.0',
+    news1: 'A welcome intro for newcomers and a demo game.',
+    news2: 'End-of-game summary with the winner and points gained.',
+    news3: 'Remembered preferences and seen questions.',
+    news4: 'Accessibility: adjustable text, high contrast, fewer animations.',
+    news5: 'Easier install and an offline warning.',
+    news6: 'Backup: reminders, storage usage and data clearing.',
+    summaryTitle: 'Game summary',
+    summaryWinner: 'Winner',
+    summaryNoPoints: 'No points this game.',
+    summaryRank: 'Standings',
+    summaryAgain: 'Play again',
+    summaryShare: 'Share',
+    hostNotes: 'Host notes',
+    hostNotesPh: 'Reminders, house rules, turn order…',
+    hostNotesSave: 'Save note',
+    pauseTimer: 'Pause timer',
+    setGames: 'Game preferences',
+    setGamesHint: 'Mode, role counts, categories and packs stay as you left them.',
+    resetPrefs: 'Reset game preferences',
+    prefsReset: 'Game preferences reset.'
   }
 };
 
@@ -798,7 +1020,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.7.0';
+const APP_VERSION = '1.9.0';
 // Ripresa dopo reload/standby: la sessione dura al massimo due ore.
 const RESUME_TTL = 2 * 60 * 60 * 1000;
 let RESUME = { room: null, snap: null, savedAt: 0, lastKey: '' };
@@ -828,6 +1050,7 @@ function loadSession() {
 }
 function saveSession(force) {
   try {
+    if (S.demo) return;
     if (NET.st === 'idle' || !NET.code || !NET.name) return;
     if (RESUME.muted && RESUME.muted === NET.code) return;
     const now = Date.now();
@@ -2727,7 +2950,7 @@ function hostBar() {
     chi
       ? `<button onclick="chiEnd()" class="w-full text-[11px] font-bold bg-emerald-600/10 border border-emerald-500/30 text-emerald-300 py-2 rounded-xl">${t('chiRevealEnd')}</button>`
       : ''
-  }<button onclick="hostAbort()" class="w-full text-[11px] font-bold bg-slate-900 border border-rose-500/30 text-rose-400 py-2 rounded-xl">⏹ ${X('Termina partita', 'End game')}</button></div>`;
+  }<div class="grid grid-cols-2 gap-1.5"><button onclick="hostNotesOpen()" class="text-[11px] font-bold bg-slate-900 border border-slate-700 text-slate-300 py-2 rounded-xl">📝 ${t('hostNotes')}</button><button onclick="tmStop()" class="text-[11px] font-bold bg-slate-900 border border-slate-700 text-slate-300 py-2 rounded-xl">⏸ ${t('pauseTimer')}</button></div><button onclick="hostAbort()" class="w-full text-[11px] font-bold bg-slate-900 border border-rose-500/30 text-rose-400 py-2 rounded-xl">⏹ ${X('Termina partita', 'End game')}</button></div>`;
 }
 function hostAbort() {
   if (!NET.host || !NET.game) return;
@@ -2740,6 +2963,9 @@ function hostAbort() {
     )
   )
     return;
+  // Preferiresti e Parole vietate non hanno una fine naturale: se l'host chiude
+  // una partita in cui sono già stati assegnati punti, la conto come conclusa.
+  if (STATS_BASE && !STATS_BASE.done && activeGameId()) statsRecord(activeGameId(), STATS_BASE, true);
   ncStopTimer();
   tbStopTimer();
   toLobby();
@@ -2807,7 +3033,7 @@ function showInvite() {
   <div class="bg-slate-900 rounded-xl p-2 text-[10px] text-slate-400 break-all select-text">${esc(link)}</div>
   <div class="grid grid-cols-2 gap-2"><button onclick="copyInvite()" class="bg-slate-800 py-2.5 rounded-xl text-xs font-bold">📋 ${t('copyLink')}</button><button onclick="shareInvite()" class="gbtn py-2.5 rounded-xl text-xs font-bold">${t('share')}</button></div>
   <button onclick="closeModal()" class="w-full bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
-  m.style.display = 'flex';
+  modalOpen();
 }
 function copyText(txt, msg) {
   const done = () => alert(msg || t('copied'));
@@ -2899,11 +3125,31 @@ function backupData() {
     lastCode: NET.lastCode,
     cust: CUST.map((c) => ({ id: c.id, name: c.name, desc: c.desc, fac: c.fac })),
     cn: CN,
+    theme: S.theme,
+    snd: S.sndOn ? 1 : 0,
+    vib: S.vibOn ? 1 : 0,
+    lastGame: S.lastGame,
+    stats: S.stats,
+    onboarded: S.onboarded ? 1 : 0,
+    dbAck: S.dbAck,
+    textSize: S.textSize,
+    contrast: S.contrast ? 1 : 0,
+    motion: S.reduceMotion ? 1 : 0,
+    timerPref: S.timerPref,
+    favPV: S.favPV,
+    ncPref: S.ncPref,
+    lastBackup: S.lastBackup,
+    hostNotes: S.hostNotes,
+    mode: S.mode,
+    cfg: { imp: S.cfg.imp, und: S.cfg.und, mwN: S.cfg.mwN, cats: [...S.cfg.cats] },
+    pvPack: (S.pv && S.pv.pack) || '',
+    seen: [...S.used].slice(-600),
     ncCats: NC_CATS.filter((c) => String(c.k).indexOf('cu') === 0).map((c) => ({ k: c.k, it: c.it, en: c.en }))
   };
 }
 function exportBackup() {
   try {
+    S.lastBackup = Date.now();
     const blob = new Blob([JSON.stringify(backupData(), null, 2)], { type: 'application/json' }),
       url = URL.createObjectURL(blob),
       a = document.createElement('a');
@@ -2913,6 +3159,7 @@ function exportBackup() {
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1500);
+    saveLocal();
     alert(t('exportOk'));
   } catch (e) {}
 }
@@ -2979,6 +3226,35 @@ function applyBackup(d) {
   S.scores = sc;
   if (typeof d.name === 'string') NET.name = cleanName(d.name, 16);
   if (typeof d.lastCode === 'string') NET.lastCode = String(d.lastCode).slice(0, 5).toUpperCase();
+  S.theme = THEMES.includes(d.theme) ? d.theme : S.theme;
+  if (d.snd !== undefined) S.sndOn = d.snd !== 0 && d.snd !== false;
+  if (d.vib !== undefined) S.vibOn = d.vib !== 0 && d.vib !== false;
+  S.stats = sanitizeStats(d.stats);
+  S.lastGame = typeof d.lastGame === 'string' && GAME_START[d.lastGame] ? d.lastGame : '';
+  S.onboarded = d.onboarded === 1 || d.onboarded === true;
+  S.dbAck = [0, 1, 2].includes(+d.dbAck) ? +d.dbAck : S.dbAck;
+  S.textSize = ['s', 'm', 'l'].includes(d.textSize) ? d.textSize : S.textSize;
+  if (d.contrast !== undefined) S.contrast = d.contrast === 1 || d.contrast === true;
+  if (d.motion !== undefined) S.reduceMotion = d.motion === 1 || d.motion === true;
+  S.timerPref = [60, 120, 180, 300].includes(+d.timerPref) ? +d.timerPref : S.timerPref;
+  S.favPV = (Array.isArray(d.favPV) ? d.favPV : []).filter((p) => typeof p === 'string' && PV_DB[p]).slice(0, 10);
+  S.ncPref = (Array.isArray(d.ncPref) ? d.ncPref : []).filter((k) => typeof k === 'string').slice(0, 20);
+  S.hostNotes = cleanText(d.hostNotes, 600);
+  if (d.mode === 'auto' || d.mode === 'gm') S.mode = d.mode;
+  if (d.cfg && typeof d.cfg === 'object') {
+    S.cfg.imp = Math.max(0, Math.min(5, Math.round(+d.cfg.imp || 0)));
+    S.cfg.und = Math.max(0, Math.min(5, Math.round(+d.cfg.und || 0)));
+    S.cfg.mwN = Math.max(0, Math.min(5, Math.round(+d.cfg.mwN || 0)));
+    const cats = (Array.isArray(d.cfg.cats) ? d.cfg.cats : []).filter((c) => CATS.includes(c));
+    S.cfg.cats = new Set(cats.length ? cats : CATS);
+  }
+  if (d.pvPack && PV_DB[d.pvPack]) S.pv.pack = d.pvPack;
+  S.used = new Set(
+    (Array.isArray(d.seen) ? d.seen : []).filter((x) => typeof x === 'string').slice(-600)
+  );
+  S.lastBackup = Date.now();
+  applyTheme();
+  applyA11y();
   resetCustomRoles();
   (Array.isArray(d.cust) ? d.cust : []).slice(0, 40).forEach((x) => {
     const id = x && typeof x.id === 'string' ? x.id : '';
@@ -3036,7 +3312,11 @@ function viewOnline() {
     .join('')}</div>
   ${
     NET.host
-      ? `${[
+      ? `${
+          S.lastGame && GAME_START[S.lastGame]
+            ? `<button onclick="${GAME_START[S.lastGame][0]}" ${NET.players.length < GAME_START[S.lastGame][1] ? 'disabled' : ''} class="w-full bg-slate-800 py-2.5 rounded-xl text-xs font-bold disabled:opacity-40">🔁 ${t('rematch')} · ${t('g_' + S.lastGame)}</button>`
+            : ''
+        }${[
           ['iNew()', '🕵️', 'g_impostore', 3],
           ['mwNew()', '⬜', 'g_mrwhite', 3],
           ['wStart()', '💬', 'g_who_said', 3],
@@ -3221,7 +3501,7 @@ function showHelp(ctx) {
     ].join('')
   );
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3 max-h-[85vh] overflow-y-auto"><h3 class="font-bold text-white">❓ ${X('Aiuto', 'Help')}</h3>${sec(X('Giochi', 'Games'), games)}${sec(t('tm_civ'), ['villico', ...CORE, ...SPEC_C].map(it).join(''))}${sec(t('tm_wolf'), ['lupo', ...SPEC_W].map(it).join(''))}${sec(t('tm_third'), SPEC_T.map(it).join(''))}${sec(X('Punteggi (Lupus)', 'Scoring (Werewolf)'), score)}${sec(X('Regole e consigli', 'Rules & tips'), tips, openRules)}<button onclick="closeModal()" class="gbtn px-4 py-2 rounded-xl text-xs font-bold w-full">${t('close')}</button></div>`;
-  m.style.display = 'flex';
+  modalOpen();
 }
 const WORDS = {
   food: [
@@ -3311,6 +3591,30 @@ const GAMES = [
   ['taboo', '🚫', 'border-orange-500/50'],
   ['chisono', '👤', 'border-sky-500/50']
 ];
+// Come riavviare un gioco dalla lobby: [chiamata, giocatori minimi].
+const GAME_START = {
+  impostore: ['iNew()', 3],
+  mrwhite: ['mwNew()', 3],
+  who_said: ['wStart()', 3],
+  preferisci: ['pvHostOpen()', 2],
+  lupus: ['lupNew()', 4],
+  nomicose: ['ncHostOpen()', 2],
+  taboo: ['tbHostOpen()', 4],
+  chisono: ['chiStart()', 3]
+};
+// Stesse azioni di GAME_START ma come funzioni, per i pulsanti generati dal codice.
+const GAME_FN = {
+  impostore: iNew,
+  mrwhite: mwNew,
+  who_said: wStart,
+  preferisci: pvHostOpen,
+  lupus: lupNew,
+  nomicose: ncHostOpen,
+  taboo: tbHostOpen,
+  chisono: chiStart
+};
+const THEMES = ['viola', 'oceano', 'tramonto', 'bosco'];
+const THEME_DOT = { viola: '#a855f7', oceano: '#22d3ee', tramonto: '#fb923c', bosco: '#34d399' };
 
 // Minigames Hub: database domande (IT)
 // Categorie (toggle): classic, hot, flirty, nsfw, dark
@@ -5591,7 +5895,24 @@ const S = {
   cfg: { und: 1, mwN: 1, cats: new Set(CATS), imp: 1 },
   G: null,
   sel: null,
-  hint: ''
+  hint: '',
+  theme: 'viola',
+  sndOn: true,
+  vibOn: true,
+  lastGame: '',
+  stats: { games: 0, byGame: {}, wins: {}, played: {}, streak: {}, best: {} },
+  onboarded: false,
+  dbAck: 0,
+  textSize: 'm',
+  contrast: false,
+  reduceMotion: false,
+  timerPref: 120,
+  favPV: [],
+  ncPref: [],
+  lastBackup: 0,
+  backupSnooze: 0,
+  hostNotes: '',
+  demo: false
 };
 const $ = (id) => document.getElementById(id);
 const esc = (s) =>
@@ -5687,9 +6008,10 @@ function tmDraw() {
     html =
       `<div class="tmr-box" role="group" aria-label="${X('Timer di discussione', 'Discussion timer')}"><span aria-hidden="true">⏱️</span>` +
       [60, 120, 180, 300]
+        .sort((a, b) => (b === S.timerPref) - (a === S.timerPref))
         .map(
           (s) =>
-            `<button onclick="tmStart(${s})" aria-label="${X('Timer', 'Timer')} ${s / 60} ${X('minuti', 'minutes')}">${s / 60}′</button>`
+            `<button onclick="tmStart(${s})" aria-label="${X('Timer', 'Timer')} ${s / 60} ${X('minuti', 'minutes')}">${s / 60}′${s === S.timerPref ? ' ★' : ''}</button>`
         )
         .join('') +
       `</div>`;
@@ -5748,9 +6070,13 @@ function audioUnlock() {
   } catch (e) {}
 }
 function tmRing() {
-  try {
-    navigator.vibrate && navigator.vibrate([240, 120, 240]);
-  } catch (e) {}
+  if (S.vibOn) {
+    try {
+      navigator.vibrate && navigator.vibrate([240, 120, 240]);
+    } catch (e) {}
+  }
+  announce(t('timeUp'));
+  if (!S.sndOn) return;
   try {
     const A = window.AudioContext || window.webkitAudioContext;
     if (!A) return;
@@ -5830,6 +6156,7 @@ function netClose() {
   clearSession();
 }
 function goHome() {
+  if (S.demo) return exitDemo();
   const live =
     (S.screen === 'play' && S.G && S.G.phase !== 'end') || (S.screen === 'online' && NET.view);
   if (live && !confirm(X('Vuoi uscire? La partita andrà persa.', 'Leave? The game will be lost.')))
@@ -5840,6 +6167,7 @@ function goHome() {
   home();
 }
 function back() {
+  if (S.demo) return exitDemo();
   if (NET.lsetup) {
     NET.lsetup = false;
     S.screen = 'online';
@@ -5864,7 +6192,7 @@ function selectGame(g) {
   S.game = ONLY_ONLINE.includes(g) ? null : g;
   S.quick = false;
   S.gm = { a: '', b: '', c: '' };
-  S.pv = { a: '', b: '' };
+  S.pv = { a: '', b: '', i: S.pv.i || 0, pack: S.pv.pack || '' };
   if (ONLY_ONLINE.includes(g)) {
     S.hint = g;
     S.screen = 'online';
@@ -5873,6 +6201,7 @@ function selectGame(g) {
     S.screen = 'setup';
   }
   render();
+  if (['impostore', 'mrwhite', 'who_said', 'preferisci'].includes(g) && S.mode === 'auto') maybeDbTip();
 }
 function setLang(l) {
   S.lang = l;
@@ -5949,10 +6278,19 @@ function showScores() {
   ${canEdit ? `<div class="grid grid-cols-2 gap-2"><button onclick="editScores()" class="bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">✏️ ${t('scoreEdit')}</button><button onclick="undoRound()" class="bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">↩️ ${t('undoRound')}</button></div>` : ''}
   <button onclick="shareSummary()" class="w-full bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">📤 ${t('shareResult')}</button>
   <div class="flex justify-between items-center"><button onclick="resetScores()" class="text-[11px] text-rose-400 font-bold">↺ ${t('resetScores')}</button><button onclick="closeModal()" class="gbtn px-4 py-2 rounded-xl text-xs font-bold">${t('close')}</button></div></div>`;
-  m.style.display = 'flex';
+  modalOpen();
 }
 function closeModal() {
-  $('modal').style.display = 'none';
+  const m = $('modal');
+  if (!m) return;
+  m.style.display = 'none';
+  m.setAttribute('aria-hidden', 'true');
+  if (MODAL_PREV && MODAL_PREV.focus) {
+    try {
+      MODAL_PREV.focus();
+    } catch (e) {}
+  }
+  MODAL_PREV = null;
 }
 function scoreKeys() {
   const seen = new Set(),
@@ -5977,7 +6315,7 @@ function editScores() {
     )
     .join('')}</div>
   <div class="flex gap-2"><button onclick="showScores()" class="flex-1 bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${t('back')}</button><button onclick="saveScores()" class="flex-1 gbtn py-2.5 rounded-xl text-xs font-bold">${X('Salva', 'Save')}</button></div></div>`;
-  m.style.display = 'flex';
+  modalOpen();
 }
 function saveScores() {
   if (NET.conn && !NET.host) return;
@@ -6862,7 +7200,7 @@ function showInGame() {
         `<div class="bg-slate-900 px-3 py-2 rounded-xl text-xs"><b class="${LCOL[LT[r]]}">${RN(r)}</b></div>`
     )
     .join('')}<button onclick="closeModal()" class="${BTN}">${t('close')}</button></div>`;
-  m.style.display = 'flex';
+  modalOpen();
 }
 function glim() {
   return L().glim || 'one';
@@ -7481,6 +7819,7 @@ function viewLF() {
 function setMode(m) {
   S.mode = m;
   render();
+  if (m === 'auto' && ['impostore', 'mrwhite', 'who_said'].includes(S.game)) maybeDbTip();
 }
 function gmN() {
   let n = (S.gmName || '').trim() || 'GM';
@@ -7822,6 +8161,8 @@ function dismissResume() {
 function viewHome() {
   return `<div class="space-y-4"><div class="text-center space-y-1 mb-4"><h2 class="text-2xl font-extrabold">${t('pickGame')}</h2><p class="text-slate-400 text-xs">${t('pickSub')}</p></div>
   ${resumeCard()}
+  ${onboardCard()}
+  ${backupReminder()}
   ${GAMES.map(
     ([
       id,
@@ -7832,6 +8173,7 @@ function viewHome() {
     <p class="text-xs text-slate-400 mt-1">${t('d_' + id)}</p></div></div>`
   ).join('')}
   <div onclick="S.hint='';S.screen='online';render()" class="glass p-4 rounded-2xl cursor-pointer border border-cyan-500/30 flex items-start gap-3.5"><div class="text-3xl">🌐</div><div class="flex-1"><div class="flex items-center gap-2"><h3 class="font-bold text-white">Online</h3><span class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full">beta</span></div><p class="text-xs text-slate-400 mt-1">${X('Crea una stanza con un codice e gioca da telefoni diversi.', 'Create a room with a code and play from separate phones.')}</p></div></div>
+  <div class="grid grid-cols-2 gap-2"><button onclick="installApp()" class="bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">📲 ${t('install')}</button><button onclick="showNews()" class="bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">✨ ${t('news')}</button></div>
   <div class="glass p-4 rounded-2xl border border-slate-600/40 space-y-2"><h3 class="font-bold text-white text-sm">💾 ${t('backupTitle')}</h3><p class="text-[11px] text-slate-400">${X('Salva ruoli personalizzati, categorie di Nomi Cose e Città e punteggi in un file JSON, poi ripristinali su un altro telefono.', 'Save custom roles, Names Things and Cities categories and scores to a JSON file, then restore them on another phone.')}</p><div class="grid grid-cols-2 gap-2"><button onclick="exportBackup()" class="bg-slate-800 py-2.5 rounded-xl text-xs font-bold">⬇️ ${t('exportBtn')}</button><button onclick="importBackup()" class="bg-slate-800 py-2.5 rounded-xl text-xs font-bold">⬆️ ${t('importBtn')}</button></div></div></div>`;
 }
 function viewSetup() {
@@ -7853,7 +8195,9 @@ function viewSetup() {
         (p) =>
           `<button onclick="pvPreset('${p}')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold ${S.pv.pack === p ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-slate-400'}">${t('pvPack' + p[0].toUpperCase() + p.slice(1))}</button>`
       )
-      .join('')}<button onclick="pvRandom()" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300">🎲 ${t('pvRandom')}</button></div></div>
+      .join('')}<button onclick="pvRandom()" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300">🎲 ${t('pvRandom')}</button></div>
+      <div class="flex flex-wrap gap-1.5 mt-1.5">${S.pv.pack ? `<button onclick="togglePackFav()" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 ${S.favPV.includes(S.pv.pack) ? 'text-amber-300' : 'text-slate-400'}">${S.favPV.includes(S.pv.pack) ? '★ ' + t('favRemove') : '☆ ' + t('favAdd')}</button>` : ''}${S.favPV.length ? `<button onclick="pvFavRandom()" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-amber-300">★ ${t('favRandom')}</button>` : ''}</div>
+      ${dbHint()}</div>
     <div><p class="text-[11px] text-slate-400 mb-1">${t('pvA')}</p><input autocomplete="off" maxlength="80" value="${esc(S.pv.a)}" oninput="S.pv.a=this.value;chk()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500"></div>
     <div><p class="text-[11px] text-slate-400 mb-1">${t('pvB')}</p><input autocomplete="off" maxlength="80" value="${esc(S.pv.b)}" oninput="S.pv.b=this.value;chk()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500"></div>
     <p class="text-[11px] text-slate-500">${t('pvPass')} ${X('ogni giocatore, poi si contano i voti.', 'each player, then the votes are counted.')}</p></div>`;
@@ -7862,7 +8206,7 @@ function viewSetup() {
   <div class="flex gap-2"><input autocomplete="off" id="pn" onkeydown="if(event.key==='Enter')addPlayer()" placeholder="${t('namePh')}" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500"><button onclick="addPlayer()" class="gbtn px-4 rounded-xl font-bold text-xs">${t('add')}</button></div>
   <div class="flex justify-between text-[11px] font-bold text-slate-400 px-1"><span>${t('players').toUpperCase()} (${pl.length})</span><button onclick="clearPlayers()" class="text-rose-400">${t('clear')}</button></div>
   <div class="max-h-36 overflow-y-auto space-y-1.5">${pl.length ? pl.map((p, i) => `<div class="flex justify-between items-center bg-slate-900 px-3 py-1.5 rounded-xl text-xs font-semibold"><span>${i + 1}. ${esc(p)}</span><button onclick="removePlayer(${i})" class="text-slate-500 px-1" aria-label="${X('Rimuovi', 'Remove')} ${esc(p)}">🗑</button></div>`).join('') : `<p class="text-xs text-slate-500 italic">${t('none')}</p>`}</div>
-  ${PLAYABLE.includes(g) && g !== 'preferisci' ? modeUI(g) : ''}${g !== 'lupus' && g !== 'preferisci' && PLAYABLE.includes(g) ? quickUI() : ''}${cfg}
+  ${PLAYABLE.includes(g) && g !== 'preferisci' ? modeUI(g) : ''}${g !== 'lupus' && g !== 'preferisci' && PLAYABLE.includes(g) ? quickUI() : ''}${['impostore', 'who_said', 'mrwhite'].includes(g) ? dbHint() : ''}${cfg}
   ${PLAYABLE.includes(g) ? '' : `<p class="text-xs text-amber-300 text-center">${t('comingSoon')}</p>`}
   ${g === 'mrwhite' && e.und + e.mw === 0 ? `<p class="text-xs text-amber-300 text-center">${t('needRole')}</p>` : ''}
   <button id="start-btn" onclick="startGame()" ${canStart() ? '' : 'disabled'} class="${BTN}">${t(g === 'lupus' ? 'next' : 'start')}</button></section>`;
@@ -8035,6 +8379,7 @@ function pvPreset(pack) {
   S.pv.i = i + 1;
   S.pv.pack = pack;
   render();
+  maybeDbTip();
 }
 function pvRandom() {
   const packs = Object.keys(PV_DB),
@@ -8054,6 +8399,7 @@ function pvPresetOnline(pack) {
   NET.pvPack = pack;
   chkPv();
   render();
+  maybeDbTip();
 }
 function pvRandomOnline() {
   const packs = Object.keys(PV_DB),
@@ -8083,6 +8429,7 @@ function viewPvSetup() {
         `<button onclick="pvPresetOnline('${p}')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold ${NET.pvPack === p ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-slate-400'}">${t('pvPack' + p[0].toUpperCase() + p.slice(1))}</button>`
     )
     .join('')}<button onclick="pvRandomOnline()" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300">🎲 ${t('pvRandom')}</button></div></div>
+  ${dbHint()}
   <div><p class="text-[11px] text-slate-400 mb-1">${t('pvA')}</p><input autocomplete="off" maxlength="80" value="${esc(NET.pvA || '')}" oninput="NET.pvA=this.value;chkPv()" class="${inp}"></div>
   <div><p class="text-[11px] text-slate-400 mb-1">${t('pvB')}</p><input autocomplete="off" maxlength="80" value="${esc(NET.pvB || '')}" oninput="NET.pvB=this.value;chkPv()" class="${inp}"></div>
   <p class="text-[11px] text-slate-500">${NET.players.length} ${t('players').toLowerCase()} · ${X('servono almeno 2 giocatori e due opzioni diverse.', 'at least 2 players and two different options needed.')}</p>
@@ -8314,7 +8661,10 @@ function ncHostOpen() {
   if (!NET.host) return;
   netPrune();
   if (NET.players.length < 2) return;
-  if (!Array.isArray(NET.ncDraft) || !NET.ncDraft.length) NET.ncDraft = NC_CATS.slice(0, 3);
+  if (!Array.isArray(NET.ncDraft) || !NET.ncDraft.length) {
+    const pref = (S.ncPref || []).map((k) => NC_CATS.find((c) => c.k === k)).filter(Boolean).slice(0, NC_MAX);
+    NET.ncDraft = pref.length ? pref : NC_CATS.slice(0, 3);
+  }
   S.hint = '';
   S.screen = 'ncsetup';
   render();
@@ -8378,6 +8728,8 @@ function ncStart() {
     end: Date.now() + NC_TIME * 1000,
     timeup: false
   };
+  S.ncPref = NET.game.cats.map((c) => c.k);
+  saveLocal();
   NCC = {};
   NET.ncStamp = '';
   S.screen = 'online';
@@ -9229,8 +9581,524 @@ function viewChi(v) {
   }${words}</div>`;
 }
 
+// --- impostazioni, temi e statistiche locali ---
+function applyTheme() {
+  try {
+    const el = document.documentElement;
+    if (!el.dataset) el.dataset = {};
+    el.dataset.theme = THEMES.includes(S.theme) ? S.theme : '';
+  } catch (e) {}
+}
+function announce(msg) {
+  try {
+    const el = $('live');
+    if (el) el.textContent = String(msg || '');
+  } catch (e) {}
+}
+function activeGameId() {
+  if (S.screen === 'online' && NET.game) return NET.game.g || '';
+  if (S.screen === 'play' && S.game) return S.game;
+  return '';
+}
+// Ogni gioco segna la fine in modo diverso: qui normalizzo i marcatori.
+const END_PH = { impostore: 'r', mrwhite: 'end', who_said: 'wres', preferisci: 'pvres', lupus: 'end' };
+function gameOverNow(gid) {
+  if (S.screen === 'online' && NET.game && NET.game.g === gid) {
+    if (gid === 'lupus') return !!(S.G && S.G.phase === 'end');
+    if (gid === 'tb') return NET.game.ph === 'end';
+    return ['r', 'res', 'end'].includes(NET.game.ph);
+  }
+  return (
+    S.screen === 'play' &&
+    !!S.G &&
+    S.game === gid &&
+    (S.G.phase === 'end' || S.G.phase === (END_PH[gid] || 'end'))
+  );
+}
+let STATS_BASE = null;
+let MODAL_PREV = null;
+// La base dei punteggi si prende all'inizio della partita: le vittorie si contano sul delta.
+function statsTick() {
+  const gid = activeGameId();
+  if (!gid) {
+    STATS_BASE = null;
+    return;
+  }
+  if (S.lastGame !== gid) S.lastGame = gid;
+  if (!STATS_BASE || STATS_BASE.g !== gid) STATS_BASE = { g: gid, scores: { ...S.scores }, done: false };
+  // Fine partita registrata: alla partita successiva (stesso gioco) si riparte da una base nuova.
+  else if (STATS_BASE.done && !gameOverNow(gid)) STATS_BASE = { g: gid, scores: { ...S.scores }, done: false };
+  if (!STATS_BASE.done && gameOverNow(gid)) {
+    if (!S.demo) statsRecord(gid, STATS_BASE);
+    STATS_BASE.done = true;
+  }
+}
+function statsRecord(gid, base, onlyIfScored) {
+  const P = (S.screen === 'online' ? NET.players : S.players).slice(0, 40);
+  if (!P.length || !base) return;
+  const delta = {};
+  let max = 0;
+  P.forEach((p) => {
+    const v = (+S.scores[p] || 0) - (+base.scores[p] || 0);
+    delta[p] = v;
+    if (v > max) max = v;
+  });
+  if (onlyIfScored && max <= 0) return;
+  const st = S.stats;
+  if (!st || typeof st !== 'object') return;
+  st.games = (+st.games || 0) + 1;
+  st.byGame[gid] = (+st.byGame[gid] || 0) + 1;
+  P.forEach((p) => {
+    const n = cleanName(p, 20);
+    if (!n) return;
+    st.played[n] = (+st.played[n] || 0) + 1;
+    if (max > 0 && delta[p] === max) {
+      st.wins[n] = (+st.wins[n] || 0) + 1;
+      st.streak[n] = (+st.streak[n] || 0) + 1;
+      st.best[n] = Math.max(+st.best[n] || 0, st.streak[n]);
+    } else st.streak[n] = 0;
+  });
+  statsPrune();
+  announce(t('gameOver'));
+}
+// Evita che il file di salvataggio cresca senza limite: restano i 40 nomi più presenti.
+function statsPrune() {
+  const st = S.stats,
+    keys = Object.keys(st.played || {});
+  if (keys.length <= 60) return;
+  keys
+    .sort((a, b) => (+st.played[b] || 0) - (+st.played[a] || 0))
+    .slice(40)
+    .forEach((k) => {
+      delete st.played[k];
+      delete st.wins[k];
+      delete st.streak[k];
+      delete st.best[k];
+    });
+}
+function statsTop(n) {
+  const st = S.stats || {};
+  return Object.keys(st.played || {})
+    .map((k) => [k, +st.wins[k] || 0, +st.played[k] || 0, +st.streak[k] || 0, +st.best[k] || 0])
+    .sort((a, b) => b[1] - a[1] || b[2] - a[2] || a[0].localeCompare(b[0]))
+    .slice(0, n || 5);
+}
+// Le statistiche arrivano anche da un backup: vanno validate come tutto il resto.
+function sanitizeStats(x) {
+  const out = { games: 0, byGame: {}, wins: {}, played: {}, streak: {}, best: {} };
+  if (!x || typeof x !== 'object') return out;
+  out.games = Math.max(0, Math.min(99999, Math.round(+x.games || 0)));
+  [
+    ['byGame', 400],
+    ['wins', 9999],
+    ['played', 9999],
+    ['streak', 9999],
+    ['best', 9999]
+  ].forEach(([k, cap]) => {
+    const src = x[k];
+    if (!src || typeof src !== 'object') return;
+    Object.keys(src)
+      .slice(0, 80)
+      .forEach((key) => {
+        const name = k === 'byGame' ? String(key).slice(0, 20) : cleanName(key, 20);
+        const v = Math.round(+src[key]);
+        if (!name || !isFinite(v) || v < 0) return;
+        if (k === 'byGame' && !GAME_START[name]) return;
+        out[k][name] = Math.min(cap, v);
+      });
+  });
+  return out;
+}
+function resetStats() {
+  if (!confirm(t('statsResetConfirm'))) return;
+  S.stats = { games: 0, byGame: {}, wins: {}, played: {}, streak: {}, best: {} };
+  STATS_BASE = null;
+  saveLocal();
+  alert(t('statsResetOk'));
+  showSettings();
+}
+function setTheme(th) {
+  S.theme = THEMES.includes(th) ? th : 'viola';
+  applyTheme();
+  saveLocal();
+  showSettings();
+}
+function toggleSnd() {
+  S.sndOn = !S.sndOn;
+  saveLocal();
+  showSettings();
+}
+function toggleVib() {
+  S.vibOn = !S.vibOn;
+  saveLocal();
+  showSettings();
+}
+// --- accessibilità, installazione e avvisi ---
+function applyA11y() {
+  try {
+    const el = document.documentElement;
+    if (!el.dataset) el.dataset = {};
+    el.dataset.text = ['s', 'm', 'l'].includes(S.textSize) ? S.textSize : 'm';
+    el.dataset.contrast = S.contrast ? 'high' : '';
+    el.dataset.motion = S.reduceMotion ? 'off' : '';
+  } catch (e) {}
+}
+function setTextSize(v) {
+  S.textSize = ['s', 'm', 'l'].includes(v) ? v : 'm';
+  applyA11y();
+  saveLocal();
+  showSettings();
+}
+function toggleContrast() {
+  S.contrast = !S.contrast;
+  applyA11y();
+  saveLocal();
+  showSettings();
+}
+function toggleMotion() {
+  S.reduceMotion = !S.reduceMotion;
+  applyA11y();
+  saveLocal();
+  showSettings();
+}
+function setTimerPref(sec) {
+  S.timerPref = [60, 120, 180, 300].includes(+sec) ? +sec : 120;
+  saveLocal();
+  tmDraw();
+  showSettings();
+}
+let INSTALL_EVT = null;
+function isStandalone() {
+  try {
+    return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+  } catch (e) {
+    return false;
+  }
+}
+function showInstallHelp() {
+  const m = $('modal');
+  if (!m) return;
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">📲 ${t('install')}</h3><p class="text-xs text-slate-300">${t('installHint')}</p><button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
+  modalOpen();
+}
+function installApp() {
+  if (INSTALL_EVT) {
+    const ev = INSTALL_EVT;
+    INSTALL_EVT = null;
+    try {
+      ev.prompt();
+      ev.userChoice && ev.userChoice.then(() => render());
+      return;
+    } catch (e) {}
+  }
+  showInstallHelp();
+}
+function updateOffline() {
+  const el = $('off');
+  if (!el) return;
+  let off = false;
+  try {
+    off = navigator.onLine === false;
+  } catch (e) {}
+  if (el.classList && el.classList.toggle) el.classList.toggle('on', off);
+  else el.className = off ? 'on' : '';
+}
+// --- avviso sulle domande automatiche ---
+function showDbTip(force) {
+  if (S.dbAck === 2 && !force) return;
+  const m = $('modal');
+  if (!m) return;
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">✍️ ${t('dbTitle')}</h3><p class="text-xs text-slate-300 leading-relaxed">${t('dbBody')}</p><div class="flex gap-2"><button onclick="dismissDbTip(1)" class="flex-1 bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${t('dbNever')}</button><button onclick="dismissDbTip(0)" class="flex-1 gbtn py-2.5 rounded-xl text-xs font-bold">${t('dbOk')}</button></div></div>`;
+  modalOpen();
+}
+function dismissDbTip(never) {
+  if (never) S.dbAck = 2;
+  else if (!S.dbAck) S.dbAck = 1;
+  saveLocal();
+  closeModal();
+  render();
+}
+function maybeDbTip() {
+  if (S.dbAck === 0) {
+    showDbTip();
+    return true;
+  }
+  return false;
+}
+function dbHint() {
+  return `<p class="text-[11px] text-amber-300/90 bg-amber-500/10 border border-amber-500/30 rounded-xl px-3 py-2 leading-relaxed">✍️ ${t('dbHint')} <button onclick="showDbTip(true)" class="underline font-bold">${t('dbWhy')}</button></p>`;
+}
+// --- onboarding e demo ---
+function onboardCard() {
+  if (S.onboarded || S.demo) return '';
+  return `<div class="glass p-4 rounded-2xl border border-amber-500/40 space-y-2">
+    <h3 class="font-bold text-white">👋 ${t('onboardTitle')}</h3>
+    <ol class="text-xs text-slate-300 space-y-1 list-decimal list-inside"><li>${t('onboard1')}</li><li>${t('onboard2')}</li><li>${t('onboard3')}</li></ol>
+    <div class="flex gap-2"><button onclick="dismissOnboard()" class="flex-1 bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${t('onboardOk')}</button><button onclick="startDemo()" class="flex-1 gbtn py-2.5 rounded-xl text-xs font-bold">${t('onboardDemo')}</button></div></div>`;
+}
+function dismissOnboard() {
+  S.onboarded = true;
+  saveLocal();
+  render();
+}
+function restartOnboard() {
+  S.onboarded = false;
+  saveLocal();
+  closeModal();
+  home();
+}
+function startDemo() {
+  closeModal();
+  if (!S.demo) {
+    S.demoPrev = { players: [...S.players], scores: { ...S.scores } };
+    S.demoAdded = S.players.length < 2;
+    if (S.demoAdded) S.players = ['Anna', 'Bruno', 'Carla'];
+  }
+  S.demo = true;
+  S.game = 'preferisci';
+  S.mode = 'auto';
+  S.pv = { a: X('Caffè', 'Coffee'), b: X('Tè', 'Tea'), i: 0, pack: '' };
+  S.screen = 'setup';
+  startPref();
+  announce(t('demoBar'));
+}
+function exitDemo() {
+  if (S.demoPrev) {
+    S.players = S.demoPrev.players;
+    S.scores = S.demoPrev.scores;
+  }
+  S.demo = false;
+  S.demoPrev = null;
+  S.demoAdded = false;
+  home();
+}
+function demoBar() {
+  if (!S.demo) return '';
+  return `<div class="glass p-2.5 rounded-xl border border-amber-500/40 flex items-center gap-2 text-[11px] font-bold text-amber-200"><span class="flex-1">🧪 ${t('demoBar')}</span><button onclick="exitDemo()" class="bg-slate-800 px-3 py-1.5 rounded-lg">${t('demoExit')}</button></div>`;
+}
+// --- riepilogo di fine partita ---
+function summaryData() {
+  const gid = activeGameId();
+  if (!gid || !STATS_BASE || STATS_BASE.g !== gid || !gameOverNow(gid)) return null;
+  const P = (S.screen === 'online' ? NET.players : S.players).slice(0, 40);
+  if (!P.length) return null;
+  const rows = P.map((p) => ({ n: p, d: (+S.scores[p] || 0) - (+STATS_BASE.scores[p] || 0) })).sort(
+    (a, b) => b.d - a.d || a.n.localeCompare(b.n)
+  );
+  const max = Math.max(0, ...rows.map((r) => r.d));
+  return { gid, rows, max, winners: max > 0 ? rows.filter((r) => r.d === max) : [] };
+}
+function summaryBar() {
+  const d = summaryData();
+  if (!d) return '';
+  const win = d.winners.length
+      ? `<p class="text-sm font-extrabold text-white">🏁 ${t('summaryWinner')}: ${d.winners.map((w) => esc(w.n) + ' +' + w.d).join(', ')}</p>`
+      : `<p class="text-sm font-bold text-slate-300">🏁 ${t('summaryNoPoints')}</p>`,
+    rows = d.rows
+      .map(
+        (r, i) =>
+          `<div class="flex justify-between bg-slate-900 px-3 py-1.5 rounded-lg text-[11px]"><span>#${i + 1} <b>${esc(r.n)}</b></span><span class="${r.d === d.max && r.d > 0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">${r.d > 0 ? '+' + r.d : '0'}</span></div>`
+      )
+      .join('');
+  return `<section class="glass p-4 rounded-2xl space-y-2 border border-emerald-500/30"><div class="flex justify-between items-center"><h3 class="font-bold text-white text-sm">📊 ${t('summaryTitle')}</h3><span class="text-[10px] text-slate-400">${t('g_' + d.gid)}</span></div>${win}<details class="bg-slate-900/40 rounded-xl p-2"><summary class="text-[11px] font-bold cursor-pointer">${t('summaryRank')}</summary><div class="space-y-1 mt-1.5">${rows}</div></details><div class="flex gap-2"><button onclick="shareSummary()" class="flex-1 bg-slate-800 py-2 rounded-xl text-[11px] font-bold">📤 ${t('summaryShare')}</button><button onclick="rematchSummary()" class="flex-1 gbtn py-2 rounded-xl text-[11px] font-bold">🔁 ${t('summaryAgain')}</button></div></section>`;
+}
+function rematchSummary() {
+  const d = summaryData();
+  if (!d) return;
+  if (S.demo) return startDemo();
+  if (S.screen === 'online') {
+    if (!NET.host) return;
+    const fn = GAME_FN[d.gid];
+    if (fn) fn();
+    return;
+  }
+  S.screen = 'play';
+  startGame();
+}
+// --- contenuti, backup e dati ---
+function togglePackFav(p) {
+  const k = p || (S.pv && S.pv.pack) || '';
+  if (!PV_DB[k]) return;
+  const i = S.favPV.indexOf(k);
+  if (i >= 0) S.favPV.splice(i, 1);
+  else S.favPV.push(k);
+  saveLocal();
+  render();
+}
+function pvFavRandom() {
+  const list = (S.favPV || []).filter((p) => PV_DB[p]);
+  if (!list.length) return;
+  pvPreset(list[rnd(list.length)]);
+}
+function forgetSeen() {
+  S.used = new Set();
+  saveLocal();
+  alert(t('seenCleared'));
+  showSettings();
+}
+function fmtDate(ts) {
+  try {
+    return ts ? new Date(ts).toLocaleDateString(S.lang === 'it' ? 'it-IT' : 'en-GB') : t('backupNever');
+  } catch (e) {
+    return t('backupNever');
+  }
+}
+function storageBytes() {
+  try {
+    let n = 0;
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i),
+        v = localStorage.getItem(k) || '';
+      n += (String(k).length + String(v).length) * 2;
+    }
+    return n;
+  } catch (e) {
+    return 0;
+  }
+}
+function fmtBytes(n) {
+  return n > 1024 * 1024 ? (n / (1024 * 1024)).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
+}
+function backupReminder() {
+  if (S.demo) return '';
+  const meaningful = Object.keys(S.scores).length || S.stats.games || CUST.length;
+  const old = !S.lastBackup || Date.now() - S.lastBackup > 30 * 86400000;
+  if (!meaningful || !old || S.backupSnooze > Date.now()) return '';
+  return `<div class="glass p-3 rounded-2xl border border-amber-500/40 space-y-2"><p class="text-[11px] text-amber-200 font-bold">💾 ${t('backupReminder')}</p><div class="flex gap-2"><button onclick="snoozeBackup()" class="flex-1 bg-slate-800 py-2 rounded-xl text-[11px] font-bold">${t('backupLater')}</button><button onclick="exportBackup()" class="flex-1 gbtn py-2 rounded-xl text-[11px] font-bold">${t('backupNow')}</button></div></div>`;
+}
+function snoozeBackup() {
+  S.backupSnooze = Date.now() + 7 * 86400000;
+  saveLocal();
+  render();
+}
+function clearLocalData() {
+  if (!confirm(t('clearLocalConfirm'))) return;
+  try {
+    localStorage.removeItem('mgh_save_v1');
+    localStorage.removeItem('mgh_session_v1');
+  } catch (e) {}
+  try {
+    location.reload();
+  } catch (e) {}
+}
+function showNews() {
+  const m = $('modal');
+  if (!m) return;
+  const items = ['news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">✨ ${t('newsTitle')}</h3><ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">${items.map((k) => `<li>${t(k)}</li>`).join('')}</ul><button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
+  modalOpen();
+}
+function hostNotesOpen() {
+  const m = $('modal');
+  if (!m) return;
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-2"><h3 class="font-bold text-white">📝 ${t('hostNotes')}</h3><textarea id="hn" rows="5" maxlength="600" placeholder="${t('hostNotesPh')}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">${esc(S.hostNotes)}</textarea><div class="flex gap-2"><button onclick="closeModal()" class="flex-1 bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${t('close')}</button><button onclick="saveHostNotes()" class="flex-1 gbtn py-2.5 rounded-xl text-xs font-bold">${t('hostNotesSave')}</button></div></div>`;
+  modalOpen();
+}
+function saveHostNotes() {
+  const el = $('hn');
+  S.hostNotes = el ? cleanText(el.value, 600) : S.hostNotes;
+  saveLocal();
+  closeModal();
+  announce(t('hostNotes'));
+}
+function resetPrefs() {
+  S.mode = 'auto';
+  S.cfg = { und: 1, mwN: 1, cats: new Set(CATS), imp: 1 };
+  S.pv.pack = '';
+  S.ncPref = [];
+  S.timerPref = 120;
+  saveLocal();
+  alert(t('prefsReset'));
+  showSettings();
+}
+function showSettings() {
+  const m = $('modal');
+  if (!m) return;
+  const th = [
+      ['viola', t('thDefault')],
+      ['oceano', t('thOcean')],
+      ['tramonto', t('thSunset')],
+      ['bosco', t('thForest')]
+    ],
+    top = statsTop(5),
+    fav = Object.entries(S.stats.byGame || {}).sort((a, b) => b[1] - a[1])[0],
+    row = (on) =>
+      `class="w-full flex justify-between items-center bg-slate-900 px-3 py-2.5 rounded-xl text-xs font-bold" aria-pressed="${on}"`;
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-4 max-h-[85vh] overflow-y-auto">
+  <h3 class="font-bold text-white">⚙️ ${t('settings')}</h3>
+  <div class="space-y-2">
+    <button onclick="toggleSnd()" ${row(S.sndOn)}><span>🔔 ${t('setSound')}</span><span class="${S.sndOn ? 'text-emerald-400' : 'text-slate-500'}">${S.sndOn ? t('setOn') : t('setOff')}</span></button>
+    <button onclick="toggleVib()" ${row(S.vibOn)}><span>📳 ${t('setVib')}</span><span class="${S.vibOn ? 'text-emerald-400' : 'text-slate-500'}">${S.vibOn ? t('setOn') : t('setOff')}</span></button>
+  </div>
+  <div class="space-y-2"><p class="text-xs font-bold text-slate-300">🎨 ${t('setTheme')}</p>
+    <div class="grid grid-cols-2 gap-2">${th
+      .map(
+        ([k, l]) =>
+          `<button onclick="setTheme('${k}')" aria-pressed="${S.theme === k}" class="flex items-center gap-2 bg-slate-900 px-3 py-2 rounded-xl text-[11px] font-bold border ${S.theme === k ? 'border-emerald-400 text-white' : 'border-slate-700 text-slate-300'}"><span class="rounded-full" style="width:.7rem;height:.7rem;background:${THEME_DOT[k]}"></span>${l}</button>`
+      )
+      .join('')}</div>
+  </div>
+  <div class="space-y-2"><p class="text-xs font-bold text-slate-300">♿ ${t('a11yTitle')}</p>
+    <p class="text-[11px] text-slate-400">${t('setText')}</p>
+    <div class="flex gap-2">${['s', 'm', 'l']
+      .map(
+        (v) =>
+          `<button onclick="setTextSize('${v}')" aria-pressed="${S.textSize === v}" class="flex-1 py-2 rounded-lg text-[11px] font-bold ${S.textSize === v ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-400'}">${t('text' + v.toUpperCase())}</button>`
+      )
+      .join('')}</div>
+    <button onclick="toggleContrast()" ${row(S.contrast)}><span>◐ ${t('setContrast')}</span><span class="${S.contrast ? 'text-emerald-400' : 'text-slate-500'}">${S.contrast ? t('setOn') : t('setOff')}</span></button>
+    <button onclick="toggleMotion()" ${row(S.reduceMotion)}><span>🐢 ${t('setMotion')}</span><span class="${S.reduceMotion ? 'text-emerald-400' : 'text-slate-500'}">${S.reduceMotion ? t('setOn') : t('setOff')}</span></button>
+  </div>
+  <div class="space-y-2"><p class="text-xs font-bold text-slate-300">⏱️ ${t('setTimer')}</p><div class="flex gap-2">${[60, 120, 180, 300]
+    .map(
+      (s) =>
+        `<button onclick="setTimerPref(${s})" aria-pressed="${S.timerPref === s}" class="flex-1 py-2 rounded-lg text-[11px] font-bold ${S.timerPref === s ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-400'}">${s / 60} ${t('timerMin')}</button>`
+    )
+    .join('')}</div></div>
+  <div class="space-y-2"><div class="flex justify-between items-baseline"><p class="text-xs font-bold text-slate-300">📊 ${t('statsTitle')}</p><span class="text-[11px] text-slate-500">${+S.stats.games || 0} ${+S.stats.games === 1 ? t('statsGame1') : t('statsGames')}</span></div>
+    ${fav ? `<p class="text-[11px] text-slate-400">${t('statsFav')}: <b class="text-slate-200">${esc(t('g_' + fav[0]))}</b> (${fav[1]})</p>` : ''}
+    <div class="space-y-1.5">${
+      top.length
+        ? top
+            .map(
+              ([n, w, p, s], i) =>
+                `<div class="flex justify-between bg-slate-900 px-3 py-2 rounded-xl text-[11px]"><span class="truncate">#${i + 1} <b>${esc(n)}</b></span><span class="text-amber-400 text-right">${w} ${w === 1 ? t('statsWin1') : t('statsWins')} · ${p} ${p === 1 ? t('statsGame1') : t('statsPlayed')}${s ? ' · ' + t('statsStreak') + ' ' + s : ''}</span></div>`
+            )
+            .join('')
+        : `<p class="text-[11px] text-slate-500 italic">${t('statsNone')}</p>`
+    }</div>
+    ${+S.stats.games ? `<button onclick="resetStats()" class="text-[11px] text-rose-400 font-bold">↺ ${t('statsReset')}</button>` : ''}
+  </div>
+  <div class="space-y-2"><p class="text-xs font-bold text-slate-300">🧩 ${t('setGames')}</p><p class="text-[11px] text-slate-400">${t('setGamesHint')}</p><div class="flex flex-wrap gap-2"><button onclick="resetPrefs()" class="text-[11px] text-rose-400 font-bold">↺ ${t('resetPrefs')}</button><button onclick="forgetSeen()" class="text-[11px] text-amber-300 font-bold">🧹 ${t('forgetSeen')}</button><button onclick="showDbTip(true)" class="text-[11px] text-slate-300 font-bold">✍️ ${t('dbWhy')}</button></div></div>
+  <div class="space-y-2"><p class="text-xs font-bold text-slate-300">💾 ${t('setData')}</p>
+    <p class="text-[11px] text-slate-400">${t('backupLast')}: <b class="text-slate-200">${fmtDate(S.lastBackup)}</b> · ${t('storageUse')}: <b class="text-slate-200">${fmtBytes(storageBytes())}</b></p>
+    <div class="grid grid-cols-2 gap-2"><button onclick="exportBackup()" class="bg-slate-800 py-2 rounded-xl text-[11px] font-bold">⬇️ ${t('exportBtn')}</button><button onclick="importBackup()" class="bg-slate-800 py-2 rounded-xl text-[11px] font-bold">⬆️ ${t('importBtn')}</button></div>
+    <div class="grid grid-cols-2 gap-2"><button onclick="installApp()" class="bg-slate-800 py-2 rounded-xl text-[11px] font-bold">📲 ${isStandalone() ? t('installed') : t('install')}</button><button onclick="clearLocalData()" class="bg-slate-900 border border-rose-500/30 py-2 rounded-xl text-[11px] font-bold text-rose-400">🗑 ${t('clearLocal')}</button></div>
+  </div>
+  <div class="flex gap-2"><button onclick="showNews()" class="flex-1 bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">✨ ${t('news')}</button><button onclick="restartOnboard()" class="flex-1 bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">👋 ${t('onboardAgain')}</button></div>
+  <button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button>
+</div>`;
+  modalOpen();
+}
+// Apre la modale e porta il focus dentro; closeModal ripristina il focus dopo.
+function modalOpen() {
+  const m = $('modal');
+  if (!m) return;
+  MODAL_PREV = (typeof document !== 'undefined' && document.activeElement) || null;
+  m.style.display = 'flex';
+  m.setAttribute('aria-hidden', 'false');
+  setTimeout(() => {
+    try {
+      const list = m.querySelectorAll
+        ? m.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+        : [];
+      if (list && list.length && list[0].focus) list[0].focus();
+    } catch (e) {}
+  }, 30);
+}
 function saveLocal() {
   try {
+    if (S.demo) return;
     const data = {
       v: APP_VERSION,
       players: S.players.slice(0, 40),
@@ -9240,6 +10108,26 @@ function saveLocal() {
       lastCode: NET.lastCode,
       cust: CUST.map((c) => ({ id: c.id, name: c.name, desc: c.desc, fac: c.fac })),
       cn: CN,
+      theme: S.theme,
+      snd: S.sndOn ? 1 : 0,
+      vib: S.vibOn ? 1 : 0,
+      lastGame: S.lastGame,
+      stats: S.stats,
+      onboarded: S.onboarded ? 1 : 0,
+      dbAck: S.dbAck,
+      textSize: S.textSize,
+      contrast: S.contrast ? 1 : 0,
+      motion: S.reduceMotion ? 1 : 0,
+      timerPref: S.timerPref,
+      favPV: S.favPV.slice(0, 10),
+      ncPref: S.ncPref.slice(0, 20),
+      lastBackup: S.lastBackup,
+      backupSnooze: S.backupSnooze,
+      hostNotes: S.hostNotes,
+      mode: S.mode,
+      cfg: { imp: S.cfg.imp, und: S.cfg.und, mwN: S.cfg.mwN, cats: [...S.cfg.cats] },
+      pvPack: (S.pv && S.pv.pack) || '',
+      seen: [...S.used].slice(-600),
       ncCats: NC_CATS.filter((c) => String(c.k).indexOf('cu') === 0).map((c) => ({
         k: c.k,
         it: c.it,
@@ -9264,6 +10152,40 @@ function loadLocal() {
       });
     if (typeof d.name === 'string') NET.name = cleanName(d.name, 16);
     if (typeof d.lastCode === 'string') NET.lastCode = d.lastCode.slice(0, 5);
+    S.theme = THEMES.includes(d.theme) ? d.theme : 'viola';
+    S.sndOn = d.snd !== 0 && d.snd !== false;
+    S.vibOn = d.vib !== 0 && d.vib !== false;
+    S.stats = sanitizeStats(d.stats);
+    S.lastGame = typeof d.lastGame === 'string' && GAME_START[d.lastGame] ? d.lastGame : '';
+    S.onboarded =
+      d.onboarded === 1 ||
+      d.onboarded === true ||
+      (d.stats && +d.stats.games > 0) ||
+      (d.scores && Object.keys(d.scores).length > 0);
+    S.dbAck = [0, 1, 2].includes(+d.dbAck) ? +d.dbAck : 0;
+    S.textSize = ['s', 'm', 'l'].includes(d.textSize) ? d.textSize : 'm';
+    S.contrast = d.contrast === 1 || d.contrast === true;
+    S.reduceMotion = d.motion === 1 || d.motion === true;
+    S.timerPref = [60, 120, 180, 300].includes(+d.timerPref) ? +d.timerPref : 120;
+    S.favPV = (Array.isArray(d.favPV) ? d.favPV : []).filter((p) => typeof p === 'string' && PV_DB[p]).slice(0, 10);
+    S.ncPref = (Array.isArray(d.ncPref) ? d.ncPref : []).filter((k) => typeof k === 'string').slice(0, 20);
+    S.lastBackup = Math.max(0, +d.lastBackup || 0);
+    S.backupSnooze = Math.max(0, +d.backupSnooze || 0);
+    S.hostNotes = cleanText(d.hostNotes, 600);
+    if (d.mode === 'auto' || d.mode === 'gm') S.mode = d.mode;
+    if (d.cfg && typeof d.cfg === 'object') {
+      S.cfg.imp = Math.max(0, Math.min(5, Math.round(+d.cfg.imp || 0)));
+      S.cfg.und = Math.max(0, Math.min(5, Math.round(+d.cfg.und || 0)));
+      S.cfg.mwN = Math.max(0, Math.min(5, Math.round(+d.cfg.mwN || 0)));
+      const cats = (Array.isArray(d.cfg.cats) ? d.cfg.cats : []).filter((c) => CATS.includes(c));
+      S.cfg.cats = new Set(cats.length ? cats : CATS);
+    }
+    if (d.pvPack && PV_DB[d.pvPack]) S.pv.pack = d.pvPack;
+    S.used = new Set(
+      (Array.isArray(d.seen) ? d.seen : []).filter((x) => typeof x === 'string').slice(-600)
+    );
+    applyTheme();
+    applyA11y();
     // Ruoli e categorie personalizzati: restano su questo telefono.
     if (Number.isFinite(+d.cn)) CN = Math.max(CN, +d.cn);
     if (Array.isArray(d.cust))
@@ -9292,12 +10214,16 @@ function loadLocal() {
 }
 function render() {
   if (S.screen === 'online' && NET.game && NET.game.g === 'lupus' && S.G) lupSync();
+  statsTick();
   const on = 'px-2 py-1 text-[11px] font-bold rounded-lg bg-purple-600 text-white',
     off = 'px-2 py-1 text-[11px] font-bold rounded-lg text-slate-400';
   $('lb-it').className = S.lang === 'it' ? on : off;
   $('lb-en').className = S.lang === 'en' ? on : off;
   $('lb-it').setAttribute('aria-pressed', S.lang === 'it');
   $('lb-en').setAttribute('aria-pressed', S.lang === 'en');
+  $('set').setAttribute('aria-label', t('settings'));
+  $('set').setAttribute('title', t('settings'));
+  $('modal').setAttribute('aria-label', t('dialog'));
   $('hlp').setAttribute('aria-label', X('Aiuto e regole', 'Help and rules'));
   $('hlp').setAttribute('title', X('Aiuto e regole', 'Help and rules'));
   $('scr').setAttribute('aria-label', X('Punteggi', 'Scores'));
@@ -9305,7 +10231,7 @@ function render() {
   const top = Object.entries(S.scores).sort((a, b) => b[1] - a[1])[0];
   $('top').textContent = top && top[1] > 0 ? `${top[0]}: ${top[1]}` : t('points');
   document.documentElement.lang = S.lang;
-  $('app').innerHTML =
+  const body =
     S.screen === 'home'
       ? viewHome()
       : S.screen === 'setup'
@@ -9325,6 +10251,7 @@ function render() {
                   : S.screen === 'tbsetup'
                     ? viewTbSetup()
                     : viewPlay();
+  $('app').innerHTML = (S.demo ? demoBar() : '') + summaryBar() + body;
   if (!tmAllowed() && (TMR.iv || TMR.done)) tmClear();
   if (tmAuto() && (TMR.iv || TMR.done)) tmClear();
   tmDraw();
@@ -9335,15 +10262,91 @@ function render() {
 loadLocal();
 loadSession();
 parseInvite();
+applyTheme();
+applyA11y();
+updateOffline();
 // PWA: installabile e avviabile offline quando è servita via http(s).
+function showUpd() {
+  const el = $('upd');
+  if (!el) return;
+  const s = el.querySelector ? el.querySelector('span') : null,
+    go = $('upd-go'),
+    x = $('upd-x');
+  if (s) s.textContent = t('updateReady');
+  if (go) go.textContent = t('updateBtn');
+  if (x) x.setAttribute('aria-label', X('Chiudi', 'Close'));
+  el.classList.add('on');
+}
+function hideUpd() {
+  const el = $('upd');
+  if (el) el.classList.remove('on');
+}
 function pwaInit() {
   try {
     if (!/^https?:$/.test(String(location.protocol || ''))) return;
-    if (navigator.serviceWorker)
-      navigator.serviceWorker.register('sw.js').catch(() => {});
+    if (!navigator.serviceWorker) return;
+    // Se c'era già un service worker attivo, un cambio di controller = nuova versione.
+    const had = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (had) showUpd();
+    });
+    navigator.serviceWorker
+      .register('sw.js')
+      .then((reg) => {
+        const upd = () => {
+          try {
+            reg.update();
+          } catch (e) {}
+        };
+        setInterval(upd, 30 * 60 * 1000);
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden) upd();
+        });
+      })
+      .catch(() => {});
   } catch (e) {}
 }
 pwaInit();
+// Installazione: il browser decide quando l'app è installabile.
+try {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    INSTALL_EVT = e;
+  });
+  window.addEventListener('appinstalled', () => {
+    INSTALL_EVT = null;
+  });
+  window.addEventListener('online', updateOffline);
+  window.addEventListener('offline', updateOffline);
+} catch (e) {}
+// Esc chiude la modale; Tab resta dentro la modale aperta.
+document.addEventListener('keydown', (e) => {
+  const m = $('modal');
+  if (!m || m.style.display === 'none') return;
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    closeModal();
+    return;
+  }
+  if (e.key !== 'Tab') return;
+  let list = [];
+  try {
+    list = m.querySelectorAll
+      ? [].slice.call(m.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+      : [];
+  } catch (err) {}
+  list = list.filter((x) => !x.disabled);
+  if (!list.length) return;
+  const first = list[0],
+    last = list[list.length - 1];
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
+});
 if (window.addEventListener)
   window.addEventListener('pagehide', () => saveSession(true));
 document.addEventListener('visibilitychange', () => {

@@ -30,20 +30,30 @@ No install, no account, no backend.
 - **Host controls** — the host can end the game at any time (scores are kept), close a Names, Things and Cities round or a Forbidden Words turn before the timer runs out, and end/reveal Who Am I?.
 - **Score tools** — 🏆 shows the table with "Undo last round" (up to 20 snapshots) and "Edit scores" for manual corrections. Host edits are pushed to every phone, and the panel can share or copy the summary.
 - **Backup & restore** — export players, scores, custom roles and custom Names, Things and Cities categories to a JSON file and import them on another phone.
-- **Installable PWA** — add it to the home screen; the app shell loads offline (also when the server answers with an error) while multiplayer still needs a connection.
+- **Installable PWA** — add it to the home screen from the in-app install button (or the browser prompt); the offline badge appears when the connection drops, and the app shell loads offline (also when the server answers with an error) while multiplayer still needs a connection.
 - **Resume after reload or standby** — a room interrupted by a refresh is offered again on the home screen for up to 2 hours. The host restores players, scores and the current game; if the old room code is no longer free, a new one is opened with the same state.
 - **Clearer lobby** — online/offline dots, connected count, host badge, tap-to-copy code and the running version.
+- **First-run intro & demo** — a short welcome card explains the flow and offers a demo game; the demo never touches saved scores or statistics.
+- **End-of-game summary** — when a game ends, the winner and the points each player gained in that game are shown at the top, with share and play-again buttons.
+- **Remembered preferences** — mode, role counts, categories, Would You Rather pack, discussion timer, favourite packs and already-seen questions are restored on the next visit and included in the backup.
+- **Questions written by the players** — a one-time note (plus a permanent hint in the setup screen) explains that the built-in databases are only a starting point and the games work best with original questions written by the group; it can be dismissed permanently and reopened from the settings.
+- **Settings panel** — sound and vibration switches, four accent themes (Purple / Ocean / Sunset / Forest), accessibility, default timer, content tools, backup data and a local statistics card, all saved on the phone and included in the backup.
+- **Local stats** — finished games, wins, current streak and best streak per player, counted from the points each player gains during a game; the most played game is shown too.
+- **Play again** — the host's lobby offers one tap to restart the last game with the same players.
+- **Update banner** — when a new version is deployed, an open tab offers to reload instead of silently running old code.
+- **Keyboard-friendly modals** — Esc closes, Tab stays inside, focus returns to the button that opened it.
 - **Bilingual IT / EN** — full interface and question databases in both languages, switchable at any time.
 - **Big content pack** — 181 Impostor prompts per language (131 generated + 50 hand-written), 207 Who Said That questions, 8 Mister White word categories (93 clusters, 676 words), 15 Werewolf roles (plus custom quick-game roles), 24 Would You Rather dilemmas, 40 Forbidden Words cards and 64 Who Am I? words, all with English counterparts.
 - **Automatic scoring** — +100 to the winners of Impostor / Mister White / Who Said That, +100 (or +50 on a tie) in Would You Rather, +10 for a unique answer the host accepts, +5 for duplicates, 0 for blank or wrong letter in Names, Things and Cities, +100 per guessed word in Forbidden Words and Who Am I? (a wrong Who Am I? guess costs one of 5 lives). Werewolf uses a full ×10 point table.
-- **Ready-made packs** — Would You Rather has Classic / Hot takes / Absurd packs plus a random button, both offline and online.
+- **Ready-made packs** — Would You Rather has Classic / Hot takes / Absurd packs plus a random button, both offline and online; packs can be marked as favourites and drawn from favourites only.
 - **Auto round timer** (Names, Things and Cities) — starts at 5 minutes, every submission cuts 1 minute (minimum 1); at zero the round closes and unanswered players score 0.
 - **Forbidden Words timer** — 60 seconds per turn, synced to every phone; a turn with no majority when time runs out is a foul.
 - **Deadline-based timers** — every clock stores an absolute end time and recomputes on `visibilitychange`, so background tabs and phone standby do not make the count drift; the round timer is also sent with its end time, so each phone counts down locally.
-- **Optional discussion timer** — a manual corner clock for the other games. It never blocks or skips a turn.
+- **Optional discussion timer** — a manual corner clock for the other games, with a preferred default duration (starred), a host pause button and host notes. It never blocks or skips a turn.
 - **Input sanitising** — names, answers, clues, custom categories and options are trimmed, stripped of control/invisible characters and capped by code point, so long or emoji-heavy input cannot break the layout or the scoring.
 - **Local saves** — players, scores, language, name, last room code, custom roles and custom Names, Things and Cities categories stay in `localStorage`; the backup file moves them to another phone.
-- **Accessibility details** — `aria-label` on icon-only buttons, `aria-pressed` on language toggles, visible `:focus-visible` outlines, ≥44 px main buttons, higher-contrast muted text, `prefers-reduced-motion` support and `touch-action: manipulation`.
+- **Data tools** — backup date, local storage used, one-tap clear of local data, and a weekly reminder when it has been a long time since the last export.
+- **Accessibility details** — `aria-label` on icon-only buttons, `aria-pressed` on language toggles, visible `:focus-visible` outlines, ≥44 px main buttons, higher-contrast muted text, `prefers-reduced-motion` support and `touch-action: manipulation`; in addition, three text sizes (Small / Normal / Large), a high-contrast mode and a manual "reduce animations" switch.
 
 ## 🕹 How to play
 
@@ -52,7 +62,7 @@ No install, no account, no backend.
    **Online:** tap **Online**, create a room (5-character code) or join one, then the host starts a game. Use the invite button in the lobby to show a QR code and a link.
 3. Play. Scores are kept by the app; the 🏆 button shows the table, with undo and manual correction.
 
-On a phone, use the browser menu (or the install prompt) to add Minigames Hub to the home screen: it opens full-screen and the shell still loads offline.
+On a phone, tap **Install the app** in the settings (or use the browser menu) to add Minigames Hub to the home screen: it opens full-screen and the shell still loads offline.
 
 Online needs 3 players (Werewolf and Forbidden Words 4, Would You Rather and Names, Things and Cities 2). Rooms are compatible only between phones running the same build (`APP_VERSION` in the source); if a phone is stuck on an old cached copy, reload the page.
 
@@ -78,6 +88,8 @@ Online needs 3 players (Werewolf and Forbidden Words 4, Would You Rather and Nam
 - Google Font *Plus Jakarta Sans*.
 - `node build-min.js` minifies only the inline JS with terser (`mangle: false`, because function names are referenced by inline handlers) and writes `index.html` + `Minigames Hub.min.html`.
 - PWA install and the offline shell are served by `sw.js`; the service worker cache name follows `APP_VERSION`, so each release replaces the old cache. Service workers only run over http(s), not from `file://`.
+- Themes are four CSS-variable sets (`--acc1/--acc2/--acc3` for gradients, `--btn1/--btn2` for buttons) switched by `data-theme` on `<html>`; no per-screen styles are duplicated for each theme.
+- Accessibility preferences are three CSS overrides on `<html>` (`data-text="s|m|l"`, `data-contrast="high"`, `data-motion="off"`), so text size, contrast and animations are changed in one place instead of patching each screen.
 
 ## ⚠️ Known limits
 
@@ -86,6 +98,8 @@ Online needs 3 players (Werewolf and Forbidden Words 4, Would You Rather and Nam
 - The interface language is global per page, not per online player.
 - In Names, Things and Cities only the **initial letter** is validated, so a wrong-category answer that starts with the right letter is accepted.
 - Custom roles and custom categories are saved in `localStorage` and in the backup file, but not in the cloud.
+- The built-in question and word databases are intentionally a starting point: the automatic questions are few and cannot know the group, so the app warns once (and keeps a hint in the setup) that the games are at their best with questions written by the players.
+- Statistics are **local to the phone**: each device counts its own games, they are not synced between players, and clearing browser data removes them unless a backup was exported. Wins are inferred from the points gained during a game, so manual score edits also affect them.
 - A phone that is fully asleep cannot receive messages until it wakes; the deadline-based timers then jump to the correct time instead of drifting. A disconnected player keeps their seat for 60 seconds.
 - Nothing is stored in the cloud: rooms, scores and games exist only while the page stays open. The PWA caches the app shell, not a live room; the resume card works on the same phone for up to 2 hours.
 - Automated tests run in Node with a mock DOM and a fake PeerJS; camera QR scanning, iOS audio unlock, real-phone networking and the installed-PWA flow still need a manual check.

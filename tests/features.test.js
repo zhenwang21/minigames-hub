@@ -171,12 +171,231 @@ const lobby = resApp.run('viewOnline()');
 check(lobby.includes('copyCode()'), 'lobby con copia del codice');
 check(lobby.includes('1/2') && lobby.includes('connessi'), 'lobby mostra i giocatori connessi');
 check(lobby.includes('offline') && lobby.includes('host'), 'lobby distingue offline e host');
-check(lobby.includes('1.7.0'), 'lobby mostra la versione');
+check(lobby.includes('1.9.0'), 'lobby mostra la versione');
 // riepilogo condivisibile
 RS.scores = { Anna: 300, Bruno: 100 };
 RN.game = { g: 'impostore' };
 const summary = resApp.run('summaryText()');
 check(summary.includes('Impostore') && summary.indexOf('1. Anna: 300') > 0, 'riepilogo con nome gioco e ordine');
 check(summary.indexOf('Anna: 300') < summary.indexOf('Bruno: 100'), 'riepilogo ordinato per punti');
+
+// --- impostazioni, temi e statistiche ---
+RN.game = null;
+RN.host = false;
+RS.screen = 'home';
+RS.stats = { games: 0, byGame: {}, wins: {}, played: {}, streak: {}, best: {} };
+resApp.run("setTheme('oceano')");
+check(RS.theme === 'oceano', 'il tema scelto viene salvato in memoria');
+check(resApp.run('document.documentElement.dataset.theme') === 'oceano', 'il tema è applicato al documento');
+check((resApp.ctx.localStorage.getItem('mgh_save_v1') || '').includes('oceano'), 'il tema finisce nel salvataggio locale');
+resApp.run("setTheme('viola')");
+resApp.run('toggleSnd()');
+check(RS.sndOn === false, 'il toggle dei suoni spegne');
+resApp.run('toggleSnd()');
+resApp.run('toggleVib()');
+check(RS.vibOn === false, 'il toggle della vibrazione spegne');
+resApp.run('toggleVib()');
+
+// statistiche: base a inizio partita, poi fine con punteggi
+RS.screen = 'play';
+RS.game = 'impostore';
+RS.players = ['Anna', 'Bruno'];
+RS.scores = { Anna: 0, Bruno: 0 };
+RS.G = { phase: 'vote' };
+resApp.run('statsTick()');
+RS.scores = { Anna: 30, Bruno: 10 };
+RS.G = { phase: 'end' };
+resApp.run('statsTick()');
+resApp.run('statsTick()');
+const st = RS.stats;
+check(st.games === 1, 'una sola partita registrata anche con più render', st.games);
+check(st.wins.Anna === 1 && st.wins.Bruno === undefined, 'vince chi ha più punti nel round');
+check(st.played.Anna === 1 && st.played.Bruno === 1, 'partite giocate per tutti i giocatori');
+check(st.byGame.impostore === 1, 'conteggio per gioco');
+check(st.best.Anna === 1 && st.streak.Bruno === 0, 'serie e record aggiornati');
+RS.G = { phase: 'vote' };
+resApp.run('statsTick()');
+RS.G = { phase: 'end' };
+resApp.run('statsTick()');
+check(RS.stats.games === 2 && RS.stats.wins.Anna === 1, 'una partita a zero punti non assegna vittorie');
+
+// impostazioni mostrate nella modale
+RS.screen = 'home';
+RS.lastGame = 'impostore';
+resApp.run('showSettings()');
+const setHtml = resApp.els.modal.innerHTML;
+check(setHtml.includes('Impostazioni') && setHtml.includes('Suoni'), 'impostazioni con i suoni');
+check(setHtml.includes('Tema') && setHtml.includes('Oceano'), 'impostazioni con i temi');
+check(setHtml.includes('Statistiche') && setHtml.includes('Anna'), 'impostazioni con le statistiche');
+check(setHtml.includes('Azzera statistiche'), 'impostazioni con azzeramento statistiche');
+
+// rigioca dalla lobby
+RN.host = true;
+RN.st = 'lobby';
+RN.view = null;
+RN.players = ['Anna', 'Bruno', 'Carla', 'Dario'];
+RN.hostName = 'Anna';
+RN.code = 'ABCDE';
+RN.err = '';
+RN.notice = '';
+RS.lastGame = 'taboo';
+const lobby2 = resApp.run('viewOnline()');
+check(lobby2.includes('tbHostOpen()') && lobby2.includes('Rigioca'), "la lobby propone di rigiocare l'ultimo gioco");
+
+// --- 1.9.0: introduzione e demo ---
+const q = boot();
+const QS = q.S;
+const QN = q.NET;
+check(!QS.onboarded, "un utente nuovo parte con l'introduzione da vedere");
+const onboard = q.run('onboardCard()');
+check(onboard.includes('Benvenuto') && onboard.includes('startDemo()'), "la home propone l'introduzione e la demo");
+q.run('dismissOnboard()');
+check(QS.onboarded === true && q.run('onboardCard()') === '', "l'introduzione si chiude e non ricompare");
+check(JSON.parse(q.ctx.localStorage.getItem('mgh_save_v1')).onboarded === 1, "l'introduzione vista è salvata");
+
+QS.players = [];
+QS.scores = {};
+QS.stats = { games: 0, byGame: {}, wins: {}, played: {}, streak: {}, best: {} };
+QS.demo = false;
+q.run('startDemo()');
+check(QS.demo === true, 'la demo parte');
+check(QS.players.join(',') === 'Anna,Bruno,Carla', 'la demo aggiunge giocatori temporanei', QS.players.join(','));
+check(QS.screen === 'play' && QS.game === 'preferisci', 'la demo gioca una partita di Preferiresti');
+q.run('pvShow()');
+q.run("pvVote('a')");
+q.run('pvShow()');
+q.run("pvVote('a')");
+q.run('pvShow()');
+q.run("pvVote('b')");
+check(QS.G.phase === 'pvres', 'la demo arriva alla fine del round', QS.G.phase);
+check(QS.stats.games === 0, 'la demo non registra statistiche');
+check(q.run('summaryData()') !== null && q.run('summaryBar()').includes('Riepilogo partita'), 'la demo mostra il riepilogo');
+const demoRaw = q.ctx.localStorage.getItem('mgh_save_v1');
+check(!demoRaw || !JSON.parse(demoRaw).players.length, 'la demo non salva i giocatori finti');
+q.run('exitDemo()');
+check(QS.demo === false && QS.players.length === 0 && QS.screen === 'home', 'uscendo dalla demo si torna alla home pulita');
+
+// --- 1.9.0: riepilogo di fine partita ---
+QS.players = ['Anna', 'Bruno', 'Carla'];
+QS.scores = { Anna: 0, Bruno: 0, Carla: 0 };
+QS.game = 'preferisci';
+QS.mode = 'auto';
+QS.pv = { a: 'Caffè', b: 'Tè', i: 0, pack: '' };
+QS.screen = 'setup';
+QS.G = null;
+q.run('startPref()');
+check(q.run('summaryData()') === null, 'durante la partita non c’è riepilogo');
+q.run('pvShow()');
+q.run("pvVote('a')");
+q.run('pvShow()');
+q.run("pvVote('a')");
+q.run('pvShow()');
+q.run("pvVote('b')");
+const sd = q.run('summaryData()');
+check(sd && sd.max === 100 && sd.winners.length === 2, 'il riepilogo calcola i punti guadagnati', JSON.stringify(sd && sd.winners));
+check(q.run('summaryBar()').includes('Vince'), 'il riepilogo nomina il vincitore');
+check(QS.stats.games === 1, 'la partita vera registra la statistica', QS.stats.games);
+q.run('rematchSummary()');
+check(QS.G.phase === 'pvpass' && q.run('summaryData()') === null, 'Rigioca azzera il riepilogo e riparte');
+
+// --- 1.9.0: avviso sulle domande automatiche ---
+QS.dbAck = 0;
+QS.game = 'impostore';
+QS.screen = 'setup';
+QS.players = ['Anna', 'Bruno', 'Carla'];
+check(q.run('viewSetup()').includes('scritte da voi'), 'il setup avvisa che le domande automatiche sono limitate');
+check(q.run('dbHint()').includes('automatiche'), 'il suggerimento permanente parla di domande automatiche');
+q.run("selectGame('impostore')");
+check(q.els.modal.innerHTML.includes('Domande scritte da voi'), "scegliere un gioco dal database mostra l'avviso");
+q.run('dismissDbTip(0)');
+check(QS.dbAck === 1, '"Ho capito" segna l’avviso come visto una volta');
+check(q.run('maybeDbTip()') === false, 'l’avviso non si ripete dopo la conferma');
+q.run("setMode('auto')");
+check(q.els.modal.style.display !== 'flex', 'tornare in automatico non riapre l’avviso');
+QS.dbAck = 0;
+q.run("setMode('auto')");
+check(q.els.modal.style.display === 'flex', 'la prima volta l’avviso compare anche dal cambio modalità');
+q.run('dismissDbTip(1)');
+check(QS.dbAck === 2, '"Non mostrare più" disattiva l’avviso');
+q.run('maybeDbTip()');
+check(q.els.modal.style.display !== 'flex', 'dopo "Non mostrare più" non si apre da solo');
+q.run('showDbTip(true)');
+check(q.els.modal.innerHTML.includes('Domande scritte da voi'), 'l’avviso resta consultabile a mano');
+q.run('closeModal()');
+
+// --- 1.9.0: accessibilità ---
+q.run("setTextSize('l')");
+check(q.run('document.documentElement.dataset.text') === 'l', 'testo grande applicato al documento');
+check(JSON.parse(q.ctx.localStorage.getItem('mgh_save_v1')).textSize === 'l', 'dimensione testo salvata');
+q.run('toggleContrast()');
+check(q.run('document.documentElement.dataset.contrast') === 'high', 'alto contrasto applicato');
+q.run('toggleMotion()');
+check(q.run('document.documentElement.dataset.motion') === 'off', 'animazioni ridotte applicate');
+check(
+  JSON.parse(q.ctx.localStorage.getItem('mgh_save_v1')).contrast === 1 &&
+    JSON.parse(q.ctx.localStorage.getItem('mgh_save_v1')).motion === 1,
+  'contrasto e animazioni salvati'
+);
+q.run("setTextSize('m')");
+q.run('toggleContrast()');
+q.run('toggleMotion()');
+
+// --- 1.9.0: preferenze ricordate ---
+QS.mode = 'gm';
+QS.cfg = { imp: 2, und: 1, mwN: 1, cats: new Set(['food', 'sport']) };
+QS.timerPref = 180;
+QS.favPV = ['classic'];
+QS.used = new Set(['impostore:0']);
+QS.pv.pack = 'hot';
+QS.demo = false;
+q.run('saveLocal()');
+const prefRaw = JSON.parse(q.ctx.localStorage.getItem('mgh_save_v1'));
+check(prefRaw.mode === 'gm' && prefRaw.cfg.cats.join(',') === 'food,sport', 'modalità e categorie salvate');
+check(prefRaw.timerPref === 180 && prefRaw.favPV[0] === 'classic' && prefRaw.pvPack === 'hot', 'timer, preferiti e pacchetto salvati');
+check(prefRaw.seen.includes('impostore:0'), 'le domande viste finiscono nel salvataggio');
+q.run("S.mode='auto';S.cfg={und:1,mwN:1,cats:new Set(CATS),imp:1};S.timerPref=120;S.favPV=[];S.used=new Set();S.pv.pack=''");
+q.run('loadLocal()');
+check(QS.mode === 'gm' && QS.timerPref === 180, 'loadLocal ripristina modalità e timer');
+check(QS.favPV.includes('classic') && QS.used.has('impostore:0'), 'loadLocal ripristina preferiti e domande viste');
+check(QS.cfg.cats.has('sport') && !QS.cfg.cats.has('tech'), 'loadLocal ripristina le categorie scelte');
+check(QS.cfg.imp === 2, 'loadLocal ripristina il numero di impostori');
+q.run("S.screen='play';S.game='impostore';tmStop();tmDraw()");
+check(/3′ ★/.test(q.els.tmr.innerHTML), 'il timer preferito è in testa con la stella', q.els.tmr.innerHTML.slice(0, 80));
+QS.screen = 'setup';
+QS.favPV = ['classic', 'hot'];
+q.run('pvFavRandom()');
+check(['classic', 'hot'].includes(QS.pv.pack), 'casuale tra i preferiti resta nei pacchetti salvati', QS.pv.pack);
+
+// --- 1.9.0: backup, spazio e dati ---
+QS.lastBackup = 0;
+q.run('exportBackup()');
+check(QS.lastBackup > 0, 'esportare un backup segna la data');
+const bd = q.run('backupData()');
+check(bd.timerPref === 180 && bd.favPV[0] === 'classic' && bd.seen.length >= 1, 'il backup include le preferenze 1.9.0');
+check(bd.onboarded === 1 && bd.dbAck === 2, 'il backup include introduzione e avviso database');
+const bytes = q.run('storageBytes()');
+check(bytes > 0, 'lo spazio locale usato è calcolato', bytes);
+check(/KB|MB/.test(q.run('fmtBytes(2048)')), 'lo spazio è formattato in KB/MB', q.run('fmtBytes(2048)'));
+q.run('hostNotesOpen()');
+q.run('$("hn").value = "  Ordine: Anna, Bruno  "');
+q.run('saveHostNotes()');
+check(QS.hostNotes === 'Ordine: Anna, Bruno', 'le note host vengono ripulite e salvate', QS.hostNotes);
+check(q.run('backupData()').hostNotes === 'Ordine: Anna, Bruno', 'le note host finiscono nel backup');
+q.run('snoozeBackup()');
+check(QS.backupSnooze > Date.now(), 'il promemoria backup si può rimandare');
+QS.lastBackup = 0;
+QS.backupSnooze = 0;
+QS.scores = { Anna: 10 };
+check(q.run('backupReminder()').includes('backup'), 'la home ricorda di esportare il backup');
+QS.scores = {};
+QS.players = [];
+QS.stats = { games: 0, byGame: {}, wins: {}, played: {}, streak: {}, best: {} };
+check(q.run('backupReminder()') === '', 'senza dati il promemoria non compare');
+q.run('resetPrefs()');
+check(QS.timerPref === 120 && QS.mode === 'auto' && QS.ncPref.length === 0, 'ripristino preferenze giochi');
+q.run('showNews()');
+check(q.els.modal.innerHTML.includes('Novità 1.9.0'), 'la modale Novità è alla versione 1.9.0');
+check(q.els.modal.innerHTML.includes('Introduzione per i nuovi arrivati'), 'le novità elencano il batch');
+q.run('closeModal()');
 
 done();
