@@ -82,7 +82,11 @@ Online needs 3 players (Werewolf and Forbidden Words 4, Would You Rather and Nam
 | `build-min.js` | `node build-min.js` regenerates both builds from the source (needs [terser](https://terser.org/)). |
 | `manifest.webmanifest`, `sw.js`, `icons/` | PWA install and offline shell; the cache version in `sw.js` must follow `APP_VERSION`. |
 | `tools/make-icons.js` | Regenerates the PNG icons with no dependencies. |
+| `tools/bump-version.js` | `node tools/bump-version.js 1.12.0` updates `APP_VERSION`, both “What’s new” titles, `sw.js` and the version assertions, then rebuilds. |
+| `tools/size-report.js` | Prints raw/gzip sizes of the main files plus the inline JS/CSS split of the minified build. |
 | `tests/` | Node test suites (`node tests/run-all.js`, add `--min` for the minified build). |
+| `.github/workflows/ci.yml` | Rebuilds, fails on a stale build and runs both test suites on every push/PR. |
+| `CHANGELOG.md` | Release notes starting at 1.11.0 (older history in the handoff). |
 | `MINIGAMES_HUB_HANDOFF.md` | Internal notes in Italian: architecture, rules that must not change, test list. |
 
 ## ⚙️ Tech
@@ -92,12 +96,26 @@ Online needs 3 players (Werewolf and Forbidden Words 4, Would You Rather and Nam
 - [PeerJS](https://peerjs.com/) 1.5.4 from jsDelivr, used only for the online rooms (public cloud broker; no server of our own).
 - [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) 1.4.4 (MIT), embedded inline to draw the invite QR without external calls.
 - Google Font *Plus Jakarta Sans*.
-- `node build-min.js` minifies only the inline JS with terser (`mangle: false`, because function names are referenced by inline handlers) and writes `index.html` + `Minigames Hub.min.html`.
+- `node build-min.js` minifies only the inline JS with terser (`mangle: false`, because function names are referenced by inline handlers) and writes `index.html` + `Minigames Hub.min.html`. Building from a clean LF checkout with terser 5.51.2 is byte-for-byte reproducible; CI rebuilds and fails if the committed build is stale.
+- GitHub Actions (`.github/workflows/ci.yml`) runs the rebuild, the stale-build check and both test suites on every push to `main` and on pull requests.
 - PWA install and the offline shell are served by `sw.js`; the service worker cache name follows `APP_VERSION`, so each release replaces the old cache. Service workers only run over http(s), not from `file://`.
 - Themes are six CSS-variable sets (`--acc1/--acc2/--acc3` for gradients, `--btn1/--btn2` for buttons) switched by `data-theme` on `<html>`; no per-screen styles are duplicated for each theme.
 - Accessibility preferences are three CSS overrides on `<html>` (`data-text="s|m|l"`, `data-contrast="high"`, `data-motion="off"`), so text size, contrast and animations are changed in one place instead of patching each screen. A `prefers-contrast: more` media query applies the same high-contrast colours automatically.
 - Cosmetics use two extra variables per game (`--ga/--gb`) set on `#app` from a single `GAME_ACCENT` map; the same pair feeds the card tile, the top bar and the soft background. Avatars start from a name hash and can be overridden per name (`S.avMap`); overrides are saved locally and exchanged through the existing lobby broadcast (`avs`) and join payload (`av`), with no extra server.
 - Personal questions live in `S.myQ` (`{ who: string[], pv: {a,b}[] }`), are validated on load/import and are exposed to the games through `whoPool()` and a virtual `PV_DB.mine` pack, so favourites, random and online paths need no special cases.
+
+## 🛠️ Development
+
+```bash
+node build-min.js                 # rebuild index.html + Minigames Hub.min.html
+node tests/run-all.js             # all suites on the source
+node tests/run-all.js --min       # all suites on the minified build
+node tools/bump-version.js 1.12.0 # bump version, titles, sw.js and rebuild
+node tools/size-report.js         # raw/gzip sizes and inline JS/CSS split
+```
+
+Terser must be available (`npm i terser` or `npm i terser --prefix "%TEMP%\mgast"`);
+the CI pins 5.51.2 because the build is reproducible with that version.
 
 ## ⚠️ Known limits
 

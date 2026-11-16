@@ -551,4 +551,45 @@ check(podium.includes('🥇') && podium.includes('🥈') && podium.includes('�
 check(c.run("joinPayload().name") === CS.players[0] || typeof c.run('joinPayload()') === 'object', 'il join include il payload avatar');
 check(c.run("sanitizeStats({recent:[{g:'lupus',t:1,w:'Anna'}]}).recent.length") === 1, 'recenti valide');
 
+// --- 1.11.0: integrità di merge, rename, recenti e pacchetto personale ---
+CS.theme = 'neon';
+CS.sndOn = false;
+CS.timerPref = 60;
+CS.textSize = 'l';
+c.call('mergeBackup', {
+  players: ['Zoe'],
+  scores: { Zoe: 7 },
+  theme: 'bosco',
+  snd: 1,
+  timerPref: 300,
+  textSize: 's',
+  stats: { games: 1 }
+});
+check(
+  CS.theme === 'neon' && CS.sndOn === false && CS.timerPref === 60 && CS.textSize === 'l',
+  'unisci non tocca le impostazioni del telefono'
+);
+CS.players = ['Anna', 'Bruno'];
+CS.scores = { Anna: 4 };
+CS.avMap = { Anna: 4 };
+c.call('renamePlayer', 0);
+c.run('$("rn").value = "Dora"');
+c.call('savePlayerName', 0);
+check(
+  CS.players[0] === 'Dora' && CS.avMap.Dora === 4 && CS.avMap.Anna === undefined,
+  'la rinomina migra anche l’avatar scelto'
+);
+check(c.run('backupData()').avMap.Dora === 4, 'gli avatar scelti finiscono nel backup');
+check(
+  c.run("sanitizeStats({recent:[{g:'lupus',t:1},{g:'who_said',t:5}]}).recent[0].g") === 'who_said',
+  'le recenti sono ordinate dalla più nuova'
+);
+CS.myQ = { who: [], pv: [] };
+CS.favPV = ['mine', 'classic'];
+c.run('syncPvMine()');
+check(
+  !c.run('PV_DB.mine') && CS.favPV.join(',') === 'classic',
+  'senza domande personali il pacchetto mine sparisce anche dai preferiti'
+);
+
 done();

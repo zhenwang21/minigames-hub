@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Stessa versione usata in locale: la build deve essere identica byte per byte.
+      - name: Install terser 5.51.2
+        run: |
+          mkdir -p /tmp/mgast
+          cd /tmp/mgast
+          npm init -y > /dev/null
+          npm install --no-audit --no-fund terser@5.51.2
+
+      - name: Rebuild minified files
+        env:
+          TEMP: /tmp
+        run: node build-min.js
+
+      - name: Committed build must be up to date
+        run: git diff --exit-code -- index.html "Minigames Hub.min.html"
+
+      - name: Tests on the source
+        run: node tests/run-all.js
+
+      - name: Tests on the minified build
+        run: node tests/run-all.js --min
