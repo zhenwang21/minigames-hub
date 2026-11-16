@@ -546,7 +546,7 @@ const I = {
     installed: 'App installata',
     offline: 'Offline',
     news: 'Novità',
-    newsTitle: 'Novità 1.11.0',
+    newsTitle: 'Novità 1.11.1',
     news9: 'Rinomina e annulla rimozione dei giocatori.',
     news10: 'Statistiche con ultime partite ed export CSV.',
     news11: 'Backup: unisci o sostituisci, con avviso di versione.',
@@ -990,7 +990,7 @@ const I = {
     installed: 'App installed',
     offline: 'Offline',
     news: 'What’s new',
-    newsTitle: 'What’s new in 1.11.0',
+    newsTitle: 'What’s new in 1.11.1',
     news9: 'Rename players and undo a removal.',
     news10: 'Statistics with recent games and CSV export.',
     news11: 'Backup: merge or replace, with a version warning.',
@@ -1132,7 +1132,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.11.0';
+const APP_VERSION = '1.11.1';
 // Ripresa dopo reload/standby: la sessione dura al massimo due ore.
 const RESUME_TTL = 2 * 60 * 60 * 1000;
 let RESUME = { room: null, snap: null, savedAt: 0, lastKey: '' };
@@ -1345,14 +1345,23 @@ function netIncoming(c) {
   c.on('data', (m) => hostMsg(c, m));
   c.on('close', () => hostLeft(c));
   c.on('error', () => hostLeft(c));
-  if (!NET.host) {
-    if (NET.elec) netPromote(NET.mirror);
-    else {
-      try {
-        c.close();
-      } catch (e) {}
-    }
+  if (NET.host) return;
+  if (NET.elec) {
+    netPromote(NET.mirror);
+    return;
   }
+  // Sto già cercando di rientrare: chi mi contatta lo sta facendo per l'elezione,
+  // quindi l'host è sparito anche per lui. Prendo il comando invece di rifiutarlo,
+  // altrimenti mi salta e restiamo con due host separati.
+  if (NET.st === 'recover' || !NET.conn) {
+    NET.recovering = false;
+    clearTimeout(NET.recT);
+    netPromote(NET.mirror);
+    return;
+  }
+  try {
+    c.close();
+  } catch (e) {}
 }
 function hostBc() {
   Object.values(NET.conns).forEach((c) => {
@@ -1736,7 +1745,8 @@ function netRecover() {
 }
 function netRejoin(tryN, cb) {
   const code = NET.code || NET.lastCode;
-  if (NET.st !== 'recover') return cb(false);
+  // Vale sia per il recupero normale sia per l'ultimo controllo prima di autoproclamarsi host.
+  if (NET.st !== 'recover' && NET.st !== 'elect') return cb(false);
   if (NET.host || NET.conn || !code || !NET.peer || NET.peer.destroyed) return cb(false);
   let c,
     done = false,
@@ -1957,27 +1967,44 @@ function netElect() {
   render();
   const cands = netCandidates();
   clearTimeout(NET.elecT);
-  if (!cands.length) return netPromote(NET.mirror);
-  // Se sono il primo della lista prendo il comando subito.
-  if (cands[0] === NET.name) return netPromote(NET.mirror);
+  if (!cands.length || cands[0] === NET.name) return netSettle();
   netTry(cands, 0);
 }
-function netTry(list, i) {
+// Prima di proclamarmi host controllo un'ultima volta il codice stanza: se
+// qualcuno si è già promosso lo trovo lì e rientro, invece di creare un secondo host.
+function netSettle() {
   if (!NET.elec || NET.host) return;
-  if (i >= list.length) return netPromote(NET.mirror);
+  netRejoin(0, (ok) => {
+    if (ok || !NET.elec || NET.host) return;
+    netPromote(NET.mirror);
+  });
+}
+function netTry(list, i, attempt) {
+  if (!NET.elec || NET.host) return;
+  if (i >= list.length) return netSettle();
   const n = list[i];
-  if (n === NET.name) return netPromote(NET.mirror);
-  netDial(n, (ok) => {
-    if (!ok && NET.elec && !NET.host) netTry(list, i + 1);
+  if (n === NET.name) return netSettle();
+  const a = attempt || 0;
+  netDial(n, (ok, quick) => {
+    if (ok || !NET.elec || NET.host) return;
+    // I client scoprono la caduta dell'host in momenti diversi: se il candidato
+    // chiude subito riprovo un paio di volte prima di passare al successivo.
+    if (quick && a < 2) {
+      clearTimeout(NET.elecT);
+      NET.elecT = setTimeout(() => netTry(list, i, a + 1), 450);
+      return;
+    }
+    netTry(list, i + 1, 0);
   });
 }
 // Prova a contattare un giocatore e a entrare nella sua stanza come host.
 function netDial(name, cb) {
   const id = NET.peers[name];
-  if (!id || !NET.peer || NET.peer.destroyed) return cb(false);
+  if (!id || !NET.peer || NET.peer.destroyed) return cb(false, false);
   let done = false,
     to = null;
   let c;
+  const t0 = Date.now();
   const finish = (ok) => {
     if (done) return;
     done = true;
@@ -1987,12 +2014,14 @@ function netDial(name, cb) {
         c && c.close();
       } catch (e) {}
     }
-    cb(ok);
+    // Un "no" immediato può essere solo timing: il peer non si è ancora accorto
+    // che l'host è sparito. Un timeout invece significa che non è raggiungibile.
+    cb(ok, !ok && Date.now() - t0 < NET_DIAL_MS - 200);
   };
   try {
     c = NET.peer.connect(id, { reliable: true });
   } catch (e) {
-    return cb(false);
+    return cb(false, false);
   }
   to = setTimeout(() => finish(false), NET_DIAL_MS);
   c.on('open', () => {

@@ -242,6 +242,11 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 
 ## 11. Cosa è stato corretto nell'ultima revisione
 
+### Versione 1.11.1 (fix rielezione host)
+- **Race di rielezione**: quando l'host spariva, un client poteva superare un candidato con priorità più alta che non se n'era ancora accorto e autoproclamarsi, lasciando **due host** nella stanza. Ora: `netDial` segnala se il "no" è arrivato subito; `netTry` riprova un paio di volte lo stesso candidato prima di passare al successivo; `netIncoming`, se il client è in `recover` (o senza connessione), accetta la connessione di elezione e prende il comando invece di chiuderla; `netSettle` fa un ultimo controllo sul codice stanza (`mgh-<code>`) prima di autoproclamarsi, così chi si è già promosso viene trovato e si rientra. `netRejoin` accetta anche lo stato `elect`.
+- **Test**: `online.test.js` stabile su **52 esecuzioni consecutive** con Node 20; 12/12 suite verdi su sorgente e minificato.
+- `APP_VERSION` e `VERSION` portate a **1.11.1**; build: sorgente **484.991** byte, minificato **398.400** byte.
+
 ### Versione 1.11.0 (funzionale + contenuti + cosmetics)
 - **Gestione giocatori**: `renamePlayer()`/`savePlayerName()` con modale, migrazione del punteggio e blocco dei nomi duplicati; `removePlayer()` salva l'ultimo rimosso in `P_UNDO` e la lista setup mostra **Annulla rimozione** (`undoRemovePlayer()`). `clearPlayers()` azzera anche l'undo.
 - **Statistiche**: `stats.recent` (max 20, `{g,t,w}`) registrato da `statsRecord()` con i nomi dei vincitori; `sanitizeStats()` valida e ordina le recenti. In impostazioni compaiono **Ultime partite** (`statsRecentHtml`) ed **Esporta CSV** (`statsCsv()`, colonne Nome/Partite/Vittorie/Serie attuale/Miglior serie).

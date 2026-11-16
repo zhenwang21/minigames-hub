@@ -4,6 +4,20 @@
 release number; `sw.js` must follow it. Older history (1.2–1.5) is described in
 `MINIGAMES_HUB_HANDOFF.md`.
 
+## 1.11.1 — 2026-11-16
+
+### Fixed
+- **Host re-election race** — when the host disappeared, a client could skip a
+  higher-priority candidate that had not noticed the loss yet and promote itself,
+  leaving two hosts in the room. Candidates that close the connection immediately
+  are now retried, a client that is already recovering accepts the incoming
+  election instead of refusing it, and before self-promoting every client makes a
+  final check on the room code. The later host elections in `online.test.js` are
+  now stable (52 consecutive runs).
+
+### Changed
+- Minified build: 398,400 bytes.
+
 ## 1.11.0 — 2026-11-16
 
 ### Added
