@@ -29,19 +29,22 @@ No install, no account, no backend.
 - **Fast recovery** — a client whose connection blips reconnects to the room by itself instead of triggering an election, then asks the host to re-send the current screen (`{t:'sync'}`). Coming back from standby or mobile-data hiccups no longer leaves a stuck or out-of-date screen. A dropped player keeps their seat for 60 seconds.
 - **Host controls** — the host can end the game at any time (scores are kept), close a Names, Things and Cities round or a Forbidden Words turn before the timer runs out, and end/reveal Who Am I?.
 - **Score tools** — 🏆 shows the table with "Undo last round" (up to 20 snapshots) and "Edit scores" for manual corrections. Host edits are pushed to every phone, and the panel can share or copy the summary.
-- **Backup & restore** — export players, scores, custom roles and custom Names, Things and Cities categories to a JSON file and import them on another phone.
+- **Backup & restore** — export players, scores, custom roles, custom Names, Things and Cities categories and personal questions to a JSON file. Importing shows the file version and offers **merge** (adds players, scores, statistics and content without touching settings) or **replace**; a backup from a different app version is flagged first.
 - **Installable PWA** — add it to the home screen from the in-app install button (or the browser prompt); the offline badge appears when the connection drops, and the app shell loads offline (also when the server answers with an error) while multiplayer still needs a connection.
 - **Resume after reload or standby** — a room interrupted by a refresh is offered again on the home screen for up to 2 hours. The host restores players, scores and the current game; if the old room code is no longer free, a new one is opened with the same state.
 - **Clearer lobby** — online/offline dots, connected count, host badge, tap-to-copy code and the running version.
-- **Game identities** — each game has its own accent gradient on the home card and a thin colour bar during setup and play, independent of the selected theme.
-- **Player avatars** — a stable emoji and colour derived from each name in the setup list, online lobby, score table and end-of-game summary; nothing extra is stored or synced.
-- **Subtle motion** — cards lift on hover and the winner pulses in the summary; both respect the reduce-animations setting and `prefers-reduced-motion`.
+- **Game identities** — each game has its own accent gradient on the home card, a thin colour bar and a soft radial background during setup and play, independent of the selected theme.
+- **Player avatars** — a stable emoji and colour derived from each name in the setup list, online lobby, score table and end-of-game summary; tap an avatar to choose a different one. The choice is saved on the phone and shared through the lobby so every device shows it.
+- **Subtle motion** — cards lift on hover, the winner pulses in the summary, role and word cards flip in, and the top three get 🥇🥈🥉; all of it respects the reduce-animations setting and `prefers-reduced-motion`.
 - **First-run intro & demo** — a short welcome card explains the flow and offers a demo game; the demo never touches saved scores or statistics.
 - **End-of-game summary** — when a game ends, the winner and the points each player gained in that game are shown at the top, with share and play-again buttons.
 - **Remembered preferences** — mode, role counts, categories, Would You Rather pack, discussion timer, favourite packs and already-seen questions are restored on the next visit and included in the backup.
-- **Questions written by the players** — a one-time note (plus a permanent hint in the setup screen) explains that the built-in databases are only a starting point and the games work best with original questions written by the group; it can be dismissed permanently and reopened from the settings.
-- **Settings panel** — sound and vibration switches, four accent themes (Purple / Ocean / Sunset / Forest), accessibility, default timer, content tools, backup data and a local statistics card, all saved on the phone and included in the backup.
-- **Local stats** — finished games, wins, current streak and best streak per player, counted from the points each player gains during a game; the most played game is shown too.
+- **Questions written by the players** — a one-time note (plus a permanent hint in the setup screen) explains that the built-in databases are only a starting point and the games work best with original questions written by the group; it can be dismissed permanently and reopened from the settings. **My questions** adds your own lines for Who Said That? and Would You Rather (one per line / `A | B` pairs), used alongside the built-in ones and saved in the backup.
+- **Host notes** — a private memo in the host bar, plus **Share with everyone** to send it read-only to every phone in the room; guests see it as a dismissible banner.
+- **Player management** — rename a player inline (the score follows the new name), remove one by mistake and tap **Undo removal**, or clear the whole list.
+- **Settings panel** — sound and vibration switches, six accent themes (Purple / Ocean / Sunset / Forest / Neon / Ice), accessibility, default timer, content tools, backup data and a local statistics card, all saved on the phone and included in the backup.
+- **Local stats** — finished games, wins, current streak and best streak per player, counted from the points each player gains during a game; the most played game, the last few games with their winners, and a CSV export are included too.
+- **Victory sounds** — a short chime at the end of a game, with a different three-note pattern per game; it follows the existing sound switch.
 - **Play again** — the host's lobby offers one tap to restart the last game with the same players.
 - **Update banner** — when a new version is deployed, an open tab offers to reload instead of silently running old code.
 - **Keyboard-friendly modals** — Esc closes, Tab stays inside, focus returns to the button that opened it.
@@ -91,9 +94,10 @@ Online needs 3 players (Werewolf and Forbidden Words 4, Would You Rather and Nam
 - Google Font *Plus Jakarta Sans*.
 - `node build-min.js` minifies only the inline JS with terser (`mangle: false`, because function names are referenced by inline handlers) and writes `index.html` + `Minigames Hub.min.html`.
 - PWA install and the offline shell are served by `sw.js`; the service worker cache name follows `APP_VERSION`, so each release replaces the old cache. Service workers only run over http(s), not from `file://`.
-- Themes are four CSS-variable sets (`--acc1/--acc2/--acc3` for gradients, `--btn1/--btn2` for buttons) switched by `data-theme` on `<html>`; no per-screen styles are duplicated for each theme.
-- Accessibility preferences are three CSS overrides on `<html>` (`data-text="s|m|l"`, `data-contrast="high"`, `data-motion="off"`), so text size, contrast and animations are changed in one place instead of patching each screen.
-- Cosmetics use two extra variables per game (`--ga/--gb`) set on `#app` from a single `GAME_ACCENT` map; avatars are derived from the player name with a small hash, so they need no storage and stay identical on every phone.
+- Themes are six CSS-variable sets (`--acc1/--acc2/--acc3` for gradients, `--btn1/--btn2` for buttons) switched by `data-theme` on `<html>`; no per-screen styles are duplicated for each theme.
+- Accessibility preferences are three CSS overrides on `<html>` (`data-text="s|m|l"`, `data-contrast="high"`, `data-motion="off"`), so text size, contrast and animations are changed in one place instead of patching each screen. A `prefers-contrast: more` media query applies the same high-contrast colours automatically.
+- Cosmetics use two extra variables per game (`--ga/--gb`) set on `#app` from a single `GAME_ACCENT` map; the same pair feeds the card tile, the top bar and the soft background. Avatars start from a name hash and can be overridden per name (`S.avMap`); overrides are saved locally and exchanged through the existing lobby broadcast (`avs`) and join payload (`av`), with no extra server.
+- Personal questions live in `S.myQ` (`{ who: string[], pv: {a,b}[] }`), are validated on load/import and are exposed to the games through `whoPool()` and a virtual `PV_DB.mine` pack, so favourites, random and online paths need no special cases.
 
 ## ⚠️ Known limits
 
@@ -101,7 +105,8 @@ Online needs 3 players (Werewolf and Forbidden Words 4, Would You Rather and Nam
 - Online depends on the public PeerJS cloud: if it is down or blocked, rooms do not work.
 - The interface language is global per page, not per online player.
 - In Names, Things and Cities only the **initial letter** is validated, so a wrong-category answer that starts with the right letter is accepted.
-- Custom roles and custom categories are saved in `localStorage` and in the backup file, but not in the cloud.
+- Custom roles, custom categories and **My questions** are saved in `localStorage` and in the backup file, but not in the cloud. In online games the host picks the questions, so a guest's personal questions are not used unless that guest is hosting.
+- Avatars can be overridden per name; the choice is saved locally, included in the backup and broadcast in the lobby, but it is not a cloud profile (a very old client ignores the extra field).
 - The built-in question and word databases are intentionally a starting point: the automatic questions are few and cannot know the group, so the app warns once (and keeps a hint in the setup) that the games are at their best with questions written by the players.
 - Statistics are **local to the phone**: each device counts its own games, they are not synced between players, and clearing browser data removes them unless a backup was exported. Wins are inferred from the points gained during a game, so manual score edits also affect them.
 - A phone that is fully asleep cannot receive messages until it wakes; the deadline-based timers then jump to the correct time instead of drifting. A disconnected player keeps their seat for 60 seconds.

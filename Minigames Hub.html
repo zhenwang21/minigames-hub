@@ -22,12 +22,15 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 html[data-theme="oceano"]{--acc1:#22d3ee;--acc2:#38bdf8;--acc3:#818cf8;--btn1:#0891b2;--btn2:#2563eb}
 html[data-theme="tramonto"]{--acc1:#fb923c;--acc2:#f43f5e;--acc3:#f59e0b;--btn1:#ea580c;--btn2:#db2777}
 html[data-theme="bosco"]{--acc1:#34d399;--acc2:#84cc16;--acc3:#10b981;--btn1:#059669;--btn2:#16a34a}
+html[data-theme="neon"]{--acc1:#22d3ee;--acc2:#a855f7;--acc3:#f0abfc;--btn1:#0891b2;--btn2:#7c3aed}
+html[data-theme="ghiaccio"]{--acc1:#93c5fd;--acc2:#e0f2fe;--acc3:#38bdf8;--btn1:#1d4ed8;--btn2:#0ea5e9}
 body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#0b0f19;color:#f8fafc;-webkit-tap-highlight-color:transparent}
 .glass{background:rgba(17,24,39,.85);border:1px solid rgba(255,255,255,.08)}
 .gtext{background:linear-gradient(135deg,var(--acc1),var(--acc2) 50%,var(--acc3));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .gbtn{background:linear-gradient(135deg,var(--btn1),var(--btn2));color:#fff}
 /* cosmetics: accento per gioco (identità visiva, separato dal tema scelto) */
-#app{--ga:#a855f7;--gb:#ec4899}
+#app{--ga:#a855f7;--gb:#ec4899;position:relative;isolation:isolate}
+#app[data-game]:after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:1rem;background:radial-gradient(110% 45% at 50% 0,var(--ga),transparent 70%);opacity:.12}
 #app[data-game]:before{content:"";display:block;height:.28rem;border-radius:999px;background:linear-gradient(90deg,var(--ga),var(--gb));margin:0 0 .45rem;opacity:.85}
 .gtile{width:3rem;height:3rem;flex:0 0 3rem;display:flex;align-items:center;justify-content:center;border-radius:.9rem;background:linear-gradient(135deg,var(--ga),var(--gb));box-shadow:0 8px 22px -12px var(--ga);font-size:1.7rem}
 .av{display:inline-flex;align-items:center;justify-content:center;width:1.35rem;height:1.35rem;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(148,163,184,.18);font-size:.78rem;line-height:1;flex:0 0 1.35rem}
@@ -35,6 +38,8 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#0b0f19;col
 @media (prefers-reduced-motion:no-preference){.gcard{transition:transform .16s ease,box-shadow .16s ease}.gcard:hover{transform:translateY(-2px);box-shadow:0 14px 30px -18px #000}}
 @keyframes cpop{0%{transform:scale(.96);opacity:.5}60%{transform:scale(1.02)}100%{transform:scale(1);opacity:1}}
 .celebrate{animation:cpop .45s ease-out}
+@keyframes flipin{0%{transform:scaleX(.88);opacity:.35}100%{transform:scaleX(1);opacity:1}}
+.flipin{animation:flipin .3s ease-out}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 #upd{position:fixed;left:.6rem;right:.6rem;bottom:calc(env(safe-area-inset-bottom,0px) + .6rem);z-index:70;display:none;align-items:center;gap:.5rem;background:#111827;border:1px solid var(--acc1);border-radius:1rem;padding:.55rem .8rem;box-shadow:0 12px 34px rgba(0,0,0,.55);font-size:.75rem;font-weight:700}
 #upd.on{display:flex}
@@ -57,6 +62,14 @@ html[data-contrast="high"] .bg-slate-900{background:#020617}
 html[data-contrast="high"] .text-slate-300,html[data-contrast="high"] .text-slate-400,html[data-contrast="high"] .text-slate-500{color:#e5e7eb!important}
 html[data-contrast="high"] .gbtn{box-shadow:inset 0 0 0 2px #fff}
 html[data-contrast="high"] .gtext{background:none;-webkit-text-fill-color:#fff;color:#fff}
+@media (prefers-contrast:more){
+ body{background:#000;color:#fff}
+ .glass{background:#0b1120;border-color:rgba(255,255,255,.55)}
+ .bg-slate-900{background:#020617}
+ .text-slate-300,.text-slate-400,.text-slate-500{color:#e5e7eb!important}
+ .gbtn{box-shadow:inset 0 0 0 2px #fff}
+ .gtext{background:none;-webkit-text-fill-color:#fff;color:#fff}
+}
 /* riduci animazioni su richiesta, oltre alla preferenza di sistema */
 html[data-motion="off"] *,html[data-motion="off"] :before,html[data-motion="off"] :after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 @media (max-width:430px){#top{display:none}}
@@ -533,7 +546,12 @@ const I = {
     installed: 'App installata',
     offline: 'Offline',
     news: 'Novità',
-    newsTitle: 'Novità 1.10.0',
+    newsTitle: 'Novità 1.11.0',
+    news9: 'Rinomina e annulla rimozione dei giocatori.',
+    news10: 'Statistiche con ultime partite ed export CSV.',
+    news11: 'Backup: unisci o sostituisci, con avviso di versione.',
+    news12: 'Le mie domande per Chi l’ha detto? e Preferiresti.',
+    news13: 'Sfondi per gioco, podio, temi Neon e Ghiaccio, avatar scelti e suoni di vittoria.',
     news7: 'Colori e simboli dedicati per ogni gioco.',
     news8: 'Avatar e colori per i giocatori in liste, lobby e classifiche.',
     news1: 'Introduzione per i nuovi arrivati e partita demo.',
@@ -555,7 +573,45 @@ const I = {
     setGames: 'Preferenze giochi',
     setGamesHint: 'Modalità, numero di ruoli, categorie e pacchetti restano come li hai lasciati.',
     resetPrefs: 'Ripristina preferenze giochi',
-    prefsReset: 'Preferenze giochi ripristinate.'
+    prefsReset: 'Preferenze giochi ripristinate.',
+    renamePlayer: 'Rinomina giocatore',
+    save: 'Salva',
+    undoRemove: 'Annulla rimozione',
+    undoRemoved: 'Giocatore ripristinato.',
+    importTitle: 'Ripristina backup',
+    importFrom: 'Backup del',
+    importVerWarn: 'Questo backup viene da una versione diversa: alcuni dati potrebbero non essere compatibili.',
+    importPlayers: 'Giocatori',
+    importScores: 'Punteggi',
+    importGames: 'Partite',
+    importMerge: 'Unisci',
+    importReplace: 'Sostituisci',
+    importMergeHint: 'Aggiunge giocatori, punteggi, statistiche e contenuti senza toccare le impostazioni.',
+    importReplaceHint: 'Sostituisce tutti i dati di questo telefono con quelli del backup.',
+    importCancel: 'Annulla',
+    importMerged: 'Backup unito ai dati esistenti.',
+    statsRecent: 'Ultime partite',
+    statsCsv: 'Esporta CSV',
+    statsCsvOk: 'Statistiche esportate in CSV.',
+    shareNote: 'Mostra a tutti',
+    noteShared: 'Nota condivisa con la stanza.',
+    noteTitle: 'Nota host',
+    myQ: 'Le mie domande',
+    myQHint: 'Domande usate insieme a quelle automatiche, solo su questo telefono.',
+    myQWho: 'Chi l’ha detto? — una domanda per riga',
+    myQWhoPh: 'Qual è il tuo piatto preferito?\nChe cosa non porteresti mai in vacanza?',
+    myQPV: 'Preferiresti — una coppia per riga, separata da |',
+    myQPVPh: 'Caffè | Tè\nMare | Montagna',
+    myQSave: 'Salva domande',
+    myQSaved: 'Domande salvate.',
+    myQCount: 'domande',
+    myQEmpty: 'Nessuna domanda personale.',
+    myQClear: 'Svuota',
+    myQPack: 'Le mie',
+    avatarPick: 'Scegli avatar',
+    avatarReset: 'Avatar automatico',
+    thNeon: 'Neon',
+    thIce: 'Ghiaccio'
   },
   en: {
     pickGame: 'Choose a game',
@@ -934,7 +990,12 @@ const I = {
     installed: 'App installed',
     offline: 'Offline',
     news: 'What’s new',
-    newsTitle: 'What’s new in 1.10.0',
+    newsTitle: 'What’s new in 1.11.0',
+    news9: 'Rename players and undo a removal.',
+    news10: 'Statistics with recent games and CSV export.',
+    news11: 'Backup: merge or replace, with a version warning.',
+    news12: 'My questions for Who Said That? and Would You Rather.',
+    news13: 'Per-game backgrounds, podium, Neon and Ice themes, chosen avatars and victory sounds.',
     news7: 'Dedicated colours and symbols for every game.',
     news8: 'Avatars and colours for players in lists, lobbies and standings.',
     news1: 'A welcome intro for newcomers and a demo game.',
@@ -956,7 +1017,45 @@ const I = {
     setGames: 'Game preferences',
     setGamesHint: 'Mode, role counts, categories and packs stay as you left them.',
     resetPrefs: 'Reset game preferences',
-    prefsReset: 'Game preferences reset.'
+    prefsReset: 'Game preferences reset.',
+    renamePlayer: 'Rename player',
+    save: 'Save',
+    undoRemove: 'Undo removal',
+    undoRemoved: 'Player restored.',
+    importTitle: 'Restore backup',
+    importFrom: 'Backup from',
+    importVerWarn: 'This backup comes from a different version: some data may not be compatible.',
+    importPlayers: 'Players',
+    importScores: 'Scores',
+    importGames: 'Games',
+    importMerge: 'Merge',
+    importReplace: 'Replace',
+    importMergeHint: 'Adds players, scores, statistics and content without touching your settings.',
+    importReplaceHint: 'Replaces all data on this phone with the backup.',
+    importCancel: 'Cancel',
+    importMerged: 'Backup merged with your existing data.',
+    statsRecent: 'Recent games',
+    statsCsv: 'Export CSV',
+    statsCsvOk: 'Statistics exported as CSV.',
+    shareNote: 'Share with everyone',
+    noteShared: 'Note shared with the room.',
+    noteTitle: 'Host note',
+    myQ: 'My questions',
+    myQHint: 'Questions used alongside the built-in ones, on this phone only.',
+    myQWho: 'Who said that? — one question per line',
+    myQWhoPh: 'What is your favourite dish?\nWhat would you never take on holiday?',
+    myQPV: 'Would you rather — one pair per line, separated by |',
+    myQPVPh: 'Coffee | Tea\nSea | Mountains',
+    myQSave: 'Save questions',
+    myQSaved: 'Questions saved.',
+    myQCount: 'questions',
+    myQEmpty: 'No personal questions yet.',
+    myQClear: 'Clear',
+    myQPack: 'Mine',
+    avatarPick: 'Choose avatar',
+    avatarReset: 'Automatic avatar',
+    thNeon: 'Neon',
+    thIce: 'Ice'
   }
 };
 
@@ -1033,7 +1132,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.10.0';
+const APP_VERSION = '1.11.0';
 // Ripresa dopo reload/standby: la sessione dura al massimo due ore.
 const RESUME_TTL = 2 * 60 * 60 * 1000;
 let RESUME = { room: null, snap: null, savedAt: 0, lastKey: '' };
@@ -1158,6 +1257,7 @@ function netReset() {
     game: null,
     pendingSnap: null,
     notice: '',
+    note: null,
     scores: {},
     offline: {},
     gone: {},
@@ -1262,7 +1362,8 @@ function hostBc() {
         players: NET.players,
         host: NET.hostName,
         peers: NET.peers,
-        order: NET.order
+        order: NET.order,
+        avs: S.avMap
       });
     } catch (e) {}
   });
@@ -1300,6 +1401,10 @@ function hostMsg(c, m) {
     setTimeout(() => c.close(), 100);
     return;
   }
+  if (m.av != null) {
+    const i = Math.round(+m.av);
+    if (i >= 0 && i < AV_E.length) S.avMap[n] = i;
+  }
   const ex = NET.players.find((x) => x.toLowerCase() === n.toLowerCase());
   // L'host originale è tornato: gli restituisco il comando e torno client.
   if (ex && ex === NET.origHost && NET.hostName !== ex) return netHandback(c, ex);
@@ -1336,7 +1441,8 @@ function hostMsg(c, m) {
       host: NET.hostName,
       you: ex,
       peers: NET.peers,
-      order: NET.order
+      order: NET.order,
+      avs: S.avMap
     });
     netPresence();
     netResync(ex);
@@ -1464,7 +1570,7 @@ function netJoin(codeArg, nameArg) {
         if (!joined) netFail({ type: 'timeout' });
       }, 12000);
       c.on('open', () => {
-        c.send({ t: 'join', name: NET.name, v: APP_VERSION });
+        c.send(joinPayload());
       });
       c.on('data', (m) => {
         if (m.t === 'lobby') {
@@ -1594,6 +1700,7 @@ function netAdopt(c, m, code) {
   NET.order = m.order || m.players || [];
   NET.peers = m.peers || {};
   NET.hostName = m.host || NET.hostName;
+  if (m.avs) Object.assign(S.avMap, sanitizeAvMap(m.avs));
   if (m.you) NET.name = m.you;
   if (m.snap) NET.mirror = m.snap;
   NET.elec = false;
@@ -1654,7 +1761,7 @@ function netRejoin(tryN, cb) {
   to = setTimeout(() => finish(false), 2500);
   c.on('open', () => {
     try {
-      c.send({ t: 'join', name: NET.name, v: APP_VERSION });
+      c.send(joinPayload());
     } catch (e) {
       finish(false);
     }
@@ -1769,6 +1876,15 @@ function netClientMsg(m, c) {
     NET.ncStamp = m.stamp;
     NCC = {};
   }
+  if (m.t === 'note') {
+    const txt = cleanText(m.text, 600);
+    if (txt) {
+      NET.note = { text: txt, from: cleanName(m.from, 16) };
+      announce(t('noteTitle'));
+      render();
+    }
+    return;
+  }
   netView(m);
 }
 // --- cambio host: elezione, passaggio di consegne, rientro dell'host originale ---
@@ -1882,7 +1998,7 @@ function netDial(name, cb) {
   c.on('open', () => {
     if (done) return;
     try {
-      c.send({ t: 'join', name: NET.name, v: APP_VERSION });
+      c.send(joinPayload());
     } catch (e) {
       finish(false);
     }
@@ -2080,6 +2196,13 @@ function netSend(m) {
   });
   netView(m);
 }
+// Il proprio avatar scelto viaggia con il join e viene ridistribuito dalla lobby.
+function joinPayload() {
+  const o = { t: 'join', name: NET.name, v: APP_VERSION },
+    i = S.avMap ? S.avMap[NET.name] : null;
+  if (Number.isInteger(i)) o.av = i;
+  return o;
+}
 function netAct(m) {
   if (NET.host) hostApply(NET.name, m);
   else if (NET.conn) NET.conn.send(m);
@@ -2096,6 +2219,13 @@ function netSync() {
   } catch (e) {}
 }
 function hostApply(n, m) {
+  if (m && m.t === 'av' && n) {
+    const i = Math.round(+m.i);
+    if (i >= 0 && i < AV_E.length) S.avMap[n] = i;
+    else delete S.avMap[n];
+    hostBc();
+    return;
+  }
   const G = NET.game;
   if (!G || !m || !n) return;
   if (m.t === 'sync') return netResync(n);
@@ -3153,6 +3283,8 @@ function backupData() {
     ncPref: S.ncPref,
     lastBackup: S.lastBackup,
     hostNotes: S.hostNotes,
+    myQ: S.myQ,
+    avMap: S.avMap,
     mode: S.mode,
     cfg: { imp: S.cfg.imp, und: S.cfg.und, mwN: S.cfg.mwN, cats: [...S.cfg.cats] },
     pvPack: (S.pv && S.pv.pack) || '',
@@ -3195,16 +3327,118 @@ function importBackup() {
         alert(t('importBad'));
         return;
       }
-      if (!confirm(t('importConfirm'))) return;
-      applyBackup(d);
-      alert(t('importOk'));
-      render();
+      PENDING_BACKUP = d;
+      showImportDialog(d);
     };
     r.onerror = () => alert(t('importBad'));
     r.readAsText(f);
   };
   document.body.appendChild(inp);
   inp.click();
+}
+function showImportDialog(d) {
+  const m = $('modal');
+  if (!m) return;
+  const ver = cleanText(d.v, 20) || '?',
+    date = d.exportedAt ? String(d.exportedAt).slice(0, 10) : fmtDate(0),
+    pc = (Array.isArray(d.players) ? d.players : []).slice(0, 40).length,
+    sc = d.scores && typeof d.scores === 'object' ? Object.keys(d.scores).length : 0,
+    gm = +((d.stats || {}).games) || 0;
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3">
+  <h3 class="font-bold text-white">💾 ${t('importTitle')}</h3>
+  <p class="text-[11px] text-slate-400">${t('importFrom')} <b class="text-slate-200">${esc(date)}</b> · v${esc(ver)}</p>
+  ${ver !== APP_VERSION ? `<p class="text-[11px] text-amber-200 bg-amber-500/10 border border-amber-500/40 rounded-xl px-3 py-2">⚠️ ${t('importVerWarn')}</p>` : ''}
+  <div class="grid grid-cols-3 gap-2 text-center">${[
+    [t('importPlayers'), pc],
+    [t('importScores'), sc],
+    [t('importGames'), gm]
+  ]
+    .map(
+      ([k, v]) =>
+        `<div class="bg-slate-900 rounded-xl px-2 py-2"><p class="text-base font-extrabold text-white">${v}</p><p class="text-[10px] text-slate-400">${k}</p></div>`
+    )
+    .join('')}</div>
+  <button onclick="applyImport('merge')" class="w-full bg-emerald-600/20 border border-emerald-500/40 py-2.5 rounded-xl text-xs font-bold text-emerald-200">🔀 ${t('importMerge')}</button>
+  <p class="text-[10px] text-slate-500 -mt-1">${t('importMergeHint')}</p>
+  <button onclick="applyImport('replace')" class="w-full bg-rose-600/20 border border-rose-500/40 py-2.5 rounded-xl text-xs font-bold text-rose-200">♻️ ${t('importReplace')}</button>
+  <p class="text-[10px] text-slate-500 -mt-1">${t('importReplaceHint')}</p>
+  <button onclick="PENDING_BACKUP=null;closeModal()" class="w-full bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${t('importCancel')}</button>
+</div>`;
+  modalOpen();
+}
+function applyImport(mode) {
+  const d = PENDING_BACKUP;
+  if (!d) return;
+  PENDING_BACKUP = null;
+  if (mode === 'merge') mergeBackup(d);
+  else applyBackup(d);
+  closeModal();
+  saveLocal();
+  render();
+  alert(mode === 'merge' ? t('importMerged') : t('importOk'));
+}
+// Unione conservativa: aggiunge dati senza riscrivere le impostazioni del telefono.
+function mergeBackup(d) {
+  const P = S.players.slice();
+  (Array.isArray(d.players) ? d.players : []).forEach((x) => {
+    const n = cleanName(x, 20);
+    if (n && P.length < 40 && !P.some((p) => p.toLowerCase() === n.toLowerCase())) P.push(n);
+  });
+  S.players = P;
+  if (d.scores && typeof d.scores === 'object')
+    Object.keys(d.scores).forEach((k) => {
+      const n = cleanName(k, 20),
+        v = +d.scores[k];
+      if (!n || !isFinite(v)) return;
+      S.scores[n] = Math.max(+S.scores[n] || 0, Math.round(v));
+    });
+  const inc = sanitizeStats(d.stats),
+    st = S.stats;
+  st.games = Math.min(99999, (+st.games || 0) + inc.games);
+  ['byGame', 'wins', 'played'].forEach((k) => {
+    if (!st[k] || typeof st[k] !== 'object') st[k] = {};
+    Object.keys(inc[k]).forEach((n) => {
+      st[k][n] = Math.min(99999, (+st[k][n] || 0) + inc[k][n]);
+    });
+  });
+  ['streak', 'best'].forEach((k) => {
+    if (!st[k] || typeof st[k] !== 'object') st[k] = {};
+    Object.keys(inc[k]).forEach((n) => {
+      st[k][n] = Math.max(+st[k][n] || 0, inc[k][n]);
+    });
+  });
+  const rec = [];
+  [...(Array.isArray(st.recent) ? st.recent : []), ...inc.recent]
+    .sort((a, b) => (b.t || 0) - (a.t || 0))
+    .forEach((e) => {
+      if (rec.length >= 20 || rec.some((x) => x.g === e.g && x.t === e.t && x.w === e.w)) return;
+      rec.push(e);
+    });
+  st.recent = rec;
+  S.used = new Set(
+    [...S.used, ...(Array.isArray(d.seen) ? d.seen : []).filter((x) => typeof x === 'string')].slice(-600)
+  );
+  (Array.isArray(d.cust) ? d.cust : []).slice(0, 40).forEach((x) => {
+    const id = x && typeof x.id === 'string' ? x.id : '',
+      name = cleanName(x && x.name, 24);
+    if (!id || !/^cx\d+$/.test(id) || !name) return;
+    if (CUST.some((c) => c.id === id || c.name.toLowerCase() === name.toLowerCase())) return;
+    const c = { id: id, name: name, desc: cleanText(x.desc, 200), fac: ['civ', 'wolf', 'third'].includes(x.fac) ? x.fac : 'civ' };
+    CUST.push(c);
+    cReg(c);
+    CN = Math.max(CN, +id.slice(2) || 0);
+  });
+  (Array.isArray(d.ncCats) ? d.ncCats : []).slice(0, 20).forEach((x) => {
+    const name = cleanName(x && (x.it || x.en), 18);
+    if (!name || NC_CATS.some((c) => ncLab(c).toLowerCase() === name.toLowerCase())) return;
+    NC_CATS.push({ k: 'cu' + Date.now().toString(36) + NC_CATS.length, it: name, en: name });
+  });
+  mergeMyQ(d.myQ);
+  const avs = sanitizeAvMap(d.avMap);
+  Object.keys(avs).forEach((n) => {
+    if (S.avMap[n] == null) S.avMap[n] = avs[n];
+  });
+  S.lastBackup = Date.now();
 }
 function resetCustomRoles() {
   CUST.slice().forEach((c) => {
@@ -3221,6 +3455,47 @@ function resetCustomRoles() {
   CUST = [];
   CF = null;
   CN = 0;
+}
+// Domande personali: testo semplice, cap numerico e nessun duplicato.
+function sanitizeMyQ(x) {
+  const out = { who: [], pv: [] };
+  (Array.isArray(x && x.who) ? x.who : []).slice(0, 80).forEach((q) => {
+    const s = cleanText(q, 140);
+    if (s && !out.who.some((v) => v.toLowerCase() === s.toLowerCase())) out.who.push(s);
+  });
+  (Array.isArray(x && x.pv) ? x.pv : []).slice(0, 60).forEach((q) => {
+    const a = cleanText(q && q.a, 80),
+      b = cleanText(q && q.b, 80);
+    if (!a || !b) return;
+    if (out.pv.some((v) => v.a.toLowerCase() === a.toLowerCase() && v.b.toLowerCase() === b.toLowerCase())) return;
+    out.pv.push({ a: a, b: b });
+  });
+  return out;
+}
+function mergeMyQ(x) {
+  const add = sanitizeMyQ(x);
+  add.who.forEach((q) => {
+    if (!S.myQ.who.some((v) => v.toLowerCase() === q.toLowerCase())) S.myQ.who.push(q);
+  });
+  add.pv.forEach((q) => {
+    if (!S.myQ.pv.some((v) => v.a.toLowerCase() === q.a.toLowerCase() && v.b.toLowerCase() === q.b.toLowerCase()))
+      S.myQ.pv.push(q);
+  });
+  S.myQ.who = S.myQ.who.slice(0, 80);
+  S.myQ.pv = S.myQ.pv.slice(0, 60);
+  syncPvMine();
+}
+function sanitizeAvMap(x) {
+  const out = {};
+  if (!x || typeof x !== 'object') return out;
+  Object.keys(x)
+    .slice(0, 40)
+    .forEach((k) => {
+      const n = cleanName(k, 20),
+        i = Math.round(+x[k]);
+      if (n && i >= 0 && i < AV_E.length) out[n] = i;
+    });
+  return out;
 }
 function applyBackup(d) {
   const P = [];
@@ -3266,6 +3541,10 @@ function applyBackup(d) {
     (Array.isArray(d.seen) ? d.seen : []).filter((x) => typeof x === 'string').slice(-600)
   );
   S.lastBackup = Date.now();
+  S.myQ = sanitizeMyQ(d.myQ);
+  syncPvMine();
+  if (d.pvPack && PV_DB[d.pvPack]) S.pv.pack = d.pvPack;
+  S.avMap = sanitizeAvMap(d.avMap);
   applyTheme();
   applyA11y();
   resetCustomRoles();
@@ -3310,17 +3589,17 @@ function viewOnline() {
     return `<div class="space-y-4 text-center py-10"><p class="text-slate-200 text-sm font-bold">🔄 ${X('Host disconnesso: scelgo il nuovo host…', 'Host disconnected: electing a new host…')}</p><p class="text-xs text-slate-500 px-6">${X('La stanza continua da sola. Aspetta qualche secondo senza chiudere la pagina.', 'The room carries on by itself. Wait a few seconds without closing the page.')}</p>${back}</div>`;
   if (NET.st === 'recover')
     return `<div class="space-y-4 text-center py-10"><p class="text-slate-200 text-sm font-bold">🔄 ${X('Connessione persa: riprovo…', 'Connection lost: retrying…')}</p><p class="text-xs text-slate-500 px-6">${X('Se non torna subito, un altro giocatore prende il comando della stanza.', 'If it does not come back at once, another player takes over the room.')}</p>${back}</div>`;
-  if (NET.st === 'lobby' && NET.view) return offBan + viewNetGame() + hostBar();
+  if (NET.st === 'lobby' && NET.view) return noteBanner() + offBan + viewNetGame() + hostBar();
   if (NET.st === 'lobby') {
     const onN = NET.players.filter((p) => !off.includes(p)).length;
-    return `<div class="space-y-4 py-2"><div class="text-center"><p class="text-xs text-slate-400">${X('Codice stanza', 'Room code')}</p><h2 class="text-4xl font-extrabold tracking-widest gtext">${esc(NET.code)}</h2><button onclick="copyCode()" class="mt-1 text-[11px] bg-slate-800 px-3 py-1.5 rounded-lg font-bold" aria-label="${t('roomCopy')} ${esc(NET.code)}">📋 ${t('roomCopy')}</button><p class="text-[11px] text-slate-500 mt-2">${X('Gli altri aprono la stessa pagina, scelgono Online e inseriscono il codice.', 'Others open the same page, choose Online and enter the code.')}</p><p class="text-[11px] text-slate-500 mt-1">${X('Se ricarichi la pagina, rientra con lo stesso nome entro 60 secondi.', 'If you reload, rejoin with the same name within 60 seconds.')}</p><button onclick="showInvite()" class="mt-2 w-full bg-slate-800 py-2.5 rounded-xl text-xs font-bold">📤 ${t('inviteTitle')}</button></div>
+    return noteBanner() + `<div class="space-y-4 py-2"><div class="text-center"><p class="text-xs text-slate-400">${X('Codice stanza', 'Room code')}</p><h2 class="text-4xl font-extrabold tracking-widest gtext">${esc(NET.code)}</h2><button onclick="copyCode()" class="mt-1 text-[11px] bg-slate-800 px-3 py-1.5 rounded-lg font-bold" aria-label="${t('roomCopy')} ${esc(NET.code)}">📋 ${t('roomCopy')}</button><p class="text-[11px] text-slate-500 mt-2">${X('Gli altri aprono la stessa pagina, scelgono Online e inseriscono il codice.', 'Others open the same page, choose Online and enter the code.')}</p><p class="text-[11px] text-slate-500 mt-1">${X('Se ricarichi la pagina, rientra con lo stesso nome entro 60 secondi.', 'If you reload, rejoin with the same name within 60 seconds.')}</p><button onclick="showInvite()" class="mt-2 w-full bg-slate-800 py-2.5 rounded-xl text-xs font-bold">📤 ${t('inviteTitle')}</button></div>
   ${NET.err ? `<p class="text-[11px] text-amber-300 text-center">${esc(NET.err)}</p>` : ''}
   ${NET.notice ? `<div class="text-[11px] bg-amber-500/10 border border-amber-500/40 text-amber-200 rounded-xl px-3 py-2 text-center space-y-1"><p>${esc(NET.notice)}</p><button onclick="showInvite()" class="underline font-bold">${t('roomNoticeNew')}</button></div>` : ''}
   <div class="flex justify-between text-[11px] text-slate-400 px-1"><span>🟢 ${onN}/${NET.players.length} ${t('roomPlayers')}</span><span>${t('roomVersion')} ${APP_VERSION}</span></div>
   <div class="space-y-1.5">${NET.players
     .map(
       (p, i) =>
-        `<div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl text-sm"><span class="flex items-center gap-2"><span style="width:.5rem;height:.5rem;border-radius:9999px;display:inline-block;background:${off.includes(p) ? '#fbbf24' : '#34d399'}"></span>${avHtml(p)}<b>${esc(p)}${p === NET.name ? ' (' + X('tu', 'you') + ')' : ''}</b>${p === NET.hostName ? '<span class="text-[10px] bg-purple-600/30 text-purple-200 px-1.5 py-0.5 rounded-full">host</span>' : ''}</span><span class="flex items-center gap-2">${off.includes(p) ? `<span class="text-[10px] text-amber-300">${X('offline', 'offline')}</span>` : ''}${NET.host && p !== NET.hostName ? `<button onclick="netKick(${i})" class="text-rose-400/80 hover:text-rose-300 text-xs px-1" aria-label="${X('Espelli', 'Kick')} ${esc(p)}" title="${X('Espelli', 'Kick')}">✕</button>` : ''}</span></div>`
+        `<div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl text-sm"><span class="flex items-center gap-2"><span style="width:.5rem;height:.5rem;border-radius:9999px;display:inline-block;background:${off.includes(p) ? '#fbbf24' : '#34d399'}"></span>${p === NET.name ? `<button onclick="avatarPickNet()" class="shrink-0" aria-label="${t('avatarPick')}" title="${t('avatarPick')}">${avHtml(p)}</button>` : avHtml(p)}<b>${esc(p)}${p === NET.name ? ' (' + X('tu', 'you') + ')' : ''}</b>${p === NET.hostName ? '<span class="text-[10px] bg-purple-600/30 text-purple-200 px-1.5 py-0.5 rounded-full">host</span>' : ''}</span><span class="flex items-center gap-2">${off.includes(p) ? `<span class="text-[10px] text-amber-300">${X('offline', 'offline')}</span>` : ''}${NET.host && p !== NET.hostName ? `<button onclick="netKick(${i})" class="text-rose-400/80 hover:text-rose-300 text-xs px-1" aria-label="${X('Espelli', 'Kick')} ${esc(p)}" title="${X('Espelli', 'Kick')}">✕</button>` : ''}</span></div>`
     )
     .join('')}</div>
   ${
@@ -3648,12 +3927,54 @@ function avHash(s) {
   return h;
 }
 function av(name) {
-  const h = avHash(name);
-  return { e: AV_E[h % AV_E.length], c: AV_C[(h >>> 3) % AV_C.length] };
+  const key = String(name == null ? '' : name),
+    h = avHash(key),
+    ov = S.avMap ? S.avMap[key] : null;
+  return {
+    e: Number.isInteger(ov) && AV_E[ov] ? AV_E[ov] : AV_E[h % AV_E.length],
+    c: AV_C[(h >>> 3) % AV_C.length]
+  };
 }
 function avHtml(name, cls) {
   const a = av(name);
   return `<span class="av${cls ? ' ' + cls : ''}" style="border-color:${a.c}88;background:${a.c}26" aria-hidden="true">${a.e}</span>`;
+}
+// Scelta manuale dell'avatar: vale per il nome, offline e online (via lobby).
+let AV_PICK = '';
+function avatarPick(i) {
+  const p = S.players[i];
+  if (p != null) avatarPickName(p);
+}
+function avatarPickNet() {
+  avatarPickName(NET.name);
+}
+function avatarPickName(name) {
+  const m = $('modal');
+  if (!m || name == null) return;
+  AV_PICK = name;
+  const cur = av(name).e;
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">🎨 ${t('avatarPick')} · ${esc(name)}</h3>
+  <div class="grid grid-cols-6 gap-2">${AV_E.map(
+    (e, j) =>
+      `<button onclick="setAvatarPick(${j})" aria-label="${e}" aria-pressed="${cur === e}" class="text-2xl py-1.5 rounded-xl border ${cur === e ? 'border-emerald-400 bg-emerald-500/15' : 'border-slate-700 bg-slate-900'}">${e}</button>`
+  ).join('')}</div>
+  <button onclick="setAvatarPick(-1)" class="w-full bg-slate-800 py-2 rounded-xl text-[11px] font-bold">${t('avatarReset')}</button>
+  <button onclick="AV_PICK='';closeModal()" class="w-full bg-slate-900 border border-slate-700 py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
+  modalOpen();
+}
+function setAvatarPick(j) {
+  const name = AV_PICK;
+  AV_PICK = '';
+  if (name == null) return;
+  if (j >= 0 && j < AV_E.length) S.avMap[name] = j;
+  else delete S.avMap[name];
+  const keys = Object.keys(S.avMap);
+  if (keys.length > 40) keys.slice(0, keys.length - 40).forEach((k) => delete S.avMap[k]);
+  saveLocal();
+  if (NET.host) hostBc();
+  else if (NET.conn) netAct({ t: 'av', i: j });
+  closeModal();
+  render();
 }
 // Come riavviare un gioco dalla lobby: [chiamata, giocatori minimi].
 const GAME_START = {
@@ -3677,8 +3998,15 @@ const GAME_FN = {
   taboo: tbHostOpen,
   chisono: chiStart
 };
-const THEMES = ['viola', 'oceano', 'tramonto', 'bosco'];
-const THEME_DOT = { viola: '#a855f7', oceano: '#22d3ee', tramonto: '#fb923c', bosco: '#34d399' };
+const THEMES = ['viola', 'oceano', 'tramonto', 'bosco', 'neon', 'ghiaccio'];
+const THEME_DOT = {
+  viola: '#a855f7',
+  oceano: '#22d3ee',
+  tramonto: '#fb923c',
+  bosco: '#34d399',
+  neon: '#f0abfc',
+  ghiaccio: '#38bdf8'
+};
 
 // Minigames Hub: database domande (IT)
 // Categorie (toggle): classic, hot, flirty, nsfw, dark
@@ -5716,7 +6044,10 @@ const WHO_ALL_EN = Object.values(WHO_DB_EN).flat();
 // Scelta del database in base alla lingua dell'interfaccia.
 const impGen = () => (S.lang === 'en' ? IMP_GEN_EN : IMP_GEN);
 const impHand = () => (S.lang === 'en' ? IMP_HAND_EN : IMP_HAND);
-const whoPool = () => (S.lang === 'en' ? WHO_ALL_EN : WHO_ALL);
+const whoPool = () => {
+  const base = S.lang === 'en' ? WHO_ALL_EN : WHO_ALL;
+  return S.myQ && S.myQ.who.length ? S.myQ.who.concat(base) : base;
+};
 // Coppie di parole (Mister White) in inglese: stessi cluster, stessi indici.
 const CL_EN = {
   food: [
@@ -5964,7 +6295,7 @@ const S = {
   sndOn: true,
   vibOn: true,
   lastGame: '',
-  stats: { games: 0, byGame: {}, wins: {}, played: {}, streak: {}, best: {} },
+  stats: { games: 0, byGame: {}, wins: {}, played: {}, streak: {}, best: {}, recent: [] },
   onboarded: false,
   dbAck: 0,
   textSize: 'm',
@@ -5976,8 +6307,13 @@ const S = {
   lastBackup: 0,
   backupSnooze: 0,
   hostNotes: '',
+  myQ: { who: [], pv: [] },
+  avMap: {},
   demo: false
 };
+// Ultimo giocatore rimosso (annullabile) e backup in attesa di conferma.
+let P_UNDO = null,
+  PENDING_BACKUP = null;
 const $ = (id) => document.getElementById(id);
 const esc = (s) =>
   String(s).replace(
@@ -6167,8 +6503,46 @@ function tmRing() {
       }, 1200);
   } catch (e) {}
 }
-function discRow() {
-  return `<div class="flex gap-2 justify-center items-center flex-wrap"><button onclick="showHelp('rules')" aria-label="${X('Apri le regole', 'Open the rules')}" class="px-2.5 py-1.5 rounded-lg bg-slate-800 text-[11px] font-bold text-slate-300">📖 ${X('Regole', 'Rules')}</button></div>`;
+// Piccolo accordo di vittoria diverso per gioco; rispetta l'interruttore audio.
+const CHIME = {
+  impostore: [523, 659, 784],
+  mrwhite: [494, 587, 740],
+  who_said: [587, 740, 880],
+  preferisci: [440, 554, 659],
+  lupus: [392, 494, 587],
+  nomicose: [523, 784, 1047],
+  taboo: [466, 622, 784],
+  chisono: [659, 784, 988]
+};
+function winChime(gid) {
+  if (!S.sndOn) return;
+  try {
+    const A = window.AudioContext || window.webkitAudioContext;
+    if (!A) return;
+    const c = AC || new A();
+    if (c.state === 'suspended') c.resume();
+    (CHIME[gid] || CHIME.impostore).forEach((f, i) => {
+      const o = c.createOscillator(),
+        g = c.createGain(),
+        at = c.currentTime + i * 0.13;
+      o.type = 'triangle';
+      o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, at);
+      g.gain.exponentialRampToValueAtTime(0.18, at + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, at + 0.2);
+      o.connect(g).connect(c.destination);
+      o.start(at);
+      o.stop(at + 0.22);
+    });
+    if (!AC)
+      setTimeout(() => {
+        try {
+          c.close();
+        } catch (e) {}
+      }, 1000);
+  } catch (e) {}
+}
+function discRow() {  return `<div class="flex gap-2 justify-center items-center flex-wrap"><button onclick="showHelp('rules')" aria-label="${X('Apri le regole', 'Open the rules')}" class="px-2.5 py-1.5 rounded-lg bg-slate-800 text-[11px] font-bold text-slate-300">📖 ${X('Regole', 'Rules')}</button></div>`;
 }
 
 // --- casualità sicura: Fisher-Yates + crypto ---
@@ -6288,13 +6662,68 @@ function addPlayer() {
 }
 function removePlayer(i) {
   const p = S.players[i];
+  if (p == null) return;
+  const hasScore = Object.prototype.hasOwnProperty.call(S.scores, p);
+  P_UNDO = { n: p, i: i, sc: hasScore ? S.scores[p] : null };
   S.players.splice(i, 1);
   if (!(S.scores[p] > 0)) delete S.scores[p];
+  saveLocal();
+  render();
+}
+function undoRemovePlayer() {
+  const u = P_UNDO;
+  P_UNDO = null;
+  if (!u) return;
+  if (!S.players.some((p) => p.toLowerCase() === u.n.toLowerCase())) {
+    S.players.splice(Math.min(u.i, S.players.length), 0, u.n);
+    if (u.sc != null) S.scores[u.n] = u.sc;
+  }
+  saveLocal();
+  render();
+  announce(t('undoRemoved'));
+}
+function renamePlayer(i) {
+  const p = S.players[i];
+  const m = $('modal');
+  if (p == null || !m) return;
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">✏️ ${t('renamePlayer')}</h3>
+  <input id="rn" autocomplete="off" maxlength="20" value="${esc(p)}" onkeydown="if(event.key==='Enter')savePlayerName(${i})" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
+  <div class="flex gap-2"><button onclick="closeModal()" class="flex-1 bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${t('close')}</button><button onclick="savePlayerName(${i})" class="flex-1 gbtn py-2.5 rounded-xl text-xs font-bold">${t('save')}</button></div></div>`;
+  modalOpen();
+}
+function savePlayerName(i) {
+  const el = $('rn'),
+    old = S.players[i];
+  if (!el || old == null) return;
+  const n = cleanName(el.value, 20);
+  if (!n) {
+    el.focus();
+    return;
+  }
+  if (n !== old && S.players.some((p, j) => j !== i && p.toLowerCase() === n.toLowerCase())) {
+    alert(t('dup'));
+    return;
+  }
+  if (n !== old) {
+    S.players[i] = n;
+    if (Object.prototype.hasOwnProperty.call(S.scores, old)) {
+      S.scores[n] = S.scores[old];
+      delete S.scores[old];
+    }
+    if (S.avMap && Object.prototype.hasOwnProperty.call(S.avMap, old)) {
+      S.avMap[n] = S.avMap[old];
+      delete S.avMap[old];
+    }
+    P_UNDO = null;
+  }
+  closeModal();
+  saveLocal();
   render();
 }
 function clearPlayers() {
   S.players = [];
   S.scores = {};
+  P_UNDO = null;
   render();
 }
 
@@ -7041,7 +7470,7 @@ function viewLupus() {
       r = G.roles[p];
     return !G.shown
       ? `<div class="text-center space-y-5 py-6"><p class="text-slate-400 text-sm">${t('passTo')}</p><h2 class="text-3xl font-extrabold gtext">${esc(p)}</h2><button onclick="reveal()" class="${BTN}">${t('tapReveal')}</button><p class="text-xs text-slate-500">${G.idx + 1}/${n}</p></div>`
-      : `<div class="text-center space-y-4 py-4"><p class="text-slate-400 text-sm">${esc(p)}</p><p class="text-xs font-bold ${LCOL[LT[r]]}">${t('tm_' + LT[r])}</p><h2 class="text-3xl font-black text-white">${t('r_' + r)}</h2><p class="text-xs text-slate-300 px-2">${t('d_' + r)}</p>${
+      : `<div class="text-center space-y-4 py-4 flipin"><p class="text-slate-400 text-sm">${esc(p)}</p><p class="text-xs font-bold ${LCOL[LT[r]]}">${t('tm_' + LT[r])}</p><h2 class="text-3xl font-black text-white">${t('r_' + r)}</h2><p class="text-xs text-slate-300 px-2">${t('d_' + r)}</p>${
           G.full && r === 're' && !G.vassal
             ? `<p class="text-xs text-amber-300">${X('Scegli il tuo Vassallo (non saprà di esserlo)', "Choose your Vassal (they won't know)")}</p>${lBtn(
                 S.players.filter((x) => x !== p),
@@ -8259,7 +8688,7 @@ function viewSetup() {
         (p) =>
           `<button onclick="pvPreset('${p}')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold ${S.pv.pack === p ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-slate-400'}">${t('pvPack' + p[0].toUpperCase() + p.slice(1))}</button>`
       )
-      .join('')}<button onclick="pvRandom()" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300">🎲 ${t('pvRandom')}</button></div>
+      .join('')}<button onclick="pvRandom()" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300">🎲 ${t('pvRandom')}</button>${S.myQ.pv.length ? `<button onclick="pvPreset('mine')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold ${S.pv.pack === 'mine' ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-slate-300'}">✍️ ${t('myQPack')} (${S.myQ.pv.length})</button>` : ''}</div>
       <div class="flex flex-wrap gap-1.5 mt-1.5">${S.pv.pack ? `<button onclick="togglePackFav()" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 ${S.favPV.includes(S.pv.pack) ? 'text-amber-300' : 'text-slate-400'}">${S.favPV.includes(S.pv.pack) ? '★ ' + t('favRemove') : '☆ ' + t('favAdd')}</button>` : ''}${S.favPV.length ? `<button onclick="pvFavRandom()" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-amber-300">★ ${t('favRandom')}</button>` : ''}</div>
       ${dbHint()}</div>
     <div><p class="text-[11px] text-slate-400 mb-1">${t('pvA')}</p><input autocomplete="off" maxlength="80" value="${esc(S.pv.a)}" oninput="S.pv.a=this.value;chk()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500"></div>
@@ -8269,7 +8698,8 @@ function viewSetup() {
   <div class="flex justify-between items-center border-b border-slate-700/60 pb-3"><h2 class="font-bold text-white">${t('g_' + g)}</h2><button onclick="back()" class="text-xs bg-slate-800 px-3 py-1.5 rounded-xl">← ${t('back')}</button></div>
   <div class="flex gap-2"><input autocomplete="off" id="pn" onkeydown="if(event.key==='Enter')addPlayer()" placeholder="${t('namePh')}" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500"><button onclick="addPlayer()" class="gbtn px-4 rounded-xl font-bold text-xs">${t('add')}</button></div>
   <div class="flex justify-between text-[11px] font-bold text-slate-400 px-1"><span>${t('players').toUpperCase()} (${pl.length})</span><button onclick="clearPlayers()" class="text-rose-400">${t('clear')}</button></div>
-  <div class="max-h-36 overflow-y-auto space-y-1.5">${pl.length ? pl.map((p, i) => `<div class="flex justify-between items-center bg-slate-900 px-3 py-1.5 rounded-xl text-xs font-semibold"><span class="flex items-center gap-1.5 min-w-0">${avHtml(p)}<span class="truncate">${i + 1}. ${esc(p)}</span></span><button onclick="removePlayer(${i})" class="text-slate-500 px-1" aria-label="${X('Rimuovi', 'Remove')} ${esc(p)}">🗑</button></div>`).join('') : `<p class="text-xs text-slate-500 italic">${t('none')}</p>`}</div>
+  <div class="max-h-36 overflow-y-auto space-y-1.5">${pl.length ? pl.map((p, i) => `<div class="flex justify-between items-center bg-slate-900 px-3 py-1.5 rounded-xl text-xs font-semibold"><span class="flex items-center gap-1.5 min-w-0"><button onclick="avatarPick(${i})" class="shrink-0" aria-label="${t('avatarPick')} ${esc(p)}" title="${t('avatarPick')}">${avHtml(p)}</button><span class="truncate">${i + 1}. ${esc(p)}</span></span><span class="flex items-center gap-0.5"><button onclick="renamePlayer(${i})" class="text-slate-500 px-1" aria-label="${t('renamePlayer')} ${esc(p)}" title="${t('renamePlayer')}">✏️</button><button onclick="removePlayer(${i})" class="text-slate-500 px-1" aria-label="${X('Rimuovi', 'Remove')} ${esc(p)}" title="${X('Rimuovi', 'Remove')}">🗑</button></span></div>`).join('') : `<p class="text-xs text-slate-500 italic">${t('none')}</p>`}</div>
+  ${P_UNDO ? `<button onclick="undoRemovePlayer()" class="w-full text-[11px] font-bold bg-amber-500/10 border border-amber-500/40 text-amber-200 py-2 rounded-xl">↩️ ${t('undoRemove')} · ${esc(P_UNDO.n)}</button>` : ''}
   ${PLAYABLE.includes(g) && g !== 'preferisci' ? modeUI(g) : ''}${g !== 'lupus' && g !== 'preferisci' && PLAYABLE.includes(g) ? quickUI() : ''}${['impostore', 'who_said', 'mrwhite'].includes(g) ? dbHint() : ''}${cfg}
   ${PLAYABLE.includes(g) ? '' : `<p class="text-xs text-amber-300 text-center">${t('comingSoon')}</p>`}
   ${g === 'mrwhite' && e.und + e.mw === 0 ? `<p class="text-xs text-amber-300 text-center">${t('needRole')}</p>` : ''}
@@ -8301,7 +8731,7 @@ function viewPlay() {
       r = G.roles[p];
     b = !G.shown
       ? `<div class="text-center space-y-5 py-6"><p class="text-slate-400 text-sm">${t('passTo')}</p><h2 class="text-3xl font-extrabold gtext">${esc(p)}</h2><button onclick="reveal()" class="${BTN}">${t('tapReveal')}</button><p class="text-xs text-slate-500">${G.idx + 1}/${n}</p></div>`
-      : `<div class="text-center space-y-4 py-4"><p class="text-slate-400 text-sm">${esc(p)}</p>${r === 'mw' ? `<h2 class="text-2xl font-extrabold text-pink-400">${t('youMw')}</h2><p class="text-sm text-slate-300">${t('noWord')}</p><div class="bg-slate-900 rounded-xl p-3 text-sm">${t('hint')}: <b>${G.hint || t('cat_' + G.cat)}</b></div>` : `<p class="text-xs text-slate-400">${t('yourWord')}</p><h2 class="text-4xl font-black text-white">${esc(word(r))}</h2>`}<button onclick="hideNext()" class="${BTN}">${t('hide')}</button></div>`;
+      : `<div class="text-center space-y-4 py-4 flipin"><p class="text-slate-400 text-sm">${esc(p)}</p>${r === 'mw' ? `<h2 class="text-2xl font-extrabold text-pink-400">${t('youMw')}</h2><p class="text-sm text-slate-300">${t('noWord')}</p><div class="bg-slate-900 rounded-xl p-3 text-sm">${t('hint')}: <b>${G.hint || t('cat_' + G.cat)}</b></div>` : `<p class="text-xs text-slate-400">${t('yourWord')}</p><h2 class="text-4xl font-black text-white">${esc(word(r))}</h2>`}<button onclick="hideNext()" class="${BTN}">${t('hide')}</button></div>`;
   } else if (G.phase === 'clues') {
     const done = G.cIdx >= n;
     b =
@@ -8470,6 +8900,20 @@ function pvRandomOnline() {
     p = packs[rnd(packs.length)];
   NET.pvI = rnd(PV_DB[p].length);
   pvPresetOnline(p);
+}
+// Il pacchetto "Le mie" vive dentro PV_DB: così preferiti, random e online
+// funzionano senza percorsi separati.
+function syncPvMine() {
+  try {
+    const pv = S.myQ && Array.isArray(S.myQ.pv) ? S.myQ.pv : [];
+    if (pv.length) PV_DB.mine = pv.map((q) => [q.a, q.b, q.a, q.b]);
+    else {
+      delete PV_DB.mine;
+      if (S.favPV) S.favPV = S.favPV.filter((p) => p !== 'mine');
+    }
+    if (S.pv && S.pv.pack === 'mine' && !pv.length) S.pv.pack = '';
+    if (NET.pvPack === 'mine' && !pv.length) NET.pvPack = '';
+  } catch (e) {}
 }
 function pvHostOpen() {
   if (!NET.host) return;
@@ -9330,8 +9774,8 @@ function viewTbSetup() {
   <p class="text-xs text-slate-400">${t('tbSetupHint')}</p>
   <p class="text-[11px] text-slate-500">${t('tbTapTeam')}</p>
   <div class="grid grid-cols-2 gap-2">
-    <div class="bg-slate-900 rounded-xl p-2 space-y-1.5"><p class="text-[11px] font-bold text-orange-300">${t('tbTeamA')} (${T.A.length})</p><div class="flex flex-wrap gap-1.5">${T.A.map((p) => chip(p, 'A')).join('')}</div></div>
-    <div class="bg-slate-900 rounded-xl p-2 space-y-1.5"><p class="text-[11px] font-bold text-sky-300">${t('tbTeamB')} (${T.B.length})</p><div class="flex flex-wrap gap-1.5">${T.B.map((p) => chip(p, 'B')).join('')}</div></div>
+    <div class="bg-slate-900 rounded-xl p-2 space-y-1.5 border border-orange-500/40"><p class="text-[11px] font-bold text-orange-300">${t('tbTeamA')} (${T.A.length})</p><div class="flex flex-wrap gap-1.5">${T.A.map((p) => chip(p, 'A')).join('')}</div></div>
+    <div class="bg-slate-900 rounded-xl p-2 space-y-1.5 border border-sky-500/40"><p class="text-[11px] font-bold text-sky-300">${t('tbTeamB')} (${T.B.length})</p><div class="flex flex-wrap gap-1.5">${T.B.map((p) => chip(p, 'B')).join('')}</div></div>
   </div>
   <button onclick="tbAuto();render()" class="w-full bg-slate-800 py-2.5 rounded-xl text-xs font-bold">⚖️ ${t('tabooAuto')}</button>
   <button onclick="tbStart()" ${tbCanStart() ? '' : 'disabled'} class="${BTN} disabled:opacity-40">${t('tabooStart')}</button></section>`;
@@ -9344,7 +9788,7 @@ function viewTb(v) {
     scores = `<div class="grid grid-cols-2 gap-2">${['A', 'B']
       .map(
         (k) =>
-          `<div class="bg-slate-900 rounded-xl p-2 text-center"><p class="text-[10px] text-slate-400">${tbLab(k)}</p><b class="${k === v.turn ? 'text-emerald-300' : 'text-white'}">${(v.ts && v.ts[k]) || 0}</b></div>`
+          `<div class="bg-slate-900 rounded-xl p-2 text-center border ${k === 'A' ? 'border-orange-500/40' : 'border-sky-500/40'}"><p class="text-[10px] ${k === 'A' ? 'text-orange-300' : 'text-sky-300'}">${tbLab(k)}</p><b class="${k === v.turn ? 'text-emerald-300' : 'text-white'}">${(v.ts && v.ts[k]) || 0}</b></div>`
       )
       .join('')}</div>`,
     teams = `<div class="grid grid-cols-2 gap-2 text-[11px]"><div><p class="font-bold text-orange-300">${t('tbTeamA')}</p><p class="text-slate-400">${v.teams.A.map((p) => esc(p) + (p === v.guesser ? ' 🎯' : '')).join(' · ')}</p></div><div><p class="font-bold text-sky-300">${t('tbTeamB')}</p><p class="text-slate-400">${v.teams.B.map((p) => esc(p) + (p === v.guesser ? ' 🎯' : '')).join(' · ')}</p></div></div>`;
@@ -9712,6 +10156,7 @@ function statsRecord(gid, base, onlyIfScored) {
   if (!st || typeof st !== 'object') return;
   st.games = (+st.games || 0) + 1;
   st.byGame[gid] = (+st.byGame[gid] || 0) + 1;
+  const winners = [];
   P.forEach((p) => {
     const n = cleanName(p, 20);
     if (!n) return;
@@ -9720,9 +10165,14 @@ function statsRecord(gid, base, onlyIfScored) {
       st.wins[n] = (+st.wins[n] || 0) + 1;
       st.streak[n] = (+st.streak[n] || 0) + 1;
       st.best[n] = Math.max(+st.best[n] || 0, st.streak[n]);
+      if (!winners.some((w) => w.toLowerCase() === n.toLowerCase())) winners.push(n);
     } else st.streak[n] = 0;
   });
+  if (!Array.isArray(st.recent)) st.recent = [];
+  st.recent.unshift({ g: gid, t: Date.now(), w: winners.slice(0, 8).join(', ') });
+  st.recent = st.recent.slice(0, 20);
   statsPrune();
+  winChime(gid);
   announce(t('gameOver'));
 }
 // Evita che il file di salvataggio cresca senza limite: restano i 40 nomi più presenti.
@@ -9747,11 +10197,53 @@ function statsTop(n) {
     .sort((a, b) => b[1] - a[1] || b[2] - a[2] || a[0].localeCompare(b[0]))
     .slice(0, n || 5);
 }
+function statsRecentHtml(n) {
+  const rec = ((S.stats && S.stats.recent) || []).slice(0, n || 4);
+  if (!rec.length) return '';
+  return `<div class="space-y-1"><p class="text-[11px] font-bold text-slate-400">${t('statsRecent')}</p>${rec
+    .map(
+      (e) =>
+        `<div class="flex justify-between gap-2 bg-slate-900 px-3 py-1.5 rounded-lg text-[10px]"><span class="truncate">${esc(t('g_' + e.g))}</span><span class="text-slate-400 text-right truncate">${fmtDate(e.t)}${e.w ? ' · ' + esc(e.w) : ''}</span></div>`
+    )
+    .join('')}</div>`;
+}
+function statsCsv() {
+  try {
+    const head =
+        S.lang === 'en'
+          ? ['Name', 'Games', 'Wins', 'Current streak', 'Best streak']
+          : ['Nome', 'Partite', 'Vittorie', 'Serie attuale', 'Miglior serie'],
+      rows = [head].concat(statsTop(9999).map(([n, w, p, s, b]) => [n, p, w, s, b]));
+    const csv =
+      '\ufeff' +
+      rows.map((r) => r.map((v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"').join(',')).join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' }),
+      url = URL.createObjectURL(blob),
+      a = document.createElement('a');
+    a.href = url;
+    a.download = 'minigames-hub-stats-' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+    alert(t('statsCsvOk'));
+  } catch (e) {}
+}
 // Le statistiche arrivano anche da un backup: vanno validate come tutto il resto.
 function sanitizeStats(x) {
-  const out = { games: 0, byGame: {}, wins: {}, played: {}, streak: {}, best: {} };
+  const out = { games: 0, byGame: {}, wins: {}, played: {}, streak: {}, best: {}, recent: [] };
   if (!x || typeof x !== 'object') return out;
   out.games = Math.max(0, Math.min(99999, Math.round(+x.games || 0)));
+  out.recent = (Array.isArray(x.recent) ? x.recent : [])
+    .slice(0, 20)
+    .map((e) => ({
+      g: e && typeof e.g === 'string' && GAME_START[e.g] ? e.g : '',
+      t: Math.max(0, Math.min(Date.now() + 86400000, +((e && e.t) || 0))),
+      w: cleanText(e && e.w, 60)
+    }))
+    .filter((e) => e.g && e.t)
+    .sort((a, b) => b.t - a.t)
+    .slice(0, 20);
   [
     ['byGame', 400],
     ['wins', 9999],
@@ -9775,7 +10267,7 @@ function sanitizeStats(x) {
 }
 function resetStats() {
   if (!confirm(t('statsResetConfirm'))) return;
-  S.stats = { games: 0, byGame: {}, wins: {}, played: {}, streak: {}, best: {} };
+  S.stats = { games: 0, byGame: {}, wins: {}, played: {}, streak: {}, best: {}, recent: [] };
   STATS_BASE = null;
   saveLocal();
   alert(t('statsResetOk'));
@@ -9961,7 +10453,7 @@ function summaryBar() {
     rows = d.rows
       .map(
         (r, i) =>
-          `<div class="flex justify-between bg-slate-900 px-3 py-1.5 rounded-lg text-[11px]"><span class="flex items-center gap-1.5 min-w-0"><span class="text-slate-500">#${i + 1}</span>${avHtml(r.n)}<b class="truncate">${esc(r.n)}</b></span><span class="${r.d === d.max && r.d > 0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">${r.d > 0 ? '+' + r.d : '0'}</span></div>`
+          `<div class="flex justify-between bg-slate-900 px-3 py-1.5 rounded-lg text-[11px]"><span class="flex items-center gap-1.5 min-w-0"><span class="text-slate-500">${i < 3 ? ['🥇', '🥈', '🥉'][i] : '#' + (i + 1)}</span>${avHtml(r.n)}<b class="truncate">${esc(r.n)}</b></span><span class="${r.d === d.max && r.d > 0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">${r.d > 0 ? '+' + r.d : '0'}</span></div>`
       )
       .join('');
   return `<section class="glass p-4 rounded-2xl space-y-2 border border-emerald-500/30"><div class="flex justify-between items-center"><h3 class="font-bold text-white text-sm">📊 ${t('summaryTitle')}</h3><span class="text-[10px] text-slate-400">${t('g_' + d.gid)}</span></div>${win}<details class="bg-slate-900/40 rounded-xl p-2"><summary class="text-[11px] font-bold cursor-pointer">${t('summaryRank')}</summary><div class="space-y-1 mt-1.5">${rows}</div></details><div class="flex gap-2"><button onclick="shareSummary()" class="flex-1 bg-slate-800 py-2 rounded-xl text-[11px] font-bold">📤 ${t('summaryShare')}</button><button onclick="rematchSummary()" class="flex-1 gbtn py-2 rounded-xl text-[11px] font-bold">🔁 ${t('summaryAgain')}</button></div></section>`;
@@ -10048,22 +10540,74 @@ function clearLocalData() {
 function showNews() {
   const m = $('modal');
   if (!m) return;
-  const items = ['news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
+  const items = ['news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">✨ ${t('newsTitle')}</h3><ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">${items.map((k) => `<li>${t(k)}</li>`).join('')}</ul><button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
   modalOpen();
 }
 function hostNotesOpen() {
   const m = $('modal');
   if (!m) return;
-  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-2"><h3 class="font-bold text-white">📝 ${t('hostNotes')}</h3><textarea id="hn" rows="5" maxlength="600" placeholder="${t('hostNotesPh')}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">${esc(S.hostNotes)}</textarea><div class="flex gap-2"><button onclick="closeModal()" class="flex-1 bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${t('close')}</button><button onclick="saveHostNotes()" class="flex-1 gbtn py-2.5 rounded-xl text-xs font-bold">${t('hostNotesSave')}</button></div></div>`;
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-2"><h3 class="font-bold text-white">📝 ${t('hostNotes')}</h3><textarea id="hn" rows="5" maxlength="600" placeholder="${t('hostNotesPh')}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">${esc(S.hostNotes)}</textarea><div class="flex gap-2"><button onclick="closeModal()" class="flex-1 bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${t('close')}</button>${NET.host ? `<button onclick="saveHostNotes(1)" class="flex-1 bg-amber-600/20 border border-amber-500/40 py-2.5 rounded-xl text-xs font-bold text-amber-200">📢 ${t('shareNote')}</button>` : ''}<button onclick="saveHostNotes()" class="flex-1 gbtn py-2.5 rounded-xl text-xs font-bold">${t('hostNotesSave')}</button></div></div>`;
   modalOpen();
 }
-function saveHostNotes() {
+function saveHostNotes(share) {
   const el = $('hn');
   S.hostNotes = el ? cleanText(el.value, 600) : S.hostNotes;
   saveLocal();
+  if (share) shareHostNotes();
   closeModal();
-  announce(t('hostNotes'));
+  render();
+  announce(share ? t('noteShared') : t('hostNotes'));
+}
+function shareHostNotes() {
+  if (!NET.host || !S.hostNotes) return;
+  Object.values(NET.conns || {}).forEach((c) => {
+    try {
+      c.send({ t: 'note', text: S.hostNotes, from: NET.name });
+    } catch (e) {}
+  });
+}
+function noteBanner() {
+  if (!NET.note || !NET.note.text) return '';
+  return `<div class="glass p-3 rounded-2xl border border-amber-500/40 space-y-1"><div class="flex justify-between items-center gap-2"><p class="text-[11px] font-bold text-amber-200">📝 ${t('noteTitle')}${NET.note.from ? ' · ' + esc(NET.note.from) : ''}</p><button onclick="NET.note=null;render()" class="text-slate-400 text-xs px-1" aria-label="${t('close')}">✕</button></div><p class="text-xs text-slate-200">${esc(NET.note.text)}</p></div>`;
+}
+function myQOpen() {
+  const m = $('modal');
+  if (!m) return;
+  const who = S.myQ.who.join('\n'),
+    pv = S.myQ.pv.map((q) => q.a + ' | ' + q.b).join('\n');
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3 max-h-[85vh] overflow-y-auto">
+  <h3 class="font-bold text-white">✍️ ${t('myQ')}</h3>
+  <p class="text-[11px] text-slate-400">${t('myQHint')}</p>
+  <div class="space-y-1"><label for="mq-who" class="text-[11px] font-bold text-slate-300">${t('myQWho')}</label><textarea id="mq-who" rows="4" maxlength="4000" placeholder="${t('myQWhoPh')}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">${esc(who)}</textarea></div>
+  <div class="space-y-1"><label for="mq-pv" class="text-[11px] font-bold text-slate-300">${t('myQPV')}</label><textarea id="mq-pv" rows="4" maxlength="4000" placeholder="${t('myQPVPh')}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">${esc(pv)}</textarea></div>
+  <p class="text-[10px] text-slate-500">${S.myQ.who.length + S.myQ.pv.length ? S.myQ.who.length + S.myQ.pv.length + ' ' + t('myQCount') : t('myQEmpty')}</p>
+  <div class="flex gap-2"><button onclick="myQClear()" class="bg-slate-900 border border-rose-500/30 text-rose-400 px-3 py-2.5 rounded-xl text-[11px] font-bold">${t('myQClear')}</button><button onclick="closeModal()" class="flex-1 bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${t('close')}</button><button onclick="myQSave()" class="flex-1 gbtn py-2.5 rounded-xl text-xs font-bold">${t('myQSave')}</button></div></div>`;
+  modalOpen();
+}
+function myQSave() {
+  const w = $('mq-who'),
+    p = $('mq-pv');
+  if (!w || !p) return;
+  const pv = String(p.value || '')
+    .split(/\r?\n/)
+    .map((line) => {
+      const i = line.indexOf('|');
+      return i > 0 ? { a: line.slice(0, i), b: line.slice(i + 1) } : null;
+    })
+    .filter(Boolean);
+  S.myQ = sanitizeMyQ({ who: String(w.value || '').split(/\r?\n/), pv: pv });
+  syncPvMine();
+  saveLocal();
+  closeModal();
+  render();
+  announce(t('myQSaved'));
+}
+function myQClear() {
+  S.myQ = { who: [], pv: [] };
+  syncPvMine();
+  saveLocal();
+  myQOpen();
 }
 function resetPrefs() {
   S.mode = 'auto';
@@ -10082,7 +10626,9 @@ function showSettings() {
       ['viola', t('thDefault')],
       ['oceano', t('thOcean')],
       ['tramonto', t('thSunset')],
-      ['bosco', t('thForest')]
+      ['bosco', t('thForest')],
+      ['neon', t('thNeon')],
+      ['ghiaccio', t('thIce')]
     ],
     top = statsTop(5),
     fav = Object.entries(S.stats.byGame || {}).sort((a, b) => b[1] - a[1])[0],
@@ -10131,9 +10677,10 @@ function showSettings() {
             .join('')
         : `<p class="text-[11px] text-slate-500 italic">${t('statsNone')}</p>`
     }</div>
-    ${+S.stats.games ? `<button onclick="resetStats()" class="text-[11px] text-rose-400 font-bold">↺ ${t('statsReset')}</button>` : ''}
+    ${statsRecentHtml(4)}
+    <div class="flex flex-wrap gap-2 items-center">${+S.stats.games ? `<button onclick="statsCsv()" class="text-[11px] text-emerald-300 font-bold">⬇️ ${t('statsCsv')}</button>` : ''}${+S.stats.games ? `<button onclick="resetStats()" class="text-[11px] text-rose-400 font-bold">↺ ${t('statsReset')}</button>` : ''}</div>
   </div>
-  <div class="space-y-2"><p class="text-xs font-bold text-slate-300">🧩 ${t('setGames')}</p><p class="text-[11px] text-slate-400">${t('setGamesHint')}</p><div class="flex flex-wrap gap-2"><button onclick="resetPrefs()" class="text-[11px] text-rose-400 font-bold">↺ ${t('resetPrefs')}</button><button onclick="forgetSeen()" class="text-[11px] text-amber-300 font-bold">🧹 ${t('forgetSeen')}</button><button onclick="showDbTip(true)" class="text-[11px] text-slate-300 font-bold">✍️ ${t('dbWhy')}</button></div></div>
+  <div class="space-y-2"><p class="text-xs font-bold text-slate-300">🧩 ${t('setGames')}</p><p class="text-[11px] text-slate-400">${t('setGamesHint')}</p><div class="flex flex-wrap gap-2"><button onclick="resetPrefs()" class="text-[11px] text-rose-400 font-bold">↺ ${t('resetPrefs')}</button><button onclick="forgetSeen()" class="text-[11px] text-amber-300 font-bold">🧹 ${t('forgetSeen')}</button><button onclick="showDbTip(true)" class="text-[11px] text-slate-300 font-bold">✍️ ${t('dbWhy')}</button><button onclick="myQOpen()" class="text-[11px] text-cyan-300 font-bold">✍️ ${t('myQ')} (${S.myQ.who.length + S.myQ.pv.length})</button></div></div>
   <div class="space-y-2"><p class="text-xs font-bold text-slate-300">💾 ${t('setData')}</p>
     <p class="text-[11px] text-slate-400">${t('backupLast')}: <b class="text-slate-200">${fmtDate(S.lastBackup)}</b> · ${t('storageUse')}: <b class="text-slate-200">${fmtBytes(storageBytes())}</b></p>
     <div class="grid grid-cols-2 gap-2"><button onclick="exportBackup()" class="bg-slate-800 py-2 rounded-xl text-[11px] font-bold">⬇️ ${t('exportBtn')}</button><button onclick="importBackup()" class="bg-slate-800 py-2 rounded-xl text-[11px] font-bold">⬆️ ${t('importBtn')}</button></div>
@@ -10188,6 +10735,8 @@ function saveLocal() {
       lastBackup: S.lastBackup,
       backupSnooze: S.backupSnooze,
       hostNotes: S.hostNotes,
+    myQ: S.myQ,
+    avMap: S.avMap,
       mode: S.mode,
       cfg: { imp: S.cfg.imp, und: S.cfg.und, mwN: S.cfg.mwN, cats: [...S.cfg.cats] },
       pvPack: (S.pv && S.pv.pack) || '',
@@ -10248,6 +10797,10 @@ function loadLocal() {
     S.used = new Set(
       (Array.isArray(d.seen) ? d.seen : []).filter((x) => typeof x === 'string').slice(-600)
     );
+    S.myQ = sanitizeMyQ(d.myQ);
+    syncPvMine();
+    if (d.pvPack && PV_DB[d.pvPack]) S.pv.pack = d.pvPack;
+    S.avMap = sanitizeAvMap(d.avMap);
     applyTheme();
     applyA11y();
     // Ruoli e categorie personalizzati: restano su questo telefono.

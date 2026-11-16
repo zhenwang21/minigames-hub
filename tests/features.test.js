@@ -171,7 +171,7 @@ const lobby = resApp.run('viewOnline()');
 check(lobby.includes('copyCode()'), 'lobby con copia del codice');
 check(lobby.includes('1/2') && lobby.includes('connessi'), 'lobby mostra i giocatori connessi');
 check(lobby.includes('offline') && lobby.includes('host'), 'lobby distingue offline e host');
-check(lobby.includes('1.10.0'), 'lobby mostra la versione');
+check(lobby.includes('1.11.0'), 'lobby mostra la versione');
 // riepilogo condivisibile
 RS.scores = { Anna: 300, Bruno: 100 };
 RN.game = { g: 'impostore' };
@@ -394,7 +394,7 @@ check(q.run('backupReminder()') === '', 'senza dati il promemoria non compare');
 q.run('resetPrefs()');
 check(QS.timerPref === 120 && QS.mode === 'auto' && QS.ncPref.length === 0, 'ripristino preferenze giochi');
 q.run('showNews()');
-check(q.els.modal.innerHTML.includes('Novità 1.10.0'), 'la modale Novità è alla versione 1.10.0');
+check(q.els.modal.innerHTML.includes('Novità 1.11.0'), 'la modale Novità è alla versione 1.11.0');
 check(q.els.modal.innerHTML.includes('Colori e simboli dedicati'), 'le novità elencano i cosmetics');
 q.run('closeModal()');
 
@@ -442,5 +442,113 @@ const cssCos = fs.readFileSync(sourceFile(), 'utf8');
 check(/\.gtile\{/.test(cssCos) && /\.av\{/.test(cssCos) && /#app\[data-game\]:before/.test(cssCos), 'CSS condiviso per tile, avatar e accento');
 check(/function applyGameAccent/.test(cssCos) && /applyGameAccent\(\)/.test(cssCos), 'l’accento di gioco è applicato a ogni render');
 check(/screenGame\(\)/.test(cssCos), 'il gioco attivo è dedotto anche nei setup');
+
+// --- 1.11.0: gestione giocatori ---
+CS.screen = 'setup';
+CS.game = 'lupus';
+CS.players = ['Anna', 'Bruno'];
+CS.scores = { Anna: 50, Bruno: 0 };
+c.run('renamePlayer(0)');
+check(c.els.modal.innerHTML.includes('Rinomina giocatore'), 'la modale di rinomina si apre');
+c.run('$("rn").value = "Carla"');
+c.run('savePlayerName(0)');
+check(CS.players[0] === 'Carla' && CS.scores.Carla === 50 && CS.scores.Anna === undefined, 'rinomina migra anche il punteggio');
+c.run('renamePlayer(1)');
+c.run('$("rn").value = "Carla"');
+c.run('savePlayerName(1)');
+check(CS.players[1] === 'Bruno' && c.alerts.some((m) => m.includes('già presente')), 'la rinomina rifiuta i nomi duplicati');
+c.run('closeModal()');
+c.run('removePlayer(0)');
+check(CS.players.join(',') === 'Bruno' && c.run('P_UNDO.n') === 'Carla', 'la rimozione ricorda il giocatore');
+c.run('undoRemovePlayer()');
+check(CS.players.join(',') === 'Carla,Bruno' && CS.scores.Carla === 50, 'annulla rimozione ripristina nome e punteggio');
+
+// --- 1.11.0: statistiche recenti e CSV ---
+CS.stats = { games: 0, byGame: {}, wins: {}, played: {}, streak: {}, best: {}, recent: [] };
+CS.players = ['Anna', 'Bruno'];
+CS.scores = { Anna: 120, Bruno: 20 };
+c.call('statsRecord', 'lupus', { scores: { Anna: 20, Bruno: 20 } }, true);
+check(CS.stats.recent.length === 1 && CS.stats.recent[0].g === 'lupus', 'la partita finita entra nelle recenti');
+check(CS.stats.recent[0].w === 'Anna', 'le recenti ricordano il vincitore', CS.stats.recent[0].w);
+const recHtml = c.run('statsRecentHtml(4)');
+check(recHtml.includes('Lupus') && recHtml.includes('Anna'), 'le recenti compaiono nelle impostazioni');
+const sanRec = c.run("sanitizeStats({games:2,recent:[{g:'lupus',t:1,w:'Anna'},{g:'x',t:1,w:'No'}]})");
+check(sanRec.recent.length === 1 && sanRec.recent[0].g === 'lupus', 'le recenti vengono validate nel backup');
+check(/Nome|Name/.test(fs.readFileSync(sourceFile(), 'utf8')), 'il CSV usa intestazioni tradotte');
+
+// --- 1.11.0: import con unisci/sostituisci ---
+c.run('showImportDialog({v:"1.0.0",exportedAt:"2026-01-01",players:["Dario"],scores:{Dario:5},stats:{games:2}})');
+check(c.els.modal.innerHTML.includes('Unisci') && c.els.modal.innerHTML.includes('Sostituisci'), 'la modale di import offre unisci o sostituisci');
+check(c.els.modal.innerHTML.includes('versione diversa'), 'la modale avvisa se il backup è di un’altra versione');
+c.run('PENDING_BACKUP=null;closeModal()');
+CS.players = ['Anna'];
+CS.scores = { Anna: 30 };
+CS.stats = { games: 1, byGame: { lupus: 1 }, wins: { Anna: 1 }, played: { Anna: 1 }, streak: { Anna: 1 }, best: { Anna: 1 }, recent: [] };
+c.call('mergeBackup', {
+  players: ['Anna', 'Dario'],
+  scores: { Anna: 10, Dario: 5 },
+  stats: { games: 2, byGame: { lupus: 1 }, wins: { Dario: 1 }, played: { Dario: 1 }, streak: { Dario: 1 }, best: { Dario: 1 }, recent: [{ g: 'lupus', t: 1, w: 'Dario' }] }
+});
+check(CS.players.join(',') === 'Anna,Dario', 'unisci aggiunge i giocatori mancanti');
+check(CS.scores.Anna === 30 && CS.scores.Dario === 5, 'unisci non abbassa i punteggi esistenti');
+check(CS.stats.games === 3 && CS.stats.wins.Dario === 1, 'unisci somma le statistiche');
+check(CS.stats.recent.length === 1 && CS.stats.recent[0].w === 'Dario', 'unisci importa le partite recenti');
+
+// --- 1.11.0: le mie domande ---
+CS.myQ = c.run("sanitizeMyQ({who:['Domanda personale?'],pv:[{a:'Caffè',b:'Tè'},{a:'',b:'No'}]})");
+c.run('syncPvMine()');
+check(CS.myQ.who.length === 1 && CS.myQ.pv.length === 1, 'le domande personali vengono ripulite');
+check(c.run('whoPool()').includes('Domanda personale?'), 'Chi l’ha detto? usa le domande personali');
+check(!!c.run('PV_DB.mine') && c.run('PV_DB.mine').length === 1, 'Preferiresti espone il pacchetto personale');
+c.run("S.pv.pack='';pvPreset('mine')");
+check(CS.pv.a === 'Caffè' && CS.pv.b === 'Tè' && CS.pv.pack === 'mine', 'il pacchetto personale si può scegliere');
+c.run('myQOpen()');
+c.run('$("mq-who").value = "Prima?\\nSeconda?"');
+c.run('$("mq-pv").value = "Mare | Montagna\\nRiga senza separatore"');
+c.run('myQSave()');
+check(CS.myQ.who.length === 2 && CS.myQ.pv.length === 1 && CS.myQ.pv[0].a === 'Mare', 'l’editor salva domande e coppie');
+check(c.run('backupData()').myQ.who.length === 2, 'le domande personali finiscono nel backup');
+c.call('applyBackup', { players: [], scores: {}, myQ: { who: ['Solo questa?'], pv: [] } });
+check(CS.myQ.who.length === 1 && !c.run('PV_DB.mine'), 'il ripristino sostituisce le domande personali');
+
+// --- 1.11.0: avatar scelti, temi e podio ---
+CS.avMap = { Anna: 0 };
+check(c.run("av('Anna')").e === c.run('AV_E[0]'), 'un avatar scelto vince sull’hash del nome');
+c.run("AV_PICK='Anna';setAvatarPick(3)");
+check(CS.avMap.Anna === 3 && c.run("av('Anna')").e === c.run('AV_E[3]'), 'il selettore salva l’avatar per nome');
+check(c.run("sanitizeAvMap({Anna:3,Bruno:99,X:'a'})").Bruno === undefined, 'gli avatar fuori intervallo vengono scartati');
+c.run("AV_PICK='Anna';setAvatarPick(-1)");
+check(CS.avMap.Anna === undefined, 'si può tornare all’avatar automatico');
+CS.avMap.Anna = 2;
+c.NET.name = 'Anna';
+check(c.run('joinPayload()').av === 2, 'il join porta con sé l’avatar scelto');
+CS.hostNotes = 'Regola della casa';
+c.run('NET.host=true;NET.name="Anna";NET.conns={Bruno:{send:function(m){NET.lastMsg=m}}}');
+c.run('shareHostNotes()');
+check(c.run('NET.lastMsg.t') === 'note' && c.run('NET.lastMsg.text') === 'Regola della casa', 'la nota host viene inviata ai client');
+c.run('NET.host=false;NET.conns={}');
+CS.players = ['Anna'];
+CS.scores = { Anna: 10 };
+check(c.run('THEMES').includes('neon') && c.run('THEMES').includes('ghiaccio'), 'ci sono i temi Neon e Ghiaccio');
+c.run('showSettings()');
+check(c.els.modal.innerHTML.includes('Neon') && c.els.modal.innerHTML.includes('Ghiaccio'), 'i nuovi temi compaiono nelle impostazioni');
+check(/data-theme="neon"/.test(cssCos) && /data-theme="ghiaccio"/.test(cssCos), 'i nuovi temi hanno le variabili CSS');
+check(/#app\[data-game\]:after/.test(cssCos) && /prefers-contrast:more/.test(cssCos), 'sfondo per gioco e contrasto di sistema sono nel CSS');
+CS.screen = 'play';
+CS.game = 'preferisci';
+CS.players = ['Anna', 'Bruno', 'Carla'];
+CS.scores = { Anna: 300, Bruno: 100, Carla: 100 };
+CS.pv = { a: 'Caffè', b: 'Tè', i: 0, pack: '' };
+c.run('startPref()');
+c.run('pvShow()');
+c.run("pvVote('a')");
+c.run('pvShow()');
+c.run("pvVote('a')");
+c.run('pvShow()');
+c.run("pvVote('b')");
+const podium = c.run('summaryBar()');
+check(podium.includes('🥇') && podium.includes('🥈') && podium.includes('🥉'), 'il riepilogo mostra il podio top-3');
+check(c.run("joinPayload().name") === CS.players[0] || typeof c.run('joinPayload()') === 'object', 'il join include il payload avatar');
+check(c.run("sanitizeStats({recent:[{g:'lupus',t:1,w:'Anna'}]}).recent.length") === 1, 'recenti valide');
 
 done();

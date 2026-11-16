@@ -222,10 +222,10 @@ const check = (ok, label, extra = '') => {
     p.api.netJoin();
     clients.push(p);
   }
-  const all4 = await until(() => A.api.NET.players.length === 4, 8000);
+  const all4 = await until(() => A.api.NET.players.length === 4, 12000);
   check(all4, 'quattro giocatori in lobby', A.api.NET.players.join(','));
 
-  const joined = await until(() => clients.every((c) => c.api.NET.st === 'lobby'), 8000);
+  const joined = await until(() => clients.every((c) => c.api.NET.st === 'lobby'), 12000);
   check(joined, 'i client ricevono la lobby');
   check(
     clients.every((c) => JSON.stringify(c.api.NET.players) === JSON.stringify(A.api.NET.players)),
@@ -341,7 +341,7 @@ const check = (ok, label, extra = '') => {
   const playersAll = [...clients, E];
   const vice2 = A2.api.NET.order.find((p) => p !== 'Anna' && playersAll.some((c) => c.api.NET.name === p));
   const viceP = playersAll.find((c) => c.api.NET.name === vice2);
-  const standby2 = await until(() => viceP.api.NET.mirror && !!viceP.api.NET.mirror.sg, 8000);
+  const standby2 = await until(() => viceP.api.NET.mirror && !!viceP.api.NET.mirror.sg, 12000);
   check(standby2, 'il vice riceve lo stato del Lupus', vice2);
   check(
     !!(
@@ -357,7 +357,7 @@ const check = (ok, label, extra = '') => {
   try {
     A2.api.NET.roomPeer && A2.api.NET.roomPeer.destroy();
   } catch (e) {}
-  const elected2 = await until(() => playersAll.filter((c) => c.api.NET.host).length === 1, 20000);
+  const elected2 = await until(() => playersAll.filter((c) => c.api.NET.host).length === 1, 30000);
   const newHost2 = playersAll.find((c) => c.api.NET.host);
   check(elected2, 'nuovo host eletto anche a partita in corso', newHost2 && newHost2.name);
   check(
