@@ -18,6 +18,13 @@ release number; `sw.js` must follow it. Older history (1.2–1.5) is described i
 ### Changed
 - Minified build: 398,400 bytes.
 
+### Tests
+- The timer tick in `online.test.js` now waits for the actual value instead of a
+  fixed 1200 ms, which was flaky on loaded runners.
+- `tests/run-all.js` emits `::error` annotations when a suite fails, so the
+  failing suite is visible even when job logs are not downloadable.
+- CI on GitHub Actions is green on both the source and the minified build.
+
 ## 1.11.0 — 2026-11-16
 
 ### Added

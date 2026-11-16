@@ -244,7 +244,7 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 
 ### Versione 1.11.1 (fix rielezione host)
 - **Race di rielezione**: quando l'host spariva, un client poteva superare un candidato con priorità più alta che non se n'era ancora accorto e autoproclamarsi, lasciando **due host** nella stanza. Ora: `netDial` segnala se il "no" è arrivato subito; `netTry` riprova un paio di volte lo stesso candidato prima di passare al successivo; `netIncoming`, se il client è in `recover` (o senza connessione), accetta la connessione di elezione e prende il comando invece di chiuderla; `netSettle` fa un ultimo controllo sul codice stanza (`mgh-<code>`) prima di autoproclamarsi, così chi si è già promosso viene trovato e si rientra. `netRejoin` accetta anche lo stato `elect`.
-- **Test**: `online.test.js` stabile su **52 esecuzioni consecutive** con Node 20; 12/12 suite verdi su sorgente e minificato.
+- **Test**: `online.test.js` stabile su **52 esecuzioni consecutive** con Node 20; 12/12 suite verdi su sorgente e minificato. Il check del timer online ora attende il valore reale (`until`) invece di 1200 ms fissi, che falliva sui runner lenti. `tests/run-all.js` emette annotazioni `::error` con la suite fallita, così la CI è diagnosticabile anche senza i log del job. CI GitHub Actions verde su sorgente e minificato.
 - `APP_VERSION` e `VERSION` portate a **1.11.1**; build: sorgente **484.991** byte, minificato **398.400** byte.
 
 ### Versione 1.11.0 (funzionale + contenuti + cosmetics)
