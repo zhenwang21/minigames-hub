@@ -26,6 +26,15 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#0b0f19;col
 .glass{background:rgba(17,24,39,.85);border:1px solid rgba(255,255,255,.08)}
 .gtext{background:linear-gradient(135deg,var(--acc1),var(--acc2) 50%,var(--acc3));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .gbtn{background:linear-gradient(135deg,var(--btn1),var(--btn2));color:#fff}
+/* cosmetics: accento per gioco (identità visiva, separato dal tema scelto) */
+#app{--ga:#a855f7;--gb:#ec4899}
+#app[data-game]:before{content:"";display:block;height:.28rem;border-radius:999px;background:linear-gradient(90deg,var(--ga),var(--gb));margin:0 0 .45rem;opacity:.85}
+.gtile{width:3rem;height:3rem;flex:0 0 3rem;display:flex;align-items:center;justify-content:center;border-radius:.9rem;background:linear-gradient(135deg,var(--ga),var(--gb));box-shadow:0 8px 22px -12px var(--ga);font-size:1.7rem}
+.av{display:inline-flex;align-items:center;justify-content:center;width:1.35rem;height:1.35rem;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(148,163,184,.18);font-size:.78rem;line-height:1;flex:0 0 1.35rem}
+.av.lg{width:1.7rem;height:1.7rem;font-size:1rem;flex-basis:1.7rem}
+@media (prefers-reduced-motion:no-preference){.gcard{transition:transform .16s ease,box-shadow .16s ease}.gcard:hover{transform:translateY(-2px);box-shadow:0 14px 30px -18px #000}}
+@keyframes cpop{0%{transform:scale(.96);opacity:.5}60%{transform:scale(1.02)}100%{transform:scale(1);opacity:1}}
+.celebrate{animation:cpop .45s ease-out}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 #upd{position:fixed;left:.6rem;right:.6rem;bottom:calc(env(safe-area-inset-bottom,0px) + .6rem);z-index:70;display:none;align-items:center;gap:.5rem;background:#111827;border:1px solid var(--acc1);border-radius:1rem;padding:.55rem .8rem;box-shadow:0 12px 34px rgba(0,0,0,.55);font-size:.75rem;font-weight:700}
 #upd.on{display:flex}
@@ -524,7 +533,9 @@ const I = {
     installed: 'App installata',
     offline: 'Offline',
     news: 'Novità',
-    newsTitle: 'Novità 1.9.0',
+    newsTitle: 'Novità 1.10.0',
+    news7: 'Colori e simboli dedicati per ogni gioco.',
+    news8: 'Avatar e colori per i giocatori in liste, lobby e classifiche.',
     news1: 'Introduzione per i nuovi arrivati e partita demo.',
     news2: 'Riepilogo di fine partita con vincitore e punti guadagnati.',
     news3: 'Preferenze ricordate e domande già viste.',
@@ -923,7 +934,9 @@ const I = {
     installed: 'App installed',
     offline: 'Offline',
     news: 'What’s new',
-    newsTitle: 'What’s new in 1.9.0',
+    newsTitle: 'What’s new in 1.10.0',
+    news7: 'Dedicated colours and symbols for every game.',
+    news8: 'Avatars and colours for players in lists, lobbies and standings.',
     news1: 'A welcome intro for newcomers and a demo game.',
     news2: 'End-of-game summary with the winner and points gained.',
     news3: 'Remembered preferences and seen questions.',
@@ -1020,7 +1033,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.9.0';
+const APP_VERSION = '1.10.0';
 // Ripresa dopo reload/standby: la sessione dura al massimo due ore.
 const RESUME_TTL = 2 * 60 * 60 * 1000;
 let RESUME = { room: null, snap: null, savedAt: 0, lastKey: '' };
@@ -3307,7 +3320,7 @@ function viewOnline() {
   <div class="space-y-1.5">${NET.players
     .map(
       (p, i) =>
-        `<div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl text-sm"><span class="flex items-center gap-2"><span style="width:.5rem;height:.5rem;border-radius:9999px;display:inline-block;background:${off.includes(p) ? '#fbbf24' : '#34d399'}"></span><b>${esc(p)}${p === NET.name ? ' (' + X('tu', 'you') + ')' : ''}</b>${p === NET.hostName ? '<span class="text-[10px] bg-purple-600/30 text-purple-200 px-1.5 py-0.5 rounded-full">host</span>' : ''}</span><span class="flex items-center gap-2">${off.includes(p) ? `<span class="text-[10px] text-amber-300">${X('offline', 'offline')}</span>` : ''}${NET.host && p !== NET.hostName ? `<button onclick="netKick(${i})" class="text-rose-400/80 hover:text-rose-300 text-xs px-1" aria-label="${X('Espelli', 'Kick')} ${esc(p)}" title="${X('Espelli', 'Kick')}">✕</button>` : ''}</span></div>`
+        `<div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl text-sm"><span class="flex items-center gap-2"><span style="width:.5rem;height:.5rem;border-radius:9999px;display:inline-block;background:${off.includes(p) ? '#fbbf24' : '#34d399'}"></span>${avHtml(p)}<b>${esc(p)}${p === NET.name ? ' (' + X('tu', 'you') + ')' : ''}</b>${p === NET.hostName ? '<span class="text-[10px] bg-purple-600/30 text-purple-200 px-1.5 py-0.5 rounded-full">host</span>' : ''}</span><span class="flex items-center gap-2">${off.includes(p) ? `<span class="text-[10px] text-amber-300">${X('offline', 'offline')}</span>` : ''}${NET.host && p !== NET.hostName ? `<button onclick="netKick(${i})" class="text-rose-400/80 hover:text-rose-300 text-xs px-1" aria-label="${X('Espelli', 'Kick')} ${esc(p)}" title="${X('Espelli', 'Kick')}">✕</button>` : ''}</span></div>`
     )
     .join('')}</div>
   ${
@@ -3591,6 +3604,57 @@ const GAMES = [
   ['taboo', '🚫', 'border-orange-500/50'],
   ['chisono', '👤', 'border-sky-500/50']
 ];
+// Cosmetics: due colori identitari per gioco. Non sostituiscono il tema,
+// servono solo a dare un volto riconoscibile a card e schermate.
+const GAME_ACCENT = {
+  impostore: ['#a855f7', '#ec4899'],
+  mrwhite: ['#ec4899', '#f43f5e'],
+  who_said: ['#6366f1', '#8b5cf6'],
+  preferisci: ['#06b6d4', '#14b8a6'],
+  lupus: ['#3b82f6', '#6366f1'],
+  nomicose: ['#10b981', '#22c55e'],
+  taboo: ['#f97316', '#ef4444'],
+  chisono: ['#0ea5e9', '#38bdf8']
+};
+// Deduce il gioco attivo anche dalle schermate di setup, dove S.game può essere nullo.
+const SCREEN_GAME = { ncsetup: 'nomicose', tbsetup: 'taboo', pvsetup: 'preferisci' };
+function screenGame() {
+  return (
+    activeGameId() ||
+    SCREEN_GAME[S.screen] ||
+    (S.screen === 'setup' || S.screen === 'lroles' || S.screen === 'ltype' ? S.game : '') ||
+    (S.screen === 'online' && GAME_ACCENT[S.hint] ? S.hint : '') ||
+    ''
+  );
+}
+function applyGameAccent() {
+  try {
+    const el = $('app');
+    if (!el) return;
+    if (!el.dataset) el.dataset = {};
+    const gid = screenGame(),
+      a = GAME_ACCENT[gid];
+    el.dataset.game = gid;
+    if (a && el.setAttribute) el.setAttribute('style', `--ga:${a[0]};--gb:${a[1]}`);
+    else if (el.removeAttribute) el.removeAttribute('style');
+  } catch (e) {}
+}
+// Avatar deterministico dal nome: nessun dato da salvare o sincronizzare.
+const AV_E = ['🦊', '🐼', '🐸', '🦉', '🐙', '🦄', '🐯', '🐨', '🐵', '🦁', '🐷', '🐺', '🦝', '🐹', '🦖', '🐧', '🦋', '🐢'];
+const AV_C = ['#a855f7', '#ec4899', '#06b6d4', '#22c55e', '#f59e0b', '#3b82f6', '#ef4444', '#14b8a6'];
+function avHash(s) {
+  let h = 0;
+  for (const ch of String(s == null ? '' : s)) h = (h * 31 + ch.codePointAt(0)) >>> 0;
+  return h;
+}
+function av(name) {
+  const h = avHash(name);
+  return { e: AV_E[h % AV_E.length], c: AV_C[(h >>> 3) % AV_C.length] };
+}
+function avHtml(name, cls) {
+  const a = av(name);
+  return `<span class="av${cls ? ' ' + cls : ''}" style="border-color:${a.c}88;background:${a.c}26" aria-hidden="true">${a.e}</span>`;
+}
 // Come riavviare un gioco dalla lobby: [chiamata, giocatori minimi].
 const GAME_START = {
   impostore: ['iNew()', 3],
@@ -6274,7 +6338,7 @@ function showScores() {
     rows = Object.entries(S.scores).sort((a, b) => b[1] - a[1]),
     canEdit = !NET.conn || NET.host;
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-4"><h3 class="font-bold text-white">🏆 ${t('scoresTitle')}</h3>
-  <div class="space-y-2 max-h-56 overflow-y-auto">${rows.length ? rows.map(([n, p], i) => `<div class="flex justify-between bg-slate-900 px-3 py-2.5 rounded-xl text-xs font-bold"><span>#${i + 1} ${esc(n)}</span><span class="text-amber-400">${p} PT</span></div>`).join('') : `<p class="text-xs text-slate-500 italic text-center py-3">${t('noScores')}</p>`}</div>
+  <div class="space-y-2 max-h-56 overflow-y-auto">${rows.length ? rows.map(([n, p], i) => `<div class="flex justify-between bg-slate-900 px-3 py-2.5 rounded-xl text-xs font-bold"><span class="flex items-center gap-1.5 min-w-0">${avHtml(n)}<span class="truncate">#${i + 1} ${esc(n)}</span></span><span class="text-amber-400">${p} PT</span></div>`).join('') : `<p class="text-xs text-slate-500 italic text-center py-3">${t('noScores')}</p>`}</div>
   ${canEdit ? `<div class="grid grid-cols-2 gap-2"><button onclick="editScores()" class="bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">✏️ ${t('scoreEdit')}</button><button onclick="undoRound()" class="bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">↩️ ${t('undoRound')}</button></div>` : ''}
   <button onclick="shareSummary()" class="w-full bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">📤 ${t('shareResult')}</button>
   <div class="flex justify-between items-center"><button onclick="resetScores()" class="text-[11px] text-rose-400 font-bold">↺ ${t('resetScores')}</button><button onclick="closeModal()" class="gbtn px-4 py-2 rounded-xl text-xs font-bold">${t('close')}</button></div></div>`;
@@ -8168,8 +8232,8 @@ function viewHome() {
       id,
       ic,
       bd
-    ]) => `<div onclick="selectGame('${id}')" class="glass p-4 rounded-2xl cursor-pointer border ${bd} flex items-start gap-3.5">
-    <div class="text-3xl">${ic}</div><div class="flex-1"><div class="flex items-center gap-2"><h3 class="font-bold text-white">${t('g_' + id)}</h3>${ONLY_ONLINE.includes(id) ? `<span class="text-[10px] bg-emerald-600/30 text-emerald-300 px-2 py-0.5 rounded-full">Online</span>` : !PLAYABLE.includes(id) ? `<span class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full">${t('soon')}</span>` : ''}</div>
+    ]) => `<div onclick="selectGame('${id}')" class="glass gcard p-4 rounded-2xl cursor-pointer border ${bd} flex items-start gap-3.5" style="--ga:${GAME_ACCENT[id][0]};--gb:${GAME_ACCENT[id][1]}">
+    <div class="gtile">${ic}</div><div class="flex-1"><div class="flex items-center gap-2"><h3 class="font-bold text-white">${t('g_' + id)}</h3>${ONLY_ONLINE.includes(id) ? `<span class="text-[10px] bg-emerald-600/30 text-emerald-300 px-2 py-0.5 rounded-full">Online</span>` : !PLAYABLE.includes(id) ? `<span class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full">${t('soon')}</span>` : ''}</div>
     <p class="text-xs text-slate-400 mt-1">${t('d_' + id)}</p></div></div>`
   ).join('')}
   <div onclick="S.hint='';S.screen='online';render()" class="glass p-4 rounded-2xl cursor-pointer border border-cyan-500/30 flex items-start gap-3.5"><div class="text-3xl">🌐</div><div class="flex-1"><div class="flex items-center gap-2"><h3 class="font-bold text-white">Online</h3><span class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full">beta</span></div><p class="text-xs text-slate-400 mt-1">${X('Crea una stanza con un codice e gioca da telefoni diversi.', 'Create a room with a code and play from separate phones.')}</p></div></div>
@@ -8205,7 +8269,7 @@ function viewSetup() {
   <div class="flex justify-between items-center border-b border-slate-700/60 pb-3"><h2 class="font-bold text-white">${t('g_' + g)}</h2><button onclick="back()" class="text-xs bg-slate-800 px-3 py-1.5 rounded-xl">← ${t('back')}</button></div>
   <div class="flex gap-2"><input autocomplete="off" id="pn" onkeydown="if(event.key==='Enter')addPlayer()" placeholder="${t('namePh')}" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500"><button onclick="addPlayer()" class="gbtn px-4 rounded-xl font-bold text-xs">${t('add')}</button></div>
   <div class="flex justify-between text-[11px] font-bold text-slate-400 px-1"><span>${t('players').toUpperCase()} (${pl.length})</span><button onclick="clearPlayers()" class="text-rose-400">${t('clear')}</button></div>
-  <div class="max-h-36 overflow-y-auto space-y-1.5">${pl.length ? pl.map((p, i) => `<div class="flex justify-between items-center bg-slate-900 px-3 py-1.5 rounded-xl text-xs font-semibold"><span>${i + 1}. ${esc(p)}</span><button onclick="removePlayer(${i})" class="text-slate-500 px-1" aria-label="${X('Rimuovi', 'Remove')} ${esc(p)}">🗑</button></div>`).join('') : `<p class="text-xs text-slate-500 italic">${t('none')}</p>`}</div>
+  <div class="max-h-36 overflow-y-auto space-y-1.5">${pl.length ? pl.map((p, i) => `<div class="flex justify-between items-center bg-slate-900 px-3 py-1.5 rounded-xl text-xs font-semibold"><span class="flex items-center gap-1.5 min-w-0">${avHtml(p)}<span class="truncate">${i + 1}. ${esc(p)}</span></span><button onclick="removePlayer(${i})" class="text-slate-500 px-1" aria-label="${X('Rimuovi', 'Remove')} ${esc(p)}">🗑</button></div>`).join('') : `<p class="text-xs text-slate-500 italic">${t('none')}</p>`}</div>
   ${PLAYABLE.includes(g) && g !== 'preferisci' ? modeUI(g) : ''}${g !== 'lupus' && g !== 'preferisci' && PLAYABLE.includes(g) ? quickUI() : ''}${['impostore', 'who_said', 'mrwhite'].includes(g) ? dbHint() : ''}${cfg}
   ${PLAYABLE.includes(g) ? '' : `<p class="text-xs text-amber-300 text-center">${t('comingSoon')}</p>`}
   ${g === 'mrwhite' && e.und + e.mw === 0 ? `<p class="text-xs text-amber-300 text-center">${t('needRole')}</p>` : ''}
@@ -9892,12 +9956,12 @@ function summaryBar() {
   const d = summaryData();
   if (!d) return '';
   const win = d.winners.length
-      ? `<p class="text-sm font-extrabold text-white">🏁 ${t('summaryWinner')}: ${d.winners.map((w) => esc(w.n) + ' +' + w.d).join(', ')}</p>`
+      ? `<p class="text-sm font-extrabold text-white celebrate">🎉 ${t('summaryWinner')}: ${d.winners.map((w) => avHtml(w.n) + ' ' + esc(w.n) + ' +' + w.d).join(', ')}</p>`
       : `<p class="text-sm font-bold text-slate-300">🏁 ${t('summaryNoPoints')}</p>`,
     rows = d.rows
       .map(
         (r, i) =>
-          `<div class="flex justify-between bg-slate-900 px-3 py-1.5 rounded-lg text-[11px]"><span>#${i + 1} <b>${esc(r.n)}</b></span><span class="${r.d === d.max && r.d > 0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">${r.d > 0 ? '+' + r.d : '0'}</span></div>`
+          `<div class="flex justify-between bg-slate-900 px-3 py-1.5 rounded-lg text-[11px]"><span class="flex items-center gap-1.5 min-w-0"><span class="text-slate-500">#${i + 1}</span>${avHtml(r.n)}<b class="truncate">${esc(r.n)}</b></span><span class="${r.d === d.max && r.d > 0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">${r.d > 0 ? '+' + r.d : '0'}</span></div>`
       )
       .join('');
   return `<section class="glass p-4 rounded-2xl space-y-2 border border-emerald-500/30"><div class="flex justify-between items-center"><h3 class="font-bold text-white text-sm">📊 ${t('summaryTitle')}</h3><span class="text-[10px] text-slate-400">${t('g_' + d.gid)}</span></div>${win}<details class="bg-slate-900/40 rounded-xl p-2"><summary class="text-[11px] font-bold cursor-pointer">${t('summaryRank')}</summary><div class="space-y-1 mt-1.5">${rows}</div></details><div class="flex gap-2"><button onclick="shareSummary()" class="flex-1 bg-slate-800 py-2 rounded-xl text-[11px] font-bold">📤 ${t('summaryShare')}</button><button onclick="rematchSummary()" class="flex-1 gbtn py-2 rounded-xl text-[11px] font-bold">🔁 ${t('summaryAgain')}</button></div></section>`;
@@ -9984,7 +10048,7 @@ function clearLocalData() {
 function showNews() {
   const m = $('modal');
   if (!m) return;
-  const items = ['news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
+  const items = ['news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">✨ ${t('newsTitle')}</h3><ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">${items.map((k) => `<li>${t(k)}</li>`).join('')}</ul><button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
   modalOpen();
 }
@@ -10251,6 +10315,7 @@ function render() {
                   : S.screen === 'tbsetup'
                     ? viewTbSetup()
                     : viewPlay();
+  applyGameAccent();
   $('app').innerHTML = (S.demo ? demoBar() : '') + summaryBar() + body;
   if (!tmAllowed() && (TMR.iv || TMR.done)) tmClear();
   if (tmAuto() && (TMR.iv || TMR.done)) tmClear();

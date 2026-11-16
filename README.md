@@ -33,6 +33,9 @@ No install, no account, no backend.
 - **Installable PWA** — add it to the home screen from the in-app install button (or the browser prompt); the offline badge appears when the connection drops, and the app shell loads offline (also when the server answers with an error) while multiplayer still needs a connection.
 - **Resume after reload or standby** — a room interrupted by a refresh is offered again on the home screen for up to 2 hours. The host restores players, scores and the current game; if the old room code is no longer free, a new one is opened with the same state.
 - **Clearer lobby** — online/offline dots, connected count, host badge, tap-to-copy code and the running version.
+- **Game identities** — each game has its own accent gradient on the home card and a thin colour bar during setup and play, independent of the selected theme.
+- **Player avatars** — a stable emoji and colour derived from each name in the setup list, online lobby, score table and end-of-game summary; nothing extra is stored or synced.
+- **Subtle motion** — cards lift on hover and the winner pulses in the summary; both respect the reduce-animations setting and `prefers-reduced-motion`.
 - **First-run intro & demo** — a short welcome card explains the flow and offers a demo game; the demo never touches saved scores or statistics.
 - **End-of-game summary** — when a game ends, the winner and the points each player gained in that game are shown at the top, with share and play-again buttons.
 - **Remembered preferences** — mode, role counts, categories, Would You Rather pack, discussion timer, favourite packs and already-seen questions are restored on the next visit and included in the backup.
@@ -90,6 +93,7 @@ Online needs 3 players (Werewolf and Forbidden Words 4, Would You Rather and Nam
 - PWA install and the offline shell are served by `sw.js`; the service worker cache name follows `APP_VERSION`, so each release replaces the old cache. Service workers only run over http(s), not from `file://`.
 - Themes are four CSS-variable sets (`--acc1/--acc2/--acc3` for gradients, `--btn1/--btn2` for buttons) switched by `data-theme` on `<html>`; no per-screen styles are duplicated for each theme.
 - Accessibility preferences are three CSS overrides on `<html>` (`data-text="s|m|l"`, `data-contrast="high"`, `data-motion="off"`), so text size, contrast and animations are changed in one place instead of patching each screen.
+- Cosmetics use two extra variables per game (`--ga/--gb`) set on `#app` from a single `GAME_ACCENT` map; avatars are derived from the player name with a small hash, so they need no storage and stay identical on every phone.
 
 ## ⚠️ Known limits
 

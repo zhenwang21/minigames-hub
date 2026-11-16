@@ -171,7 +171,7 @@ const lobby = resApp.run('viewOnline()');
 check(lobby.includes('copyCode()'), 'lobby con copia del codice');
 check(lobby.includes('1/2') && lobby.includes('connessi'), 'lobby mostra i giocatori connessi');
 check(lobby.includes('offline') && lobby.includes('host'), 'lobby distingue offline e host');
-check(lobby.includes('1.9.0'), 'lobby mostra la versione');
+check(lobby.includes('1.10.0'), 'lobby mostra la versione');
 // riepilogo condivisibile
 RS.scores = { Anna: 300, Bruno: 100 };
 RN.game = { g: 'impostore' };
@@ -394,8 +394,53 @@ check(q.run('backupReminder()') === '', 'senza dati il promemoria non compare');
 q.run('resetPrefs()');
 check(QS.timerPref === 120 && QS.mode === 'auto' && QS.ncPref.length === 0, 'ripristino preferenze giochi');
 q.run('showNews()');
-check(q.els.modal.innerHTML.includes('Novità 1.9.0'), 'la modale Novità è alla versione 1.9.0');
-check(q.els.modal.innerHTML.includes('Introduzione per i nuovi arrivati'), 'le novità elencano il batch');
+check(q.els.modal.innerHTML.includes('Novità 1.10.0'), 'la modale Novità è alla versione 1.10.0');
+check(q.els.modal.innerHTML.includes('Colori e simboli dedicati'), 'le novità elencano i cosmetics');
 q.run('closeModal()');
+
+// --- 1.10.0: cosmetics ---
+const c = boot();
+const CS = c.S;
+const avA = c.run("av('Anna')"),
+  avA2 = c.run("av('Anna')"),
+  avB = c.run("av('Bruno')");
+check(avA.e === avA2.e && avA.c === avA2.c, 'l’avatar è stabile per lo stesso nome');
+check(avA.e !== avB.e || avA.c !== avB.c, 'nomi diversi tendono ad avatar diversi', avA.e + ' vs ' + avB.e);
+check(/class="av/.test(c.run("avHtml('Anna')")) && c.run("avHtml('Anna')").includes(avA.e), 'avHtml produce il badge con emoji');
+check(
+  Object.keys(c.run('GAME_ACCENT')).join(',') === 'impostore,mrwhite,who_said,preferisci,lupus,nomicose,taboo,chisono',
+  'ogni gioco ha il suo accento'
+);
+check(
+  Object.values(c.run('GAME_ACCENT')).every((p) => p.length === 2 && p.every((x) => /^#[0-9a-f]{6}$/i.test(x))),
+  'gli accenti sono coppie di colori validi'
+);
+CS.screen = 'setup';
+CS.game = 'lupus';
+check(c.run('screenGame()') === 'lupus', 'il setup usa il gioco scelto per l’accento');
+CS.screen = 'ncsetup';
+check(c.run('screenGame()') === 'nomicose', 'il setup online di NC usa l’accento giusto');
+CS.screen = 'home';
+CS.game = null;
+CS.scores = { Anna: 100, Bruno: 20 };
+const homeCos = c.run('viewHome()');
+check(homeCos.includes('gtile') && homeCos.includes('--ga:#a855f7'), 'le card della home hanno la tile colorata');
+check(homeCos.includes('gcard'), 'le card della home hanno l’effetto hover');
+CS.screen = 'play';
+CS.game = 'preferisci';
+CS.players = ['Anna', 'Bruno'];
+CS.scores = { Anna: 300, Bruno: 100 };
+CS.pv = { a: 'Caffè', b: 'Tè', i: 0, pack: '' };
+c.run('startPref()');
+c.run('pvShow()');
+c.run("pvVote('a')");
+c.run('pvShow()');
+c.run("pvVote('a')");
+const sumCos = c.run('summaryBar()');
+check(sumCos.includes('celebrate') && sumCos.includes('class="av'), 'il riepilogo festeggia con avatar');
+const cssCos = fs.readFileSync(sourceFile(), 'utf8');
+check(/\.gtile\{/.test(cssCos) && /\.av\{/.test(cssCos) && /#app\[data-game\]:before/.test(cssCos), 'CSS condiviso per tile, avatar e accento');
+check(/function applyGameAccent/.test(cssCos) && /applyGameAccent\(\)/.test(cssCos), 'l’accento di gioco è applicato a ogni render');
+check(/screenGame\(\)/.test(cssCos), 'il gioco attivo è dedotto anche nei setup');
 
 done();

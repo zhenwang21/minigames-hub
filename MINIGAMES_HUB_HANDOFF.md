@@ -242,6 +242,15 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 
 ## 11. Cosa è stato corretto nell'ultima revisione
 
+### Versione 1.10.0 (cosmetics)
+- **Accento per gioco**: `GAME_ACCENT` (2 colori per gioco) alimenta la tile della card in home (`.gtile`, CSS `--ga/--gb` inline) e, a partita/setup aperto, una barra sottile in cima a `#app` (`#app[data-game]:before`). `screenGame()` deduce il gioco anche da `setup`, `ncsetup`, `tbsetup`, `pvsetup` e dalla schermata online; `applyGameAccent()` gira a ogni `render()`. I colori sono **identitari** e non sostituiscono il tema (`--acc1/2/3`, `--btn1/2`).
+- **Tile e card**: le card della home usano `.gcard` + `.gtile` con gradiente del gioco e un leggero sollevamento al passaggio (solo se le animazioni sono attive).
+- **Avatar giocatore**: `av(name)` deriva emoji e colore dal nome con un hash stabile (`avHash`), `avHtml()` produce il badge `.av`. Usati in setup, lobby online, modale punteggi e riepilogo. Nessun dato nuovo in `S`, `localStorage` o messaggi di rete: due telefoni mostrano lo stesso avatar per lo stesso nome. Collisioni possibili ma innocue.
+- **Effetto vittoria**: il riepilogo aggiunge `.celebrate` (piccola pulsazione) al vincitore; `data-motion="off"` e `prefers-reduced-motion` la disattivano.
+- **Novità 1.10.0**: titolo aggiornato e due voci nuove (`news7`, `news8`); la lista mostra prima i cosmetics e poi le voci 1.9.0.
+- **Test**: `features.test.js` sale a **128** (avatar stabile/coerente, accenti validi per tutti i giochi, `screenGame` nei setup, tile in home, riepilogo con avatar e `celebrate`, CSS/`applyGameAccent` presenti). **12/12 suite** verdi su sorgente e build; una prima esecuzione della suite minificata ha avuto un falso negativo su `online.test.js` (timeout di elezione host sotto carico), passata al rerun.
+- `APP_VERSION` e `VERSION` portate a `1.10.0`; build: sorgente **458.875** byte, minificato **377.601** byte.
+
 ### Versione 1.9.0
 - **Introduzione e demo**: card `onboardCard()` in home per i nuovi arrivati (3 passi + "Prova una partita demo"). `dismissOnboard()` salva `S.onboarded`; `loadLocal` la considera già vista per chi ha già statistiche o punteggi, così gli utenti esistenti non la vedono. `startDemo()` gioca un Preferiresti con 3 nomi temporanei e `S.demo=true`: `saveLocal()` e `saveSession()` escono subito, `statsRecord()` è saltato, `exitDemo()`/`goHome()`/`back()` ripristinano giocatori e punteggi. La barra demo in cima ha "Esci dalla demo".
 - **Riepilogo di fine partita**: `gameOverNow(gid)` normalizza i marcatori di fine (`END_PH`: impostore `r`, mrwhite/lupus `end`, who_said `wres`, preferisci `pvres`; online `r|res|end`, taboo `end`). `summaryData()` usa `STATS_BASE` e calcola il **delta** punti per giocatore; `summaryBar()` mostra vincitore/i, classifica, Condividi (`shareSummary()`) e Rigioca (`rematchSummary()` via `GAME_FN`). Compare sopra il gioco quando la partita è finita, anche in demo.
@@ -389,7 +398,7 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
   - `tests/nomicose.test.js` — 47 test su Nomi, Cose e Città (setup, categorie, lettera, punteggi, revisione host, taglio e scadenza del timer, nuovo round, cambio host).
   - `tests/taboo.test.js` — 33 test su Parole vietate (squadre, ruoli/visibilità carta, maggioranze, parità, chiusura host, timeout, punteggi, annulla round, minimo giocatori).
   - `tests/chisono.test.js` — 27 test su Chi sono io? (parole nascoste, turni, voti, vite/uscita, parità, fine e rivelazione, minimo giocatori).
-  - `tests/features.test.js` — 115 test su QR/link, backup/ripristino, annulla round, correzione punteggi, pacchetti Preferiresti, attesa offline 60 s, ripresa sessione, lobby e riepilogo condivisibile, più il batch 1.9.0 (introduzione, demo senza salvataggi, riepilogo di fine partita con delta punti, avviso database `dbAck` e hint, accessibilità S/M/L + contrasto + motion, preferenze ricordate, backup/note host/timer preferito, novità).
+  - `tests/features.test.js` — 128 test su QR/link, backup/ripristino, annulla round, correzione punteggi, pacchetti Preferiresti, attesa offline 60 s, ripresa sessione, lobby e riepilogo condivisibile, batch 1.9.0 (introduzione, demo, riepilogo, avviso database, accessibilità, preferenze, backup/note host) e cosmetics 1.10.0 (accenti per gioco, avatar derivati, tile in home, effetto vittoria).
   - `tests/pwa.test.js` — 36 test su manifest, icone PNG/SVG, service worker, precache e allineamento versione cache/`APP_VERSION`, badge offline, `beforeinstallprompt`, CSS di accessibilità e calcolo dello spazio locale.
   - `tests/i18n.test.js` — lunghezze e qualità dei database EN.
   - `tests/ui-en.test.js` — scansione delle schermate EN (falsi positivi noti: "Impostor", "eliminate", "civilians").
