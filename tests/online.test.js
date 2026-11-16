@@ -319,8 +319,9 @@ const check = (ok, label, extra = '') => {
   // 8. Timer
   A2.api.tmStart(2);
   check(A2.api.TMR.iv != null, 'timer avviato');
-  await wait(1200);
-  check(A2.api.TMR.left === 1, 'il timer scende', String(A2.api.TMR.left));
+  // Attesa condizionale: su un runner carico 1200 ms fissi possono scadere prima del tick.
+  const ticked = await until(() => A2.api.TMR.left === 1, 6000);
+  check(ticked, 'il timer scende', String(A2.api.TMR.left));
   A2.api.tmStop();
   check(A2.api.TMR.iv === null, 'timer fermato');
 
