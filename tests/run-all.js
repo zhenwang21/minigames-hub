@@ -24,16 +24,33 @@ const files = fs
 const env = { ...process.env, MG_FILE: target };
 if (useMin) env.MG_SKIP_UI = '1';
 
+// GitHub Actions mostra le annotazioni anche quando i log del job non sono
+// scaricabili: utile per capire quale suite fallisce sulla CI.
+function ghaData(s) {
+  return String(s).replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A');
+}
+
 console.log('Suite: ' + files.length + '  File: ' + target + '\n');
 let failed = 0;
 for (const f of files) {
   console.log('\n=== ' + f + ' ===');
   const r = spawnSync(process.execPath, [path.join(__dirname, f)], {
-    stdio: 'inherit',
+    encoding: 'utf8',
     env,
-    cwd: ROOT
+    cwd: ROOT,
+    maxBuffer: 16 * 1024 * 1024
   });
-  if (r.status !== 0) failed++;
+  if (r.stdout) process.stdout.write(r.stdout);
+  if (r.stderr) process.stderr.write(r.stderr);
+  if (r.status !== 0) {
+    failed++;
+    if (process.env.GITHUB_ACTIONS === 'true') {
+      const lines = String(r.stdout || '').split(/\r?\n/);
+      const fails = lines.filter((l) => /^FAIL\b/.test(l.trim())).slice(0, 5);
+      const detail = fails.length ? fails.join(' | ') : lines.slice(-3).join(' | ');
+      console.log('::error title=tests/' + f + '::' + ghaData(detail || 'suite fallita'));
+    }
+  }
 }
 
 console.log('\n' + (files.length - failed) + '/' + files.length + ' suite superate');
