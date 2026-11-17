@@ -171,7 +171,7 @@ const lobby = resApp.run('viewOnline()');
 check(lobby.includes('copyCode()'), 'lobby con copia del codice');
 check(lobby.includes('1/2') && lobby.includes('connessi'), 'lobby mostra i giocatori connessi');
 check(lobby.includes('offline') && lobby.includes('host'), 'lobby distingue offline e host');
-check(lobby.includes('1.12.0'), 'lobby mostra la versione');
+check(lobby.includes('1.13.0'), 'lobby mostra la versione');
 // riepilogo condivisibile
 RS.scores = { Anna: 300, Bruno: 100 };
 RN.game = { g: 'impostore' };
@@ -394,7 +394,7 @@ check(q.run('backupReminder()') === '', 'senza dati il promemoria non compare');
 q.run('resetPrefs()');
 check(QS.timerPref === 120 && QS.mode === 'auto' && QS.ncPref.length === 0, 'ripristino preferenze giochi');
 q.run('showNews()');
-check(q.els.modal.innerHTML.includes('Novità 1.12.0'), 'la modale Novità è alla versione 1.12.0');
+check(q.els.modal.innerHTML.includes('Novità 1.13.0'), 'la modale Novità è alla versione 1.13.0');
 check(q.els.modal.innerHTML.includes('Colori e simboli dedicati'), 'le novità elencano i cosmetics');
 q.run('closeModal()');
 
@@ -566,6 +566,53 @@ check(
   'i coriandoli sono collegati al riepilogo'
 );
 check(c.run('THEME_BG.neon') === '#0a0616' && c.run('THEME_BG.ghiaccio') === '#07131f', 'la mappa degli sfondi tema è coerente');
+
+// --- 1.13.0: tema Carta, anteprime, font, accento, corona, serie, coriandoli ---
+check(c.run('THEMES').includes('carta') && c.run('THEME_BG.carta') === '#f7f2e8', 'il tema Carta è registrato');
+check(/html\[data-theme="carta"\]/.test(cssCos) && /html\[data-theme="carta"\] body\{background:#f7f2e8\}/.test(cssCos), 'Carta ha gli override chiari nel CSS');
+check(/\.theme-card\{/.test(cssCos) && /\.theme-card \.tp\{/.test(cssCos), 'le impostazioni mostrano anteprime dei temi');
+check(c.run('THEME_ACC.carta').length === 2 && c.run('THEME_DOT.carta') === '#b45309', 'ogni tema ha una coppia di colori per l’anteprima');
+c.run("setTheme('carta')");
+check(c.run('document.documentElement.dataset.theme') === 'carta' && c.run('document.documentElement.style._p["--btn1"]') === undefined, 'Carta è applicato e senza accento manuale non ci sono override inline');
+check(c.run('viewHome()').length > 0, 'la home si disegna con il tema Carta');
+
+c.run("setFont('round')");
+check(c.run('S.font') === 'round' && c.run('document.documentElement.dataset.font') === 'round', 'il font arrotondato è applicato e salvato');
+c.run("setFont('sans')");
+check(c.run('S.font') === 'sans' && c.run('document.documentElement.dataset.font') === '', 'si torna al font standard');
+
+check(c.run("normHex('#FACC15')") === '#facc15' && c.run("normHex('giallo')") === '', 'l’accento accetta solo esadecimali validi');
+check(Math.round(c.run("contrastRatio('#000000','#ffffff')")) === 21, 'il calcolo del contrasto è corretto');
+c.run("setAccent('#facc15')");
+const accentOk = ['--acc1', '--acc2', '--acc3', '--btn1', '--btn2'].every((k) => {
+  const v = c.run(`document.documentElement.style._p['${k}']`);
+  return /^#[0-9a-f]{6}$/.test(v || '');
+});
+check(c.run('S.accent') === '#facc15' && accentOk, 'l’accento personalizzato imposta tutte le variabili');
+check(
+  c.run("contrastRatio(document.documentElement.style._p['--btn1'], '#ffffff')") >= 4.4,
+  'i bottoni mantengono testo bianco leggibile'
+);
+check(c.run('backupData().accent') === '#facc15' && c.run('backupData().font') === 'sans', 'accento e font entrano nel backup');
+c.run('resetAccent()');
+check(c.run('S.accent') === '' && c.run('document.documentElement.style._p["--acc1"]') === undefined, 'si torna all’accento del tema');
+const c2 = boot();
+c2.call('applyBackup', { players: ['Anna'], accent: '#2563eb', font: 'round' });
+check(c2.S.accent === '#2563eb' && c2.S.font === 'round', 'il ripristino riporta accento e font');
+
+c.run("S.stats.streak = { Anna: 3, Bruno: 1 }");
+check(c.run("streakTag('Anna')").includes('🔥3') && c.run("streakTag('Bruno')") === '', 'la fiamma compare solo dalle due vittorie di fila');
+check(/\.av\.host\{/.test(cssCos) && /\.av\.win\{/.test(cssCos), 'corona host e cornice vincitore sono nel CSS');
+check(c.run('CONF_KIND.lupus') === 'stars' && c.run('CONF_KIND.nomicose') === 'dots', 'i coriandoli cambiano forma per gioco');
+check(/\.confetti\[data-kind="stars"\]/.test(cssCos) && /\.confetti\[data-kind="dots"\]/.test(cssCos), 'le varianti dei coriandoli sono nel CSS');
+check(/logo-shine/.test(cssCos) && /logo-shine/.test(fs.readFileSync(sourceFile(), 'utf8')), 'il logo ha il riflesso animato');
+check(/#app\.screen-in\{/.test(cssCos) && typeof c.run('screenIn') === 'function', 'il cambio schermata ha una transizione');
+check(
+  /html\[data-motion="off"\] \.logo-shine\{animation:none\}/.test(cssCos) &&
+    /html\[data-motion="off"\] #app\.screen-in\{animation:none\}/.test(cssCos),
+  'le nuove animazioni si spengono con meno movimento'
+);
+
 check(c.run("joinPayload().name") === CS.players[0] || typeof c.run('joinPayload()') === 'object', 'il join include il payload avatar');
 check(c.run("sanitizeStats({recent:[{g:'lupus',t:1,w:'Anna'}]}).recent.length") === 1, 'recenti valide');
 

@@ -24,12 +24,32 @@ html[data-theme="tramonto"]{--acc1:#fb923c;--acc2:#f43f5e;--acc3:#f59e0b;--btn1:
 html[data-theme="bosco"]{--acc1:#34d399;--acc2:#84cc16;--acc3:#10b981;--btn1:#059669;--btn2:#16a34a}
 html[data-theme="neon"]{--acc1:#22d3ee;--acc2:#a855f7;--acc3:#f0abfc;--btn1:#0891b2;--btn2:#7c3aed}
 html[data-theme="ghiaccio"]{--acc1:#93c5fd;--acc2:#e0f2fe;--acc3:#38bdf8;--btn1:#1d4ed8;--btn2:#0ea5e9}
+/* tema chiaro: testi scuri, superfici crema */
+html[data-theme="carta"]{--acc1:#b45309;--acc2:#0f766e;--acc3:#9a3412;--btn1:#92400e;--btn2:#0f766e;color-scheme:light}
+html[data-theme="carta"] body{background:#f7f2e8;color:#1c1917}
+html[data-theme="carta"] .glass{background:rgba(255,252,245,.94);border-color:rgba(28,25,23,.14)}
+html[data-theme="carta"] .bg-slate-900{background:#efe7d8}
+html[data-theme="carta"] .bg-slate-800{background:#e7ddca}
+html[data-theme="carta"] .bg-slate-700{background:#d6c9b2}
+html[data-theme="carta"] .bg-slate-900\/40{background:rgba(28,25,23,.06)}
+html[data-theme="carta"] .text-white{color:#1c1917!important}
+html[data-theme="carta"] .text-slate-200,html[data-theme="carta"] .text-slate-300{color:#44403c!important}
+html[data-theme="carta"] .text-slate-400,html[data-theme="carta"] .text-slate-500{color:#57534e!important}
+html[data-theme="carta"] .text-emerald-400,html[data-theme="carta"] .text-emerald-300{color:#047857!important}
+html[data-theme="carta"] .text-amber-400,html[data-theme="carta"] .text-amber-300{color:#92400e!important}
+html[data-theme="carta"] .text-rose-400{color:#be123c!important}
+html[data-theme="carta"] .text-cyan-300{color:#0e7490!important}
+html[data-theme="carta"] .text-purple-200{color:#6b21a8!important}
+html[data-theme="carta"] .bg-purple-600\/30{background:rgba(147,51,234,.16)}
+html[data-theme="carta"] .border-slate-700{border-color:rgba(28,25,23,.18)}
+html[data-theme="carta"] input,html[data-theme="carta"] select,html[data-theme="carta"] textarea{color:#1c1917;background:#fffdf8;border-color:rgba(28,25,23,.2)}
 /* ogni tema tinge anche lo sfondo, così i preset si distinguono davvero */
 html[data-theme="oceano"] body{background:#04141d}
 html[data-theme="tramonto"] body{background:#1a0e13}
 html[data-theme="bosco"] body{background:#06140f}
 html[data-theme="neon"] body{background:#0a0616}
 html[data-theme="ghiaccio"] body{background:#07131f}
+html[data-theme="carta"] body{background:#f7f2e8}
 body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#0b0f19;color:#f8fafc;-webkit-tap-highlight-color:transparent}
 .glass{background:rgba(17,24,39,.85);border:1px solid rgba(255,255,255,.08)}
 .gtext{background:linear-gradient(135deg,var(--acc1),var(--acc2) 50%,var(--acc3));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
@@ -44,6 +64,22 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#0b0f19;col
 @media (prefers-reduced-motion:no-preference){.gcard{transition:transform .16s ease,box-shadow .16s ease}.gcard:hover{transform:translateY(-2px);box-shadow:0 14px 30px -18px #000}}
 @keyframes cpop{0%{transform:scale(.96);opacity:.5}60%{transform:scale(1.02)}100%{transform:scale(1);opacity:1}}
 .celebrate{animation:cpop .45s ease-out}
+/* scelta del tema: mini anteprima invece del solo pallino */
+.theme-card{display:flex;align-items:center;gap:.5rem;background:#0f172a;border:1px solid #334155;border-radius:.75rem;padding:.4rem .5rem;font-size:.68rem;font-weight:700;color:#cbd5e1;text-align:left}
+.theme-card.on{border-color:#34d399;color:#fff}
+.theme-card .tp{width:1.7rem;height:1.7rem;border-radius:.5rem;flex:0 0 1.7rem;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+html[data-theme="carta"] .theme-card{background:#fffdf8;border-color:rgba(28,25,23,.16);color:#44403c}
+html[data-theme="carta"] .theme-card.on{border-color:#0f766e;color:#1c1917}
+/* font arrotondato di sistema, senza scaricare nulla */
+html[data-font="round"] body{font-family:ui-rounded,'SF Pro Rounded','Nunito',system-ui,sans-serif}
+/* logo: riflesso lento, fermo con le animazioni disattivate */
+@keyframes shine{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+.logo-shine{background-size:200% auto;animation:shine 7s linear infinite}
+html[data-motion="off"] .logo-shine{animation:none}
+/* ingresso schermata: una sola volta per cambio di schermata */
+@keyframes screenin{0%{opacity:.35;transform:translateY(6px)}100%{opacity:1;transform:none}}
+#app.screen-in{animation:screenin .26s ease-out}
+html[data-motion="off"] #app.screen-in{animation:none}
 /* podio: barra colorata per le prime tre posizioni */
 .podium-1{box-shadow:inset 3px 0 0 #fbbf24}
 .podium-2{box-shadow:inset 3px 0 0 #cbd5e1}
@@ -51,6 +87,11 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#0b0f19;col
 /* coriandoli di fine partita: solo decorativi, nessuno stato salvato */
 .confetti{position:fixed;inset:0;z-index:64;pointer-events:none;overflow:hidden}
 .confetti i{position:absolute;top:-12px;width:.5rem;height:.8rem;border-radius:2px;opacity:.95;animation:confetti 1.9s cubic-bezier(.2,.7,.4,1) forwards}
+.confetti[data-kind="dots"] i{border-radius:50%;width:.45rem;height:.45rem}
+.confetti[data-kind="stars"] i{clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.av.host{box-shadow:0 0 0 2px #fbbf24,0 0 10px -2px #fbbf24}
+.av.win{box-shadow:0 0 0 2px #34d399}
+html[data-theme="carta"] .av{background:rgba(28,25,23,.08);border-color:rgba(28,25,23,.3)}
 @keyframes confetti{0%{transform:translate3d(0,-10vh,0) rotate(0)}100%{transform:translate3d(var(--dx,0),110vh,0) rotate(var(--rot,540deg));opacity:.15}}
 html[data-motion="off"] .confetti{display:none}
 @media (prefers-reduced-motion:reduce){.confetti{display:none}}
@@ -136,7 +177,7 @@ button,a,input,select,textarea{touch-action:manipulation}
 </head>
 <body class="min-h-screen flex flex-col p-2.5 select-none">
 <header class="w-full max-w-2xl mx-auto flex items-center justify-between gap-2 py-2.5 px-3 glass rounded-2xl mb-3">
-  <button onclick="goHome()" class="flex items-center gap-2" aria-label="Minigames Hub"><span class="text-xl" aria-hidden="true">🎭</span><span class="font-extrabold text-base gtext">MINIGAMES HUB</span></button>
+  <button onclick="goHome()" class="flex items-center gap-2" aria-label="Minigames Hub"><span class="text-xl" aria-hidden="true">🎭</span><span class="font-extrabold text-base gtext logo-shine">MINIGAMES HUB</span></button>
   <div class="flex items-center gap-1.5">
     <div class="bg-slate-800 rounded-xl p-0.5 flex">
       <button id="lb-it" onclick="setLang('it')" aria-label="Italiano" class="px-2 py-1 text-[11px] font-bold rounded-lg">🇮🇹 IT</button>
@@ -563,7 +604,7 @@ const I = {
     installed: 'App installata',
     offline: 'Offline',
     news: 'Novità',
-    newsTitle: 'Novità 1.12.0',
+    newsTitle: 'Novità 1.13.0',
     news9: 'Rinomina e annulla rimozione dei giocatori.',
     news10: 'Statistiche con ultime partite ed export CSV.',
     news11: 'Backup: unisci o sostituisci, con avviso di versione.',
@@ -571,6 +612,8 @@ const I = {
     news13: 'Sfondi per gioco, podio, temi Neon e Ghiaccio, avatar scelti e suoni di vittoria.',
     news14: 'Coriandoli di vittoria nel riepilogo, rispettando le animazioni disattivate.',
     news15: 'Temi con sfondo dedicato e podio con barre oro, argento e bronzo.',
+    news16: 'Tema chiaro Carta, anteprime dei temi, font arrotondato e accento personalizzato.',
+    news17: 'Corona all’host, fiamma per le serie vincenti e coriandoli diversi per gioco.',
     news7: 'Colori e simboli dedicati per ogni gioco.',
     news8: 'Avatar e colori per i giocatori in liste, lobby e classifiche.',
     news1: 'Introduzione per i nuovi arrivati e partita demo.',
@@ -581,6 +624,7 @@ const I = {
     news6: 'Backup: promemoria, spazio usato e cancellazione dati.',
     summaryTitle: 'Riepilogo partita',
     summaryWinner: 'Vince',
+    summaryStreak: 'Vittorie di fila',
     summaryNoPoints: 'Nessun punto in questa partita.',
     summaryRank: 'Classifica',
     summaryAgain: 'Rigioca',
@@ -630,7 +674,15 @@ const I = {
     avatarPick: 'Scegli avatar',
     avatarReset: 'Avatar automatico',
     thNeon: 'Neon',
-    thIce: 'Ghiaccio'
+    thIce: 'Ghiaccio',
+    thPaper: 'Carta',
+    setFont: 'Font',
+    fontSans: 'Standard',
+    fontRound: 'Arrotondato',
+    setAccent: 'Accento personalizzato',
+    accentReset: 'Automatico',
+    accentAuto: 'Segue il tema',
+    accentOn: 'Personalizzato'
   },
   en: {
     pickGame: 'Choose a game',
@@ -1009,7 +1061,7 @@ const I = {
     installed: 'App installed',
     offline: 'Offline',
     news: 'What’s new',
-    newsTitle: 'What’s new in 1.12.0',
+    newsTitle: 'What’s new in 1.13.0',
     news9: 'Rename players and undo a removal.',
     news10: 'Statistics with recent games and CSV export.',
     news11: 'Backup: merge or replace, with a version warning.',
@@ -1017,6 +1069,8 @@ const I = {
     news13: 'Per-game backgrounds, podium, Neon and Ice themes, chosen avatars and victory sounds.',
     news14: 'Victory confetti in the summary, respecting disabled animations.',
     news15: 'Themes with their own background and gold, silver and bronze podium bars.',
+    news16: 'Light Paper theme, theme previews, rounded font and a custom accent.',
+    news17: 'Crown on the host, flame for winning streaks and different confetti per game.',
     news7: 'Dedicated colours and symbols for every game.',
     news8: 'Avatars and colours for players in lists, lobbies and standings.',
     news1: 'A welcome intro for newcomers and a demo game.',
@@ -1027,6 +1081,7 @@ const I = {
     news6: 'Backup: reminders, storage usage and data clearing.',
     summaryTitle: 'Game summary',
     summaryWinner: 'Winner',
+    summaryStreak: 'Wins in a row',
     summaryNoPoints: 'No points this game.',
     summaryRank: 'Standings',
     summaryAgain: 'Play again',
@@ -1076,7 +1131,15 @@ const I = {
     avatarPick: 'Choose avatar',
     avatarReset: 'Automatic avatar',
     thNeon: 'Neon',
-    thIce: 'Ice'
+    thIce: 'Ice',
+    thPaper: 'Paper',
+    setFont: 'Font',
+    fontSans: 'Standard',
+    fontRound: 'Rounded',
+    setAccent: 'Custom accent',
+    accentReset: 'Automatic',
+    accentAuto: 'Follows the theme',
+    accentOn: 'Custom'
   }
 };
 
@@ -1153,7 +1216,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.12.0';
+const APP_VERSION = '1.13.0';
 // Ripresa dopo reload/standby: la sessione dura al massimo due ore.
 const RESUME_TTL = 2 * 60 * 60 * 1000;
 let RESUME = { room: null, snap: null, savedAt: 0, lastKey: '' };
@@ -3319,6 +3382,8 @@ function backupData() {
     cust: CUST.map((c) => ({ id: c.id, name: c.name, desc: c.desc, fac: c.fac })),
     cn: CN,
     theme: S.theme,
+    accent: S.accent,
+    font: S.font,
     snd: S.sndOn ? 1 : 0,
     vib: S.vibOn ? 1 : 0,
     lastGame: S.lastGame,
@@ -3565,6 +3630,8 @@ function applyBackup(d) {
   if (typeof d.name === 'string') NET.name = cleanName(d.name, 16);
   if (typeof d.lastCode === 'string') NET.lastCode = String(d.lastCode).slice(0, 5).toUpperCase();
   S.theme = THEMES.includes(d.theme) ? d.theme : S.theme;
+  if (d.accent !== undefined) S.accent = normHex(d.accent);
+  if (d.font !== undefined) S.font = d.font === 'round' ? 'round' : 'sans';
   if (d.snd !== undefined) S.sndOn = d.snd !== 0 && d.snd !== false;
   if (d.vib !== undefined) S.vibOn = d.vib !== 0 && d.vib !== false;
   S.stats = sanitizeStats(d.stats);
@@ -3649,7 +3716,7 @@ function viewOnline() {
   <div class="space-y-1.5">${NET.players
     .map(
       (p, i) =>
-        `<div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl text-sm"><span class="flex items-center gap-2"><span style="width:.5rem;height:.5rem;border-radius:9999px;display:inline-block;background:${off.includes(p) ? '#fbbf24' : '#34d399'}"></span>${p === NET.name ? `<button onclick="avatarPickNet()" class="shrink-0" aria-label="${t('avatarPick')}" title="${t('avatarPick')}">${avHtml(p)}</button>` : avHtml(p)}<b>${esc(p)}${p === NET.name ? ' (' + X('tu', 'you') + ')' : ''}</b>${p === NET.hostName ? '<span class="text-[10px] bg-purple-600/30 text-purple-200 px-1.5 py-0.5 rounded-full">host</span>' : ''}</span><span class="flex items-center gap-2">${off.includes(p) ? `<span class="text-[10px] text-amber-300">${X('offline', 'offline')}</span>` : ''}${NET.host && p !== NET.hostName ? `<button onclick="netKick(${i})" class="text-rose-400/80 hover:text-rose-300 text-xs px-1" aria-label="${X('Espelli', 'Kick')} ${esc(p)}" title="${X('Espelli', 'Kick')}">✕</button>` : ''}</span></div>`
+        `<div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl text-sm"><span class="flex items-center gap-2"><span style="width:.5rem;height:.5rem;border-radius:9999px;display:inline-block;background:${off.includes(p) ? '#fbbf24' : '#34d399'}"></span>${p === NET.name ? `<button onclick="avatarPickNet()" class="shrink-0" aria-label="${t('avatarPick')}" title="${t('avatarPick')}">${avHtml(p, p === NET.hostName ? 'host' : '')}</button>` : avHtml(p, p === NET.hostName ? 'host' : '')}<b>${esc(p)}${p === NET.name ? ' (' + X('tu', 'you') + ')' : ''}</b>${p === NET.hostName ? '<span class="text-[10px] bg-purple-600/30 text-purple-200 px-1.5 py-0.5 rounded-full">host</span>' : ''}</span><span class="flex items-center gap-2">${off.includes(p) ? `<span class="text-[10px] text-amber-300">${X('offline', 'offline')}</span>` : ''}${NET.host && p !== NET.hostName ? `<button onclick="netKick(${i})" class="text-rose-400/80 hover:text-rose-300 text-xs px-1" aria-label="${X('Espelli', 'Kick')} ${esc(p)}" title="${X('Espelli', 'Kick')}">✕</button>` : ''}</span></div>`
     )
     .join('')}</div>
   ${
@@ -4048,14 +4115,25 @@ const GAME_FN = {
   taboo: tbHostOpen,
   chisono: chiStart
 };
-const THEMES = ['viola', 'oceano', 'tramonto', 'bosco', 'neon', 'ghiaccio'];
+const THEMES = ['viola', 'oceano', 'tramonto', 'bosco', 'neon', 'ghiaccio', 'carta'];
 const THEME_DOT = {
   viola: '#a855f7',
   oceano: '#22d3ee',
   tramonto: '#fb923c',
   bosco: '#34d399',
   neon: '#f0abfc',
-  ghiaccio: '#38bdf8'
+  ghiaccio: '#38bdf8',
+  carta: '#b45309'
+};
+// Coppia di colori per l'anteprima del tema.
+const THEME_ACC = {
+  viola: ['#a855f7', '#ec4899'],
+  oceano: ['#22d3ee', '#2563eb'],
+  tramonto: ['#fb923c', '#f43f5e'],
+  bosco: ['#34d399', '#84cc16'],
+  neon: ['#22d3ee', '#a855f7'],
+  ghiaccio: ['#93c5fd', '#38bdf8'],
+  carta: ['#b45309', '#0f766e']
 };
 // Sfondo di ogni tema: serve al CSS e al colore della barra del browser (PWA).
 const THEME_BG = {
@@ -4064,7 +4142,8 @@ const THEME_BG = {
   tramonto: '#1a0e13',
   bosco: '#06140f',
   neon: '#0a0616',
-  ghiaccio: '#07131f'
+  ghiaccio: '#07131f',
+  carta: '#f7f2e8'
 };
 
 // Minigames Hub: database domande (IT)
@@ -6351,6 +6430,8 @@ const S = {
   sel: null,
   hint: '',
   theme: 'viola',
+  accent: '',
+  font: 'sans',
   sndOn: true,
   vibOn: true,
   lastGame: '',
@@ -10149,6 +10230,106 @@ function viewChi(v) {
 }
 
 // --- impostazioni, temi e statistiche locali ---
+// Accento personalizzato: si scelgono i colori, il contrasto resta garantito.
+const HEX_RE = /^#[0-9a-f]{6}$/i;
+function normHex(v) {
+  const s = String(v == null ? '' : v).trim().toLowerCase();
+  return HEX_RE.test(s) ? s : '';
+}
+function hexRgb(h) {
+  const n = parseInt(h.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+function rgbHex(r, g, b) {
+  const c = (x) =>
+    Math.max(0, Math.min(255, Math.round(x)))
+      .toString(16)
+      .padStart(2, '0');
+  return '#' + c(r) + c(g) + c(b);
+}
+function mixHex(a, b, t) {
+  const A = hexRgb(a),
+    B = hexRgb(b);
+  return rgbHex(A[0] + (B[0] - A[0]) * t, A[1] + (B[1] - A[1]) * t, A[2] + (B[2] - A[2]) * t);
+}
+function relLuma(h) {
+  const [r, g, b] = hexRgb(h).map((v) => {
+    v /= 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+function contrastRatio(a, b) {
+  const L1 = relLuma(a),
+    L2 = relLuma(b);
+  return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+}
+function ensureContrast(fg, bg, min) {
+  let x = normHex(fg) || fg;
+  const lightBg = relLuma(bg) > 0.5;
+  for (let i = 0; i < 12 && contrastRatio(x, bg) < (min || 4.5); i++)
+    x = mixHex(x, lightBg ? '#000000' : '#ffffff', 0.14);
+  return x;
+}
+function accentColors(h) {
+  const base = normHex(h);
+  if (!base) return null;
+  const bg = THEME_BG[S.theme] || THEME_BG.viola,
+    min = S.theme === 'carta' ? 4.5 : 3;
+  const acc1 = ensureContrast(base, bg, min),
+    acc2 = ensureContrast(mixHex(base, S.theme === 'carta' ? '#0f766e' : '#ffffff', 0.25), bg, min),
+    acc3 = ensureContrast(mixHex(base, S.theme === 'carta' ? '#9a3412' : '#000000', 0.2), bg, min);
+  return {
+    acc1,
+    acc2,
+    acc3,
+    btn1: ensureContrast(acc1, '#ffffff', 4.5),
+    btn2: ensureContrast(acc2, '#ffffff', 4.5)
+  };
+}
+function applyAccent() {
+  try {
+    const el = document.documentElement;
+    if (!el || !el.style) return;
+    const keys = ['--acc1', '--acc2', '--acc3', '--btn1', '--btn2'],
+      c = accentColors(S.accent),
+      set = (k, v) => {
+        if (typeof el.style.setProperty === 'function') el.style.setProperty(k, v);
+        else el.style[k] = v;
+      },
+      del = (k) => {
+        if (typeof el.style.removeProperty === 'function') el.style.removeProperty(k);
+        else delete el.style[k];
+      };
+    if (!c) {
+      keys.forEach(del);
+      return;
+    }
+    set('--acc1', c.acc1);
+    set('--acc2', c.acc2);
+    set('--acc3', c.acc3);
+    set('--btn1', c.btn1);
+    set('--btn2', c.btn2);
+  } catch (e) {}
+}
+function setAccent(v) {
+  S.accent = normHex(v);
+  saveLocal();
+  applyTheme();
+  showSettings();
+}
+function resetAccent() {
+  S.accent = '';
+  saveLocal();
+  applyTheme();
+  showSettings();
+}
+function setFont(v) {
+  S.font = v === 'round' ? 'round' : 'sans';
+  applyA11y();
+  saveLocal();
+  showSettings();
+}
 function applyTheme() {
   try {
     const el = document.documentElement;
@@ -10156,6 +10337,7 @@ function applyTheme() {
     el.dataset.theme = THEMES.includes(S.theme) ? S.theme : '';
     const meta = document.querySelector && document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', THEME_BG[S.theme] || '#0b0f19');
+    applyAccent();
   } catch (e) {}
 }
 function announce(msg) {
@@ -10356,6 +10538,7 @@ function applyA11y() {
     const el = document.documentElement;
     if (!el.dataset) el.dataset = {};
     el.dataset.text = ['s', 'm', 'l'].includes(S.textSize) ? S.textSize : 'm';
+    el.dataset.font = S.font === 'round' ? 'round' : '';
     el.dataset.contrast = S.contrast ? 'high' : '';
     el.dataset.motion = S.reduceMotion ? 'off' : '';
   } catch (e) {}
@@ -10507,12 +10690,16 @@ function summaryData() {
 }
 // Coriandoli di vittoria: elementi effimeri, nessuno stato salvato.
 let CONF_SIG = '';
-function confettiBurst() {
+// Forma dei coriandoli per gioco: stelle per Lupus, bolle per Nomi/Cose, coriandoli classici altrove.
+const CONF_KIND = { lupus: 'stars', nomicose: 'dots', chisono: 'stars', taboo: 'dots' };
+function confettiBurst(gid) {
   if (S.reduceMotion) return;
   try {
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const box = document.createElement('div');
     box.className = 'confetti';
+    const kind = CONF_KIND[gid];
+    if (kind) box.setAttribute('data-kind', kind);
     box.setAttribute('aria-hidden', 'true');
     const cols = ['var(--acc1)', 'var(--acc2)', 'var(--acc3)', '#facc15', '#34d399', '#f472b6'];
     let h = '';
@@ -10538,7 +10725,13 @@ function maybeConfetti() {
   const sig = d.gid + '|' + d.rows.map((r) => r.n + ':' + r.d).join(',');
   if (sig === CONF_SIG) return;
   CONF_SIG = sig;
-  confettiBurst();
+  confettiBurst(d.gid);
+}
+// Fiamma per chi ha vinto più partite di fila (dato locale, nessun invio online).
+function streakTag(name) {
+  const v = +(((S.stats && S.stats.streak && S.stats.streak[name]) || 0));
+  if (!(v >= 2)) return '';
+  return `<span class="text-amber-400 shrink-0" title="${esc(t('summaryStreak'))}">🔥${v}</span>`;
 }
 function summaryBar() {
   const d = summaryData();
@@ -10549,7 +10742,7 @@ function summaryBar() {
     rows = d.rows
       .map(
         (r, i) =>
-          `<div class="flex justify-between bg-slate-900 px-3 py-1.5 rounded-lg text-[11px]${i < 3 ? ' podium-' + (i + 1) : ''}"><span class="flex items-center gap-1.5 min-w-0"><span class="text-slate-500">${i < 3 ? ['🥇', '🥈', '🥉'][i] : '#' + (i + 1)}</span>${avHtml(r.n)}<b class="truncate">${esc(r.n)}</b></span><span class="${r.d === d.max && r.d > 0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">${r.d > 0 ? '+' + r.d : '0'}</span></div>`
+          `<div class="flex justify-between bg-slate-900 px-3 py-1.5 rounded-lg text-[11px]${i < 3 ? ' podium-' + (i + 1) : ''}"><span class="flex items-center gap-1.5 min-w-0"><span class="text-slate-500">${i < 3 ? ['🥇', '🥈', '🥉'][i] : '#' + (i + 1)}</span>${avHtml(r.n, i === 0 && d.max > 0 ? 'win' : '')}<b class="truncate">${esc(r.n)}</b>${streakTag(r.n)}</span><span class="${r.d === d.max && r.d > 0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">${r.d > 0 ? '+' + r.d : '0'}</span></div>`
       )
       .join('');
   return `<section class="glass p-4 rounded-2xl space-y-2 border border-emerald-500/30"><div class="flex justify-between items-center"><h3 class="font-bold text-white text-sm">📊 ${t('summaryTitle')}</h3><span class="text-[10px] text-slate-400">${t('g_' + d.gid)}</span></div>${win}<details class="bg-slate-900/40 rounded-xl p-2"><summary class="text-[11px] font-bold cursor-pointer">${t('summaryRank')}</summary><div class="space-y-1 mt-1.5">${rows}</div></details><div class="flex gap-2"><button onclick="shareSummary()" class="flex-1 bg-slate-800 py-2 rounded-xl text-[11px] font-bold">📤 ${t('summaryShare')}</button><button onclick="rematchSummary()" class="flex-1 gbtn py-2 rounded-xl text-[11px] font-bold">🔁 ${t('summaryAgain')}</button></div></section>`;
@@ -10636,7 +10829,7 @@ function clearLocalData() {
 function showNews() {
   const m = $('modal');
   if (!m) return;
-  const items = ['news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
+  const items = ['news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">✨ ${t('newsTitle')}</h3><ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">${items.map((k) => `<li>${t(k)}</li>`).join('')}</ul><button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
   modalOpen();
 }
@@ -10711,6 +10904,10 @@ function resetPrefs() {
   S.pv.pack = '';
   S.ncPref = [];
   S.timerPref = 120;
+  S.accent = '';
+  S.font = 'sans';
+  applyTheme();
+  applyA11y();
   saveLocal();
   alert(t('prefsReset'));
   showSettings();
@@ -10724,7 +10921,8 @@ function showSettings() {
       ['tramonto', t('thSunset')],
       ['bosco', t('thForest')],
       ['neon', t('thNeon')],
-      ['ghiaccio', t('thIce')]
+      ['ghiaccio', t('thIce')],
+      ['carta', t('thPaper')]
     ],
     top = statsTop(5),
     fav = Object.entries(S.stats.byGame || {}).sort((a, b) => b[1] - a[1])[0],
@@ -10740,9 +10938,27 @@ function showSettings() {
     <div class="grid grid-cols-2 gap-2">${th
       .map(
         ([k, l]) =>
-          `<button onclick="setTheme('${k}')" aria-pressed="${S.theme === k}" class="flex items-center gap-2 bg-slate-900 px-3 py-2 rounded-xl text-[11px] font-bold border ${S.theme === k ? 'border-emerald-400 text-white' : 'border-slate-700 text-slate-300'}"><span class="rounded-full" style="width:.7rem;height:.7rem;background:${THEME_DOT[k]}"></span>${l}</button>`
+          `<button onclick="setTheme('${k}')" aria-pressed="${S.theme === k}" class="theme-card ${S.theme === k ? 'on' : ''}" style="--a:${THEME_ACC[k][0]};--b:${THEME_ACC[k][1]}"><span class="tp" aria-hidden="true"></span>${l}</button>`
       )
       .join('')}</div>
+  </div>
+  <div class="space-y-2"><p class="text-xs font-bold text-slate-300">🅰️ ${t('setFont')}</p>
+    <div class="flex gap-2">${[
+      ['sans', t('fontSans')],
+      ['round', t('fontRound')]
+    ]
+      .map(
+        ([v, l]) =>
+          `<button onclick="setFont('${v}')" aria-pressed="${S.font === v}" class="flex-1 py-2 rounded-lg text-[11px] font-bold ${S.font === v ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-400'}">${l}</button>`
+      )
+      .join('')}</div>
+  </div>
+  <div class="space-y-2"><p class="text-xs font-bold text-slate-300">🌈 ${t('setAccent')}</p>
+    <div class="flex items-center gap-2">
+      <input type="color" id="accent" value="${S.accent || '#a855f7'}" onchange="setAccent(this.value)" aria-label="${t('setAccent')}" class="h-9 w-14 rounded-lg bg-slate-900 border border-slate-700 p-0.5">
+      <button onclick="resetAccent()" class="bg-slate-800 px-3 py-2 rounded-lg text-[11px] font-bold">${t('accentReset')}</button>
+      <span class="text-[11px] text-slate-400">${S.accent ? t('accentOn') : t('accentAuto')}</span>
+    </div>
   </div>
   <div class="space-y-2"><p class="text-xs font-bold text-slate-300">♿ ${t('a11yTitle')}</p>
     <p class="text-[11px] text-slate-400">${t('setText')}</p>
@@ -10816,6 +11032,8 @@ function saveLocal() {
       cust: CUST.map((c) => ({ id: c.id, name: c.name, desc: c.desc, fac: c.fac })),
       cn: CN,
       theme: S.theme,
+      accent: S.accent,
+      font: S.font,
       snd: S.sndOn ? 1 : 0,
       vib: S.vibOn ? 1 : 0,
       lastGame: S.lastGame,
@@ -10862,6 +11080,8 @@ function loadLocal() {
     if (typeof d.name === 'string') NET.name = cleanName(d.name, 16);
     if (typeof d.lastCode === 'string') NET.lastCode = d.lastCode.slice(0, 5);
     S.theme = THEMES.includes(d.theme) ? d.theme : 'viola';
+    S.accent = normHex(d.accent);
+    S.font = d.font === 'round' ? 'round' : 'sans';
     S.sndOn = d.snd !== 0 && d.snd !== false;
     S.vibOn = d.vib !== 0 && d.vib !== false;
     S.stats = sanitizeStats(d.stats);
@@ -10925,6 +11145,18 @@ function loadLocal() {
       });
   } catch (e) {}
 }
+let LAST_SCREEN = '';
+// Ingresso morbido quando si cambia schermata (una sola animazione, non a ogni render).
+function screenIn() {
+  try {
+    const el = $('app');
+    if (!el || !el.classList || S.screen === LAST_SCREEN) return;
+    LAST_SCREEN = S.screen;
+    el.classList.remove('screen-in');
+    void el.offsetWidth;
+    el.classList.add('screen-in');
+  } catch (e) {}
+}
 function render() {
   if (S.screen === 'online' && NET.game && NET.game.g === 'lupus' && S.G) lupSync();
   statsTick();
@@ -10967,6 +11199,7 @@ function render() {
   applyGameAccent();
   const sum = summaryBar();
   $('app').innerHTML = (S.demo ? demoBar() : '') + sum + body;
+  screenIn();
   if (sum) maybeConfetti();
   else CONF_SIG = '';
   if (!tmAllowed() && (TMR.iv || TMR.done)) tmClear();

@@ -4,6 +4,35 @@
 release number; `sw.js` must follow it. Older history (1.2–1.5) is described in
 `MINIGAMES_HUB_HANDOFF.md`.
 
+## 1.13.0 — 2026-11-17
+
+### Added
+- **Paper theme** — a light theme (cream surfaces, dark text, its own
+  `theme-color`) for bright rooms, with contrast-checked accents.
+- **Theme previews** — settings show a mini gradient card per theme instead of a
+  single dot, so the six presets plus Paper are visible before choosing.
+- **Rounded font** — switch between the standard system font and a rounded
+  variant, with no extra download, saved locally and in the backup.
+- **Custom accent** — pick any colour; the app derives the gradient and button
+  colours and raises their contrast automatically (at least 3:1 on dark themes,
+  4.5:1 on Paper, white text on buttons kept readable). A reset returns to the
+  theme accent.
+- **Host crown and streak flame** — the host's avatar in the online lobby gets a
+  gold ring, and players on a two-or-more winning streak get a 🔥 badge in the
+  summary. The summary winner's avatar also gets a green ring.
+- **Per-game confetti** — stars for Werewolf and Who Am I?, dots for Names,
+  Things and Cities and Forbidden Words, classic confetti otherwise.
+- **Screen and logo motion** — a short fade/slide when the screen changes and a
+  slow shine on the logo, both disabled by the reduce-animations setting or
+  `prefers-reduced-motion`.
+
+### Changed
+- Minified build: 409,027 bytes; source: 498,418 bytes.
+
+### Tests
+- `features.test.js` at 197 checks; 12/12 suites green on source and minified
+  build.
+
 ## 1.12.0 — 2026-11-17
 
 ### Added

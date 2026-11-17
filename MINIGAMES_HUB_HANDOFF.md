@@ -242,6 +242,18 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 
 ## 11. Cosa è stato corretto nell'ultima revisione
 
+### Versione 1.13.0 (personalizzazione e motion)
+- **Tema Carta**: settimo tema chiaro in `THEMES`, con override CSS per superfici (`.glass`, `bg-slate-*`), testi (`text-white/slate/emerald/amber/rose/cyan/purple`), input e `.av`; `color-scheme:light` e `THEME_BG.carta = #f7f2e8` (anche `theme-color`). Serve alle stanze luminose senza cambiare nessun gioco.
+- **Anteprime tema**: `THEME_ACC` (coppia di colori) alimenta `.theme-card`/`.tp` nelle impostazioni; `THEME_DOT` resta per usi compatti.
+- **Font**: `S.font` (`sans`/`round`) → `html[data-font="round"]` usa `ui-rounded`/`SF Pro Rounded`/`Nunito` di sistema, senza download; salvato e incluso nel backup.
+- **Accento personalizzato**: `S.accent` + `normHex`/`mixHex`/`relLuma`/`contrastRatio`/`ensureContrast`/`accentColors`/`applyAccent`. L'accento scelto viene schiarito/scurito quanto basta (≥3:1 sui temi scuri, ≥4.5:1 su Carta) e `--btn1/--btn2` restano leggibili con testo bianco; `resetAccent()` rimuove gli override inline e torna al tema. Tutto passa da `applyTheme()`.
+- **Corona e serie**: in lobby `avHtml(p, p===NET.hostName?'host':'')` aggiunge `.av.host` (anello oro); `streakTag()` mostra 🔥N nel riepilogo quando `S.stats.streak[n] >= 2`; il vincitore ha `.av.win`.
+- **Coriandoli per gioco**: `CONF_KIND` (`lupus`/`chisono` → stelle, `nomicose`/`taboo` → bolle) e `confettiBurst(gid)` imposta `data-kind`; `maybeConfetti()` passa il gioco.
+- **Motion**: `screenIn()` aggiunge `.screen-in` a `#app` solo al cambio schermata; `.logo-shine` sul titolo. Entrambe spente da `html[data-motion="off"]` e dalla media query `prefers-reduced-motion`.
+- **Novità**: `news16`/`news17` in IT/EN, in testa alla modale.
+- **Test**: `features.test.js` sale a **197** (Carta, anteprime, font, accento e contrasto, backup/ripristino, fiamma serie, CSS corona/coriandoli/logo/transizione, spegnimento motion); harness con `documentElement.style` per verificare le variabili inline. **12/12 suite** verdi su sorgente e minificato.
+- `APP_VERSION` e `VERSION` portate a **1.13.0**; build: sorgente **498.418** byte, minificato **409.027** byte.
+
 ### Versione 1.12.0 (cosmetics)
 - **Coriandoli di vittoria**: `confettiBurst()` crea 22 `<i>` in un contenitore fisso `.confetti` (CSS `@keyframes confetti`), con colori del tema; `maybeConfetti()` li lancia una sola volta per riepilogo tramite la firma `CONF_SIG` (gioco + nomi + punti) e viene chiamata da `render()` quando `summaryBar()` non è vuota. Rispetta `S.reduceMotion`, `html[data-motion="off"]` e `prefers-reduced-motion`; nessun dato salvato.
 - **Sfondi dei temi**: oltre alle variabili `--acc1/2/3` e `--btn1/2`, ogni tema tinge `body` (`oceano #04141d`, `tramonto #1a0e13`, `bosco #06140f`, `neon #0a0616`, `ghiaccio #07131f`); `THEME_BG` alimenta anche il `meta[name="theme-color"]` in `applyTheme()`, così la barra del browser segue il tema. L'alto contrasto manuale e `prefers-contrast:more` restano neri.

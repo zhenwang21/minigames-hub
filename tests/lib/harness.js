@@ -47,7 +47,19 @@ function boot(opts = {}) {
     createElement: (tag) => makeElement(tag),
     querySelectorAll: () => [],
     addEventListener() {},
-    documentElement: { lang: 'it' },
+    documentElement: {
+      lang: 'it',
+      dataset: {},
+      style: {
+        _p: {},
+        setProperty(k, v) {
+          this._p[k] = v;
+        },
+        removeProperty(k) {
+          delete this._p[k];
+        }
+      }
+    },
     head: { appendChild() {} },
     body: { appendChild() {} }
   };
