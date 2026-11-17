@@ -4,6 +4,25 @@
 release number; `sw.js` must follow it. Older history (1.2–1.5) is described in
 `MINIGAMES_HUB_HANDOFF.md`.
 
+## 1.12.0 — 2026-11-17
+
+### Added
+- **Victory confetti** — a short CSS-only burst when the end-of-game summary
+  appears. It fires once per result, never writes any state and stays off when
+  reduced motion is enabled on the phone or in the system settings.
+- **Theme backgrounds** — each of the six accent themes now also tints the page
+  background (Ocean, Sunset, Forest, Neon, Ice) instead of only the gradients.
+  The browser/PWA `theme-color` follows the selected theme.
+- **Podium bars** — the top three rows of the summary get a gold, silver and
+  bronze inset bar.
+
+### Changed
+- Minified build: 400,858 bytes; source: 488,283 bytes.
+
+### Tests
+- `features.test.js` at 175 checks; 12/12 suites green on source and minified
+  build.
+
 ## 1.11.1 — 2026-11-16
 
 ### Fixed

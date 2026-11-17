@@ -24,6 +24,12 @@ html[data-theme="tramonto"]{--acc1:#fb923c;--acc2:#f43f5e;--acc3:#f59e0b;--btn1:
 html[data-theme="bosco"]{--acc1:#34d399;--acc2:#84cc16;--acc3:#10b981;--btn1:#059669;--btn2:#16a34a}
 html[data-theme="neon"]{--acc1:#22d3ee;--acc2:#a855f7;--acc3:#f0abfc;--btn1:#0891b2;--btn2:#7c3aed}
 html[data-theme="ghiaccio"]{--acc1:#93c5fd;--acc2:#e0f2fe;--acc3:#38bdf8;--btn1:#1d4ed8;--btn2:#0ea5e9}
+/* ogni tema tinge anche lo sfondo, così i preset si distinguono davvero */
+html[data-theme="oceano"] body{background:#04141d}
+html[data-theme="tramonto"] body{background:#1a0e13}
+html[data-theme="bosco"] body{background:#06140f}
+html[data-theme="neon"] body{background:#0a0616}
+html[data-theme="ghiaccio"] body{background:#07131f}
 body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#0b0f19;color:#f8fafc;-webkit-tap-highlight-color:transparent}
 .glass{background:rgba(17,24,39,.85);border:1px solid rgba(255,255,255,.08)}
 .gtext{background:linear-gradient(135deg,var(--acc1),var(--acc2) 50%,var(--acc3));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
@@ -38,6 +44,16 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#0b0f19;col
 @media (prefers-reduced-motion:no-preference){.gcard{transition:transform .16s ease,box-shadow .16s ease}.gcard:hover{transform:translateY(-2px);box-shadow:0 14px 30px -18px #000}}
 @keyframes cpop{0%{transform:scale(.96);opacity:.5}60%{transform:scale(1.02)}100%{transform:scale(1);opacity:1}}
 .celebrate{animation:cpop .45s ease-out}
+/* podio: barra colorata per le prime tre posizioni */
+.podium-1{box-shadow:inset 3px 0 0 #fbbf24}
+.podium-2{box-shadow:inset 3px 0 0 #cbd5e1}
+.podium-3{box-shadow:inset 3px 0 0 #d97706}
+/* coriandoli di fine partita: solo decorativi, nessuno stato salvato */
+.confetti{position:fixed;inset:0;z-index:64;pointer-events:none;overflow:hidden}
+.confetti i{position:absolute;top:-12px;width:.5rem;height:.8rem;border-radius:2px;opacity:.95;animation:confetti 1.9s cubic-bezier(.2,.7,.4,1) forwards}
+@keyframes confetti{0%{transform:translate3d(0,-10vh,0) rotate(0)}100%{transform:translate3d(var(--dx,0),110vh,0) rotate(var(--rot,540deg));opacity:.15}}
+html[data-motion="off"] .confetti{display:none}
+@media (prefers-reduced-motion:reduce){.confetti{display:none}}
 @keyframes flipin{0%{transform:scaleX(.88);opacity:.35}100%{transform:scaleX(1);opacity:1}}
 .flipin{animation:flipin .3s ease-out}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
@@ -63,6 +79,7 @@ html[data-contrast="high"] .text-slate-300,html[data-contrast="high"] .text-slat
 html[data-contrast="high"] .gbtn{box-shadow:inset 0 0 0 2px #fff}
 html[data-contrast="high"] .gtext{background:none;-webkit-text-fill-color:#fff;color:#fff}
 @media (prefers-contrast:more){
+ html[data-theme] body{background:#000;color:#fff}
  body{background:#000;color:#fff}
  .glass{background:#0b1120;border-color:rgba(255,255,255,.55)}
  .bg-slate-900{background:#020617}
@@ -546,12 +563,14 @@ const I = {
     installed: 'App installata',
     offline: 'Offline',
     news: 'Novità',
-    newsTitle: 'Novità 1.11.1',
+    newsTitle: 'Novità 1.12.0',
     news9: 'Rinomina e annulla rimozione dei giocatori.',
     news10: 'Statistiche con ultime partite ed export CSV.',
     news11: 'Backup: unisci o sostituisci, con avviso di versione.',
     news12: 'Le mie domande per Chi l’ha detto? e Preferiresti.',
     news13: 'Sfondi per gioco, podio, temi Neon e Ghiaccio, avatar scelti e suoni di vittoria.',
+    news14: 'Coriandoli di vittoria nel riepilogo, rispettando le animazioni disattivate.',
+    news15: 'Temi con sfondo dedicato e podio con barre oro, argento e bronzo.',
     news7: 'Colori e simboli dedicati per ogni gioco.',
     news8: 'Avatar e colori per i giocatori in liste, lobby e classifiche.',
     news1: 'Introduzione per i nuovi arrivati e partita demo.',
@@ -990,12 +1009,14 @@ const I = {
     installed: 'App installed',
     offline: 'Offline',
     news: 'What’s new',
-    newsTitle: 'What’s new in 1.11.1',
+    newsTitle: 'What’s new in 1.12.0',
     news9: 'Rename players and undo a removal.',
     news10: 'Statistics with recent games and CSV export.',
     news11: 'Backup: merge or replace, with a version warning.',
     news12: 'My questions for Who Said That? and Would You Rather.',
     news13: 'Per-game backgrounds, podium, Neon and Ice themes, chosen avatars and victory sounds.',
+    news14: 'Victory confetti in the summary, respecting disabled animations.',
+    news15: 'Themes with their own background and gold, silver and bronze podium bars.',
     news7: 'Dedicated colours and symbols for every game.',
     news8: 'Avatars and colours for players in lists, lobbies and standings.',
     news1: 'A welcome intro for newcomers and a demo game.',
@@ -1132,7 +1153,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.11.1';
+const APP_VERSION = '1.12.0';
 // Ripresa dopo reload/standby: la sessione dura al massimo due ore.
 const RESUME_TTL = 2 * 60 * 60 * 1000;
 let RESUME = { room: null, snap: null, savedAt: 0, lastKey: '' };
@@ -4035,6 +4056,15 @@ const THEME_DOT = {
   bosco: '#34d399',
   neon: '#f0abfc',
   ghiaccio: '#38bdf8'
+};
+// Sfondo di ogni tema: serve al CSS e al colore della barra del browser (PWA).
+const THEME_BG = {
+  viola: '#0b0f19',
+  oceano: '#04141d',
+  tramonto: '#1a0e13',
+  bosco: '#06140f',
+  neon: '#0a0616',
+  ghiaccio: '#07131f'
 };
 
 // Minigames Hub: database domande (IT)
@@ -10124,6 +10154,8 @@ function applyTheme() {
     const el = document.documentElement;
     if (!el.dataset) el.dataset = {};
     el.dataset.theme = THEMES.includes(S.theme) ? S.theme : '';
+    const meta = document.querySelector && document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', THEME_BG[S.theme] || '#0b0f19');
   } catch (e) {}
 }
 function announce(msg) {
@@ -10473,6 +10505,41 @@ function summaryData() {
   const max = Math.max(0, ...rows.map((r) => r.d));
   return { gid, rows, max, winners: max > 0 ? rows.filter((r) => r.d === max) : [] };
 }
+// Coriandoli di vittoria: elementi effimeri, nessuno stato salvato.
+let CONF_SIG = '';
+function confettiBurst() {
+  if (S.reduceMotion) return;
+  try {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const box = document.createElement('div');
+    box.className = 'confetti';
+    box.setAttribute('aria-hidden', 'true');
+    const cols = ['var(--acc1)', 'var(--acc2)', 'var(--acc3)', '#facc15', '#34d399', '#f472b6'];
+    let h = '';
+    for (let i = 0; i < 22; i++) {
+      const left = (i * 4.4 + (i % 4) * 2.1).toFixed(1),
+        dx = ((i % 7) - 3) * 14,
+        rot = 360 + ((i * 53) % 360);
+      h += `<i style="left:${left}%;background:${cols[i % cols.length]};animation-delay:${(i % 7) * 0.07}s;--dx:${dx}px;--rot:${rot}deg"></i>`;
+    }
+    box.innerHTML = h;
+    document.body.appendChild(box);
+    setTimeout(() => {
+      try {
+        box.remove();
+      } catch (e) {}
+    }, 2600);
+  } catch (e) {}
+}
+// Un solo lancio per riepilogo: il render viene chiamato molte volte.
+function maybeConfetti() {
+  const d = summaryData();
+  if (!d || !d.winners.length) return;
+  const sig = d.gid + '|' + d.rows.map((r) => r.n + ':' + r.d).join(',');
+  if (sig === CONF_SIG) return;
+  CONF_SIG = sig;
+  confettiBurst();
+}
 function summaryBar() {
   const d = summaryData();
   if (!d) return '';
@@ -10482,7 +10549,7 @@ function summaryBar() {
     rows = d.rows
       .map(
         (r, i) =>
-          `<div class="flex justify-between bg-slate-900 px-3 py-1.5 rounded-lg text-[11px]"><span class="flex items-center gap-1.5 min-w-0"><span class="text-slate-500">${i < 3 ? ['🥇', '🥈', '🥉'][i] : '#' + (i + 1)}</span>${avHtml(r.n)}<b class="truncate">${esc(r.n)}</b></span><span class="${r.d === d.max && r.d > 0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">${r.d > 0 ? '+' + r.d : '0'}</span></div>`
+          `<div class="flex justify-between bg-slate-900 px-3 py-1.5 rounded-lg text-[11px]${i < 3 ? ' podium-' + (i + 1) : ''}"><span class="flex items-center gap-1.5 min-w-0"><span class="text-slate-500">${i < 3 ? ['🥇', '🥈', '🥉'][i] : '#' + (i + 1)}</span>${avHtml(r.n)}<b class="truncate">${esc(r.n)}</b></span><span class="${r.d === d.max && r.d > 0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">${r.d > 0 ? '+' + r.d : '0'}</span></div>`
       )
       .join('');
   return `<section class="glass p-4 rounded-2xl space-y-2 border border-emerald-500/30"><div class="flex justify-between items-center"><h3 class="font-bold text-white text-sm">📊 ${t('summaryTitle')}</h3><span class="text-[10px] text-slate-400">${t('g_' + d.gid)}</span></div>${win}<details class="bg-slate-900/40 rounded-xl p-2"><summary class="text-[11px] font-bold cursor-pointer">${t('summaryRank')}</summary><div class="space-y-1 mt-1.5">${rows}</div></details><div class="flex gap-2"><button onclick="shareSummary()" class="flex-1 bg-slate-800 py-2 rounded-xl text-[11px] font-bold">📤 ${t('summaryShare')}</button><button onclick="rematchSummary()" class="flex-1 gbtn py-2 rounded-xl text-[11px] font-bold">🔁 ${t('summaryAgain')}</button></div></section>`;
@@ -10569,7 +10636,7 @@ function clearLocalData() {
 function showNews() {
   const m = $('modal');
   if (!m) return;
-  const items = ['news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
+  const items = ['news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">✨ ${t('newsTitle')}</h3><ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">${items.map((k) => `<li>${t(k)}</li>`).join('')}</ul><button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
   modalOpen();
 }
@@ -10898,7 +10965,10 @@ function render() {
                     ? viewTbSetup()
                     : viewPlay();
   applyGameAccent();
-  $('app').innerHTML = (S.demo ? demoBar() : '') + summaryBar() + body;
+  const sum = summaryBar();
+  $('app').innerHTML = (S.demo ? demoBar() : '') + sum + body;
+  if (sum) maybeConfetti();
+  else CONF_SIG = '';
   if (!tmAllowed() && (TMR.iv || TMR.done)) tmClear();
   if (tmAuto() && (TMR.iv || TMR.done)) tmClear();
   tmDraw();

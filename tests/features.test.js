@@ -171,7 +171,7 @@ const lobby = resApp.run('viewOnline()');
 check(lobby.includes('copyCode()'), 'lobby con copia del codice');
 check(lobby.includes('1/2') && lobby.includes('connessi'), 'lobby mostra i giocatori connessi');
 check(lobby.includes('offline') && lobby.includes('host'), 'lobby distingue offline e host');
-check(lobby.includes('1.11.1'), 'lobby mostra la versione');
+check(lobby.includes('1.12.0'), 'lobby mostra la versione');
 // riepilogo condivisibile
 RS.scores = { Anna: 300, Bruno: 100 };
 RN.game = { g: 'impostore' };
@@ -394,7 +394,7 @@ check(q.run('backupReminder()') === '', 'senza dati il promemoria non compare');
 q.run('resetPrefs()');
 check(QS.timerPref === 120 && QS.mode === 'auto' && QS.ncPref.length === 0, 'ripristino preferenze giochi');
 q.run('showNews()');
-check(q.els.modal.innerHTML.includes('Novità 1.11.1'), 'la modale Novità è alla versione 1.11.1');
+check(q.els.modal.innerHTML.includes('Novità 1.12.0'), 'la modale Novità è alla versione 1.12.0');
 check(q.els.modal.innerHTML.includes('Colori e simboli dedicati'), 'le novità elencano i cosmetics');
 q.run('closeModal()');
 
@@ -534,6 +534,15 @@ c.run('showSettings()');
 check(c.els.modal.innerHTML.includes('Neon') && c.els.modal.innerHTML.includes('Ghiaccio'), 'i nuovi temi compaiono nelle impostazioni');
 check(/data-theme="neon"/.test(cssCos) && /data-theme="ghiaccio"/.test(cssCos), 'i nuovi temi hanno le variabili CSS');
 check(/#app\[data-game\]:after/.test(cssCos) && /prefers-contrast:more/.test(cssCos), 'sfondo per gioco e contrasto di sistema sono nel CSS');
+check(/\.confetti\{/.test(cssCos) && /@keyframes confetti/.test(cssCos), 'CSS dei coriandoli di vittoria');
+check(
+  /html\[data-motion="off"\] \.confetti\{display:none\}/.test(cssCos),
+  'i coriandoli si spengono con le animazioni disattivate'
+);
+check(
+  /html\[data-theme="neon"\] body\{background:#0a0616\}/.test(cssCos),
+  'ogni tema tinge anche lo sfondo'
+);
 CS.screen = 'play';
 CS.game = 'preferisci';
 CS.players = ['Anna', 'Bruno', 'Carla'];
@@ -548,6 +557,15 @@ c.run('pvShow()');
 c.run("pvVote('b')");
 const podium = c.run('summaryBar()');
 check(podium.includes('🥇') && podium.includes('🥈') && podium.includes('🥉'), 'il riepilogo mostra il podio top-3');
+check(
+  /podium-1/.test(podium) && /podium-2/.test(podium) && /podium-3/.test(podium),
+  'il podio ha le barre oro, argento e bronzo'
+);
+check(
+  typeof c.run('confettiBurst') === 'function' && typeof c.run('maybeConfetti') === 'function',
+  'i coriandoli sono collegati al riepilogo'
+);
+check(c.run('THEME_BG.neon') === '#0a0616' && c.run('THEME_BG.ghiaccio') === '#07131f', 'la mappa degli sfondi tema è coerente');
 check(c.run("joinPayload().name") === CS.players[0] || typeof c.run('joinPayload()') === 'object', 'il join include il payload avatar');
 check(c.run("sanitizeStats({recent:[{g:'lupus',t:1,w:'Anna'}]}).recent.length") === 1, 'recenti valide');
 

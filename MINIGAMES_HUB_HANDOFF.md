@@ -242,6 +242,14 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 
 ## 11. Cosa è stato corretto nell'ultima revisione
 
+### Versione 1.12.0 (cosmetics)
+- **Coriandoli di vittoria**: `confettiBurst()` crea 22 `<i>` in un contenitore fisso `.confetti` (CSS `@keyframes confetti`), con colori del tema; `maybeConfetti()` li lancia una sola volta per riepilogo tramite la firma `CONF_SIG` (gioco + nomi + punti) e viene chiamata da `render()` quando `summaryBar()` non è vuota. Rispetta `S.reduceMotion`, `html[data-motion="off"]` e `prefers-reduced-motion`; nessun dato salvato.
+- **Sfondi dei temi**: oltre alle variabili `--acc1/2/3` e `--btn1/2`, ogni tema tinge `body` (`oceano #04141d`, `tramonto #1a0e13`, `bosco #06140f`, `neon #0a0616`, `ghiaccio #07131f`); `THEME_BG` alimenta anche il `meta[name="theme-color"]` in `applyTheme()`, così la barra del browser segue il tema. L'alto contrasto manuale e `prefers-contrast:more` restano neri.
+- **Podio**: le prime tre righe del riepilogo hanno `.podium-1/2/3` con barra interna oro/argento/bronzo.
+- **Novità**: aggiunte `news14`/`news15` in IT/EN e messe in testa alla modale.
+- **Test**: `features.test.js` sale a **175** (CSS di coriandoli e spegnimento con animazioni off, sfondi tema, `THEME_BG`, barre del podio, funzioni collegate al riepilogo). **12/12 suite** verdi su sorgente e minificato.
+- `APP_VERSION` e `VERSION` portate a **1.12.0**; build: sorgente **488.283** byte, minificato **400.858** byte.
+
 ### Versione 1.11.1 (fix rielezione host)
 - **Race di rielezione**: quando l'host spariva, un client poteva superare un candidato con priorità più alta che non se n'era ancora accorto e autoproclamarsi, lasciando **due host** nella stanza. Ora: `netDial` segnala se il "no" è arrivato subito; `netTry` riprova un paio di volte lo stesso candidato prima di passare al successivo; `netIncoming`, se il client è in `recover` (o senza connessione), accetta la connessione di elezione e prende il comando invece di chiuderla; `netSettle` fa un ultimo controllo sul codice stanza (`mgh-<code>`) prima di autoproclamarsi, così chi si è già promosso viene trovato e si rientra. `netRejoin` accetta anche lo stato `elect`.
 - **Test**: `online.test.js` stabile su **52 esecuzioni consecutive** con Node 20; 12/12 suite verdi su sorgente e minificato. Il check del timer online ora attende il valore reale (`until`) invece di 1200 ms fissi, che falliva sui runner lenti. `tests/run-all.js` emette annotazioni `::error` con la suite fallita, così la CI è diagnosticabile anche senza i log del job. CI GitHub Actions verde su sorgente e minificato.
