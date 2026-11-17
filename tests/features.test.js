@@ -171,7 +171,7 @@ const lobby = resApp.run('viewOnline()');
 check(lobby.includes('copyCode()'), 'lobby con copia del codice');
 check(lobby.includes('1/2') && lobby.includes('connessi'), 'lobby mostra i giocatori connessi');
 check(lobby.includes('offline') && lobby.includes('host'), 'lobby distingue offline e host');
-check(lobby.includes('1.13.0'), 'lobby mostra la versione');
+check(lobby.includes('1.14.0'), 'lobby mostra la versione');
 // riepilogo condivisibile
 RS.scores = { Anna: 300, Bruno: 100 };
 RN.game = { g: 'impostore' };
@@ -394,7 +394,7 @@ check(q.run('backupReminder()') === '', 'senza dati il promemoria non compare');
 q.run('resetPrefs()');
 check(QS.timerPref === 120 && QS.mode === 'auto' && QS.ncPref.length === 0, 'ripristino preferenze giochi');
 q.run('showNews()');
-check(q.els.modal.innerHTML.includes('Novità 1.13.0'), 'la modale Novità è alla versione 1.13.0');
+check(q.els.modal.innerHTML.includes('Novità 1.14.0'), 'la modale Novità è alla versione 1.14.0');
 check(q.els.modal.innerHTML.includes('Colori e simboli dedicati'), 'le novità elencano i cosmetics');
 q.run('closeModal()');
 
@@ -612,6 +612,52 @@ check(
     /html\[data-motion="off"\] #app\.screen-in\{animation:none\}/.test(cssCos),
   'le nuove animazioni si spengono con meno movimento'
 );
+
+// --- 1.14.0: pacchetti suoni, volume, aptica e beep del timer ---
+check(
+  c.run('Object.keys(SND_PACK).join(",")') === 'soft,arcade,chime' &&
+    c.run('sndCfg().wave') === 'sine',
+  'ci sono tre pacchetti suoni e il predefinito è morbido'
+);
+c.run("setSndPack('arcade')");
+check(c.run('S.sndPack') === 'arcade' && c.run('sndCfg().wave') === 'square', 'il pacchetto scelto cambia timbro');
+check(c.run('backupData().sndPack') === 'arcade', 'il pacchetto suoni entra nel backup');
+c.run("setSndPack('chime')");
+check(c.run('S.sndPack') === 'chime' && c.run('sndCfg().gap') > c.run('SND_PACK.arcade.gap'), 'le campanelle hanno note più distanziate');
+
+check(c.run('S.vol') === 70 && Math.abs(c.run('sndLevel(1)') - 0.7) < 0.001, 'il volume parte al 70% e scala il guadagno');
+c.run('setVol(0)');
+check(c.run('S.vol') === 0 && c.run('sndLevel(1)') < 0.001 && c.run('sndReady()') === false, 'a volume zero non parte l’audio');
+c.run('setVol(100)');
+check(c.run('S.vol') === 100 && c.run('backupData().vol') === 100, 'il volume è salvato e incluso nel backup');
+const c3 = boot();
+c3.call('applyBackup', { players: ['Anna'], sndPack: 'chime', vol: 50 });
+check(c3.S.sndPack === 'chime' && c3.S.vol === 50, 'il ripristino riporta pacchetto e volume');
+
+const vib = [];
+c.ctx.navigator.vibrate = (p) => vib.push(p);
+c.run('VIB_LAST = 0');
+c.run("haptic('reveal')");
+check(JSON.stringify(vib[0]) === '[18]', 'l’aptica usa lo schema della rivelazione');
+c.run('S.vibOn = false');
+c.run('VIB_LAST = 0');
+c.run("haptic('wrong')");
+check(vib.length === 1, 'senza vibrazione attiva non parte nulla');
+c.run('S.vibOn = true');
+
+c.run('tmStart(120)');
+c.run('TMR.end = Date.now() + 9000');
+c.run('VIB_LAST = 0');
+c.run('tmTick()');
+check(c.run('TMR.beep10') === true && JSON.stringify(vib[vib.length - 1]) === '[10]', 'a 10 secondi scatta un beep/vibrazione una volta');
+c.run('tmAdd(60)');
+check(c.run('TMR.beep10') === false, 'aggiungendo un minuto il beep può riscattare');
+c.run('TMR.end = Date.now() - 1000');
+c.run('VIB_LAST = 0');
+c.run('tmTick()');
+check(c.run('TMR.done') === true && c.run('TMR.iv') === null, 'a zero il timer si chiude');
+check(JSON.stringify(vib[vib.length - 1]) === '[240,120,240]', 'la fine del timer vibra con lo schema lungo');
+check(typeof c.run('previewSnd') === 'function' && c.run('typeof setSndPack') === 'function', 'anteprima e scelta del pacchetto sono collegate');
 
 check(c.run("joinPayload().name") === CS.players[0] || typeof c.run('joinPayload()') === 'object', 'il join include il payload avatar');
 check(c.run("sanitizeStats({recent:[{g:'lupus',t:1,w:'Anna'}]}).recent.length") === 1, 'recenti valide');

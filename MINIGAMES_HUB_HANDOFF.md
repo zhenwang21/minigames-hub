@@ -242,6 +242,16 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 
 ## 11. Cosa è stato corretto nell'ultima revisione
 
+### Versione 1.14.0 (suoni, vibrazioni, timer)
+- **Pacchetti suoni**: `SND_PACK` (`soft` sine, `arcade` square, `chime` triangle) con `sndCfg()`, `sndLevel()` (volume 0–100, mai zero per le rampe esponenziali), `sndCtx()`/`tone()`/`releaseCtx()` condivisi. `winChime()` e `tmRing()` usano pacchetto e volume; `S.sndPack` e `S.vol` sono salvati, inclusi nel backup e ripristinati.
+- **Volume**: slider 0–100 in impostazioni (`setVol`), anteprima (`previewSnd`), `sndReady()` blocca l'audio a volume zero senza perdere l'impostazione.
+- **Aptica**: `haptic(kind)` con `VIB_PATTERN` (tap, reveal, correct, wrong, tick, end, win), throttle di 35 ms per evitare raffiche; usata in `reveal()`, `pvShow()`, fine timer e vittoria (`statsRecord`).
+- **Timer**: `TMR.beep10` fa scattare un beep+vibrazione una sola volta a 10 s; `tmAdd` lo riarma se si torna sopra i 10 s; a zero `tmRing()` usa lo schema lungo. `AUTO_BEEP` replica le soglie sul timer di round online senza ripetizioni.
+- **Impostazioni**: riga pacchetti con tre pulsanti e ▶, slider volume, etichette IT/EN (`setSndPack`, `sndSoft/Arcade/Chime`, `setVolume`, `previewSnd`).
+- **Novità**: `news18` IT/EN in testa alla modale.
+- **Test**: `features.test.js` sale a **212** (pacchetti e timbro, scala volume, backup/ripristino, schemi aptici e interruttore, beep a 10 s, riarmo, fine timer, anteprima). **12/12 suite** verdi su sorgente e minificato.
+- `APP_VERSION` e `VERSION` portate a **1.14.0**; build: sorgente **502.743** byte, minificato **412.370** byte.
+
 ### Versione 1.13.0 (personalizzazione e motion)
 - **Tema Carta**: settimo tema chiaro in `THEMES`, con override CSS per superfici (`.glass`, `bg-slate-*`), testi (`text-white/slate/emerald/amber/rose/cyan/purple`), input e `.av`; `color-scheme:light` e `THEME_BG.carta = #f7f2e8` (anche `theme-color`). Serve alle stanze luminose senza cambiare nessun gioco.
 - **Anteprime tema**: `THEME_ACC` (coppia di colori) alimenta `.theme-card`/`.tp` nelle impostazioni; `THEME_DOT` resta per usi compatti.

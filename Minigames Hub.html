@@ -534,6 +534,12 @@ const I = {
     settings: 'Impostazioni',
     setSound: 'Suoni',
     setVib: 'Vibrazione',
+    setSndPack: 'Pacchetto suoni',
+    sndSoft: 'Morbido',
+    sndArcade: 'Arcade',
+    sndChime: 'Campanelle',
+    setVolume: 'Volume',
+    previewSnd: 'Ascolta',
     setTheme: 'Tema',
     setOn: 'Attivo',
     setOff: 'Spento',
@@ -604,7 +610,7 @@ const I = {
     installed: 'App installata',
     offline: 'Offline',
     news: 'Novità',
-    newsTitle: 'Novità 1.13.0',
+    newsTitle: 'Novità 1.14.0',
     news9: 'Rinomina e annulla rimozione dei giocatori.',
     news10: 'Statistiche con ultime partite ed export CSV.',
     news11: 'Backup: unisci o sostituisci, con avviso di versione.',
@@ -614,6 +620,7 @@ const I = {
     news15: 'Temi con sfondo dedicato e podio con barre oro, argento e bronzo.',
     news16: 'Tema chiaro Carta, anteprime dei temi, font arrotondato e accento personalizzato.',
     news17: 'Corona all’host, fiamma per le serie vincenti e coriandoli diversi per gioco.',
+    news18: 'Tre pacchetti suoni, volume regolabile, vibrazioni più curate e beep del timer a 10 secondi e a zero.',
     news7: 'Colori e simboli dedicati per ogni gioco.',
     news8: 'Avatar e colori per i giocatori in liste, lobby e classifiche.',
     news1: 'Introduzione per i nuovi arrivati e partita demo.',
@@ -991,6 +998,12 @@ const I = {
     settings: 'Settings',
     setSound: 'Sounds',
     setVib: 'Vibration',
+    setSndPack: 'Sound pack',
+    sndSoft: 'Soft',
+    sndArcade: 'Arcade',
+    sndChime: 'Chimes',
+    setVolume: 'Volume',
+    previewSnd: 'Preview',
     setTheme: 'Theme',
     setOn: 'On',
     setOff: 'Off',
@@ -1061,7 +1074,7 @@ const I = {
     installed: 'App installed',
     offline: 'Offline',
     news: 'What’s new',
-    newsTitle: 'What’s new in 1.13.0',
+    newsTitle: 'What’s new in 1.14.0',
     news9: 'Rename players and undo a removal.',
     news10: 'Statistics with recent games and CSV export.',
     news11: 'Backup: merge or replace, with a version warning.',
@@ -1071,6 +1084,7 @@ const I = {
     news15: 'Themes with their own background and gold, silver and bronze podium bars.',
     news16: 'Light Paper theme, theme previews, rounded font and a custom accent.',
     news17: 'Crown on the host, flame for winning streaks and different confetti per game.',
+    news18: 'Three sound packs, adjustable volume, better haptics and timer beeps at 10 seconds and zero.',
     news7: 'Dedicated colours and symbols for every game.',
     news8: 'Avatars and colours for players in lists, lobbies and standings.',
     news1: 'A welcome intro for newcomers and a demo game.',
@@ -1216,7 +1230,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.13.0';
+const APP_VERSION = '1.14.0';
 // Ripresa dopo reload/standby: la sessione dura al massimo due ore.
 const RESUME_TTL = 2 * 60 * 60 * 1000;
 let RESUME = { room: null, snap: null, savedAt: 0, lastKey: '' };
@@ -3384,6 +3398,8 @@ function backupData() {
     theme: S.theme,
     accent: S.accent,
     font: S.font,
+    sndPack: S.sndPack,
+    vol: S.vol,
     snd: S.sndOn ? 1 : 0,
     vib: S.vibOn ? 1 : 0,
     lastGame: S.lastGame,
@@ -3632,6 +3648,8 @@ function applyBackup(d) {
   S.theme = THEMES.includes(d.theme) ? d.theme : S.theme;
   if (d.accent !== undefined) S.accent = normHex(d.accent);
   if (d.font !== undefined) S.font = d.font === 'round' ? 'round' : 'sans';
+  if (d.sndPack !== undefined) S.sndPack = Object.prototype.hasOwnProperty.call(SND_PACK, d.sndPack) ? d.sndPack : S.sndPack;
+  if (d.vol !== undefined) S.vol = Math.max(0, Math.min(100, Math.round(+d.vol || 0)));
   if (d.snd !== undefined) S.sndOn = d.snd !== 0 && d.snd !== false;
   if (d.vib !== undefined) S.vibOn = d.vib !== 0 && d.vib !== false;
   S.stats = sanitizeStats(d.stats);
@@ -6433,6 +6451,8 @@ const S = {
   accent: '',
   font: 'sans',
   sndOn: true,
+  sndPack: 'soft',
+  vol: 70,
   vibOn: true,
   lastGame: '',
   stats: { games: 0, byGame: {}, wins: {}, played: {}, streak: {}, best: {}, recent: [] },
@@ -6485,7 +6505,9 @@ const norm = (s) =>
 // Sempre visibile nell'angolo nei giochi testuali (tutti tranne Lupus).
 // Il timer conta su una scadenza assoluta (Date.now), non sui tick: cosi' non
 // perde secondi quando il telefono va in standby o la scheda in background.
-const TMR = { left: 0, total: 0, end: 0, iv: null, done: false, ui: '' };
+const TMR = { left: 0, total: 0, end: 0, iv: null, done: false, ui: '', beep10: false };
+// Beep una sola volta per ciascuna soglia anche sul timer di round online.
+let AUTO_BEEP = { sig: '', ten: false, zero: false };
 function tmFmt(s) {
   return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
 }
@@ -6512,6 +6534,7 @@ function tmClear() {
   TMR.left = 0;
   TMR.end = 0;
   TMR.done = false;
+  TMR.beep10 = false;
 }
 function tmDraw() {
   const el = $('tmr');
@@ -6528,7 +6551,20 @@ function tmDraw() {
   }
   let html;
   if (tmAuto()) {
-    const left = tmAutoLeft();
+    const v = NET.view || {},
+      left = tmAutoLeft(),
+      sig = String(v.end || v.left || '');
+    if (sig !== AUTO_BEEP.sig) AUTO_BEEP = { sig: sig, ten: false, zero: false };
+    if (left <= 10 && left > 0 && !AUTO_BEEP.ten) {
+      AUTO_BEEP.ten = true;
+      tmBeep(false);
+      haptic('tick');
+    }
+    if (left <= 0 && !AUTO_BEEP.zero) {
+      AUTO_BEEP.zero = true;
+      tmBeep(true);
+      haptic('end');
+    }
     html =
       `<div class="tmr-box auto${left <= 30 ? ' fin' : ''}"><span aria-hidden="true">⏱️</span>` +
       `<span aria-label="${X('Tempo rimasto', 'Time left')}">${tmFmt(left)}</span></div>`;
@@ -6563,6 +6599,11 @@ function tmDraw() {
 function tmTick() {
   if (!TMR.iv) return;
   TMR.left = tmLeft();
+  if (TMR.left <= 10 && TMR.left > 0 && !TMR.beep10) {
+    TMR.beep10 = true;
+    tmBeep(false);
+    haptic('tick');
+  }
   if (TMR.left <= 0) {
     clearInterval(TMR.iv);
     TMR.iv = null;
@@ -6584,6 +6625,7 @@ function tmStart(sec) {
 function tmAdd(sec) {
   if (!TMR.iv) return;
   TMR.end += Math.max(1, +sec || 60) * 1000;
+  if (tmLeft() > 10) TMR.beep10 = false;
   tmTick();
 }
 function tmDismiss() {
@@ -6609,41 +6651,93 @@ function audioUnlock() {
     s.start(0);
   } catch (e) {}
 }
-function tmRing() {
-  if (S.vibOn) {
-    try {
-      navigator.vibrate && navigator.vibrate([240, 120, 240]);
-    } catch (e) {}
-  }
-  announce(t('timeUp'));
-  if (!S.sndOn) return;
+// --- audio e aptica ---
+// Tre pacchetti: cambiano timbro, durata e distanza tra le note.
+const SND_PACK = {
+  soft: { wave: 'sine', gap: 0.16, dur: 0.26, level: 0.16 },
+  arcade: { wave: 'square', gap: 0.085, dur: 0.13, level: 0.07 },
+  chime: { wave: 'triangle', gap: 0.13, dur: 0.2, level: 0.18 }
+};
+function sndCfg() {
+  return SND_PACK[S.sndPack] || SND_PACK.soft;
+}
+// Il volume è 0–100; il guadagno non arriva mai a zero (le rampe esponenziali lo rifiutano).
+function sndLevel(base) {
+  const v = Math.max(0, Math.min(100, +S.vol || 0));
+  return Math.max(0.0002, (base || 0.15) * (v / 100));
+}
+function sndReady() {
+  return S.sndOn && (+S.vol || 0) > 0;
+}
+function sndCtx() {
+  const A = window.AudioContext || window.webkitAudioContext;
+  if (!A) return null;
+  const c = AC || new A();
+  if (c.state === 'suspended') c.resume();
+  return c;
+}
+function tone(c, f, at, dur, wave, level) {
+  const o = c.createOscillator(),
+    g = c.createGain();
+  o.type = wave;
+  o.frequency.value = f;
+  g.gain.setValueAtTime(0.0001, at);
+  g.gain.exponentialRampToValueAtTime(level, at + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+  o.connect(g).connect(c.destination);
+  o.start(at);
+  o.stop(at + dur + 0.02);
+}
+function releaseCtx(c, ms) {
+  if (!AC)
+    setTimeout(() => {
+      try {
+        c.close();
+      } catch (e) {}
+    }, ms || 1200);
+}
+// Aptica: schemi brevi e distinti, solo con la vibrazione attiva.
+let VIB_LAST = 0;
+const VIB_PATTERN = {
+  tap: [12],
+  reveal: [18],
+  correct: [20, 55, 20],
+  wrong: [45, 70, 45],
+  tick: [10],
+  end: [240, 120, 240],
+  win: [30, 45, 30, 45, 70]
+};
+function haptic(kind) {
+  if (!S.vibOn) return;
+  const now = Date.now();
+  if (now - VIB_LAST < 35) return;
+  VIB_LAST = now;
   try {
-    const A = window.AudioContext || window.webkitAudioContext;
-    if (!A) return;
-    const c = AC || new A();
-    if (c.state === 'suspended') c.resume();
-    [0, 0.28, 0.56].forEach((off) => {
-      const o = c.createOscillator(),
-        g = c.createGain(),
-        at = c.currentTime + off;
-      o.type = 'sine';
-      o.frequency.value = off === 0.28 ? 740 : 880;
-      g.gain.setValueAtTime(0.0001, at);
-      g.gain.exponentialRampToValueAtTime(0.25, at + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, at + 0.22);
-      o.connect(g).connect(c.destination);
-      o.start(at);
-      o.stop(at + 0.24);
-    });
-    if (!AC)
-      setTimeout(() => {
-        try {
-          c.close();
-        } catch (e) {}
-      }, 1200);
+    navigator.vibrate && navigator.vibrate(VIB_PATTERN[kind] || VIB_PATTERN.tap);
   } catch (e) {}
 }
-// Piccolo accordo di vittoria diverso per gioco; rispetta l'interruttore audio.
+// Beep di avviso: uno breve a 10 secondi, un triplo più pieno a zero.
+function tmBeep(last) {
+  if (!sndReady()) return;
+  try {
+    const c = sndCtx();
+    if (!c) return;
+    const cfg = sndCfg(),
+      at = c.currentTime;
+    tone(c, last ? 660 : 880, at, last ? 0.3 : 0.14, cfg.wave, sndLevel(last ? cfg.level * 1.2 : cfg.level * 0.8));
+    if (last) {
+      tone(c, 880, at + 0.16, 0.32, cfg.wave, sndLevel(cfg.level * 1.2));
+      tone(c, 1100, at + 0.34, 0.38, cfg.wave, sndLevel(cfg.level * 1.2));
+    }
+    releaseCtx(c, 1000);
+  } catch (e) {}
+}
+function tmRing() {
+  haptic('end');
+  announce(t('timeUp'));
+  tmBeep(true);
+}
+// Piccolo accordo di vittoria diverso per gioco; rispetta audio e volume.
 const CHIME = {
   impostore: [523, 659, 784],
   mrwhite: [494, 587, 740],
@@ -6655,31 +6749,15 @@ const CHIME = {
   chisono: [659, 784, 988]
 };
 function winChime(gid) {
-  if (!S.sndOn) return;
+  if (!sndReady()) return;
   try {
-    const A = window.AudioContext || window.webkitAudioContext;
-    if (!A) return;
-    const c = AC || new A();
-    if (c.state === 'suspended') c.resume();
+    const c = sndCtx();
+    if (!c) return;
+    const cfg = sndCfg();
     (CHIME[gid] || CHIME.impostore).forEach((f, i) => {
-      const o = c.createOscillator(),
-        g = c.createGain(),
-        at = c.currentTime + i * 0.13;
-      o.type = 'triangle';
-      o.frequency.value = f;
-      g.gain.setValueAtTime(0.0001, at);
-      g.gain.exponentialRampToValueAtTime(0.18, at + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, at + 0.2);
-      o.connect(g).connect(c.destination);
-      o.start(at);
-      o.stop(at + 0.22);
+      tone(c, f, c.currentTime + i * cfg.gap, cfg.dur, cfg.wave, sndLevel(cfg.level));
     });
-    if (!AC)
-      setTimeout(() => {
-        try {
-          c.close();
-        } catch (e) {}
-      }, 1000);
+    releaseCtx(c, 1000);
   } catch (e) {}
 }
 function discRow() {  return `<div class="flex gap-2 justify-center items-center flex-wrap"><button onclick="showHelp('rules')" aria-label="${X('Apri le regole', 'Open the rules')}" class="px-2.5 py-1.5 rounded-lg bg-slate-800 text-[11px] font-bold text-slate-300">📖 ${X('Regole', 'Rules')}</button></div>`;
@@ -7051,6 +7129,7 @@ function startGame() {
 }
 function reveal() {
   S.G.shown = true;
+  haptic('reveal');
   render();
 }
 function hideNext() {
@@ -8939,6 +9018,7 @@ function startPref() {
 }
 function pvShow() {
   S.G.shown = true;
+  haptic('reveal');
   render();
 }
 function pvVote(k) {
@@ -10416,6 +10496,7 @@ function statsRecord(gid, base, onlyIfScored) {
   st.recent = st.recent.slice(0, 20);
   statsPrune();
   winChime(gid);
+  haptic('win');
   announce(t('gameOver'));
 }
 // Evita che il file di salvataggio cresca senza limite: restano i 40 nomi più presenti.
@@ -10526,6 +10607,20 @@ function toggleSnd() {
   S.sndOn = !S.sndOn;
   saveLocal();
   showSettings();
+}
+function setSndPack(v) {
+  S.sndPack = Object.prototype.hasOwnProperty.call(SND_PACK, v) ? v : 'soft';
+  saveLocal();
+  showSettings();
+}
+function setVol(v) {
+  S.vol = Math.max(0, Math.min(100, Math.round(+v || 0)));
+  saveLocal();
+  showSettings();
+}
+function previewSnd() {
+  winChime('impostore');
+  haptic('tap');
 }
 function toggleVib() {
   S.vibOn = !S.vibOn;
@@ -10829,7 +10924,7 @@ function clearLocalData() {
 function showNews() {
   const m = $('modal');
   if (!m) return;
-  const items = ['news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
+  const items = ['news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">✨ ${t('newsTitle')}</h3><ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">${items.map((k) => `<li>${t(k)}</li>`).join('')}</ul><button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
   modalOpen();
 }
@@ -10934,6 +11029,21 @@ function showSettings() {
     <button onclick="toggleSnd()" ${row(S.sndOn)}><span>🔔 ${t('setSound')}</span><span class="${S.sndOn ? 'text-emerald-400' : 'text-slate-500'}">${S.sndOn ? t('setOn') : t('setOff')}</span></button>
     <button onclick="toggleVib()" ${row(S.vibOn)}><span>📳 ${t('setVib')}</span><span class="${S.vibOn ? 'text-emerald-400' : 'text-slate-500'}">${S.vibOn ? t('setOn') : t('setOff')}</span></button>
   </div>
+  <div class="space-y-1.5"><p class="text-xs font-bold text-slate-300">🎵 ${t('setSndPack')}</p>
+    <div class="flex gap-2">${[
+      ['soft', t('sndSoft')],
+      ['arcade', t('sndArcade')],
+      ['chime', t('sndChime')]
+    ]
+      .map(
+        ([v, l]) =>
+          `<button onclick="setSndPack('${v}')" aria-pressed="${S.sndPack === v}" class="flex-1 py-2 rounded-lg text-[11px] font-bold ${S.sndPack === v ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-400'}">${l}</button>`
+      )
+      .join('')}<button onclick="previewSnd()" class="px-3 py-2 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300" aria-label="${t('previewSnd')}" title="${t('previewSnd')}">▶</button></div>
+  </div>
+  <div class="space-y-1"><div class="flex justify-between"><p class="text-xs font-bold text-slate-300">🔊 ${t('setVolume')}</p><span class="text-[11px] text-slate-400">${S.vol}%</span></div>
+    <input type="range" min="0" max="100" step="5" value="${S.vol}" onchange="setVol(this.value)" aria-label="${t('setVolume')}" class="w-full accent-emerald-500">
+  </div>
   <div class="space-y-2"><p class="text-xs font-bold text-slate-300">🎨 ${t('setTheme')}</p>
     <div class="grid grid-cols-2 gap-2">${th
       .map(
@@ -11034,6 +11144,8 @@ function saveLocal() {
       theme: S.theme,
       accent: S.accent,
       font: S.font,
+      sndPack: S.sndPack,
+      vol: S.vol,
       snd: S.sndOn ? 1 : 0,
       vib: S.vibOn ? 1 : 0,
       lastGame: S.lastGame,
@@ -11082,6 +11194,8 @@ function loadLocal() {
     S.theme = THEMES.includes(d.theme) ? d.theme : 'viola';
     S.accent = normHex(d.accent);
     S.font = d.font === 'round' ? 'round' : 'sans';
+    S.sndPack = Object.prototype.hasOwnProperty.call(SND_PACK, d.sndPack) ? d.sndPack : 'soft';
+    S.vol = [0, 25, 50, 75, 100].includes(+d.vol) ? +d.vol : Math.max(0, Math.min(100, Math.round(+d.vol || 70)));
     S.sndOn = d.snd !== 0 && d.snd !== false;
     S.vibOn = d.vib !== 0 && d.vib !== false;
     S.stats = sanitizeStats(d.stats);

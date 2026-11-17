@@ -4,6 +4,29 @@
 release number; `sw.js` must follow it. Older history (1.2–1.5) is described in
 `MINIGAMES_HUB_HANDOFF.md`.
 
+## 1.14.0 — 2026-11-17
+
+### Added
+- **Sound packs** — Soft, Arcade and Chimes change the timbre, note spacing and
+  duration of the victory chime and timer beeps, with a preview button.
+- **Volume slider** — 0–100% on top of the on/off switch; at zero the app stays
+  silent without touching the saved choice.
+- **Haptics** — short, distinct vibration patterns for revealing a card,
+  correct/wrong answers, the 10-second warning, time-up and a win, all gated by
+  the existing vibration switch.
+- **Timer beeps** — one short beep and vibration at 10 seconds and a fuller
+  triple beep at zero, both for the discussion timer and the online round timer;
+  adding a minute re-arms the warning.
+
+### Changed
+- Settings now group sound, sound pack, volume and vibration together; sound
+  pack and volume are saved locally and included in the backup.
+- Minified build: 412,370 bytes; source: 502,743 bytes.
+
+### Tests
+- `features.test.js` at 212 checks; 12/12 suites green on source and minified
+  build.
+
 ## 1.13.0 — 2026-11-17
 
 ### Added
