@@ -540,6 +540,16 @@ const I = {
     summaryNone: 'Nessun punto questa volta.',
     roomPlayers: 'connessi',
     roomCopy: 'Copia codice',
+  roomPin: 'PIN stanza',
+  roomPinShort: 'PIN',
+  roomPinOn: 'PIN attivo',
+  roomPinSet: 'Imposta PIN',
+  roomPinRemove: 'Togli PIN',
+  roomPinHint: 'PIN della stanza: 4 cifre, vuoto per toglierlo',
+  qrBig: 'QR grande',
+  qrSmall: 'QR piccolo',
+  qrSave: 'Scarica QR',
+  qrSaved: 'QR scaricato.',
     roomVersion: 'versione',
     roomNoticeNew: 'Il codice è cambiato: condividi il nuovo invito.',
     settings: 'Impostazioni',
@@ -621,7 +631,7 @@ const I = {
     installed: 'App installata',
     offline: 'Offline',
     news: 'Novità',
-    newsTitle: 'Novità 1.15.0',
+    newsTitle: 'Novità 1.16.0',
     news9: 'Rinomina e annulla rimozione dei giocatori.',
     news10: 'Statistiche con ultime partite ed export CSV.',
     news11: 'Backup: unisci o sostituisci, con avviso di versione.',
@@ -633,6 +643,7 @@ const I = {
     news17: 'Corona all’host, fiamma per le serie vincenti e coriandoli diversi per gioco.',
     news18: 'Tre pacchetti suoni, volume regolabile, vibrazioni più curate e beep del timer a 10 secondi e a zero.',
     news19: 'Risultati condivisibili come immagine, scorciatoie PWA per i giochi, schermo acceso durante i timer e una pagina Privacy.',
+    news20: 'Host: passa il comando, riordina i giocatori, PIN stanza e QR più grande o scaricabile. Banner per chi è offline.',
     news7: 'Colori e simboli dedicati per ogni gioco.',
     news8: 'Avatar e colori per i giocatori in liste, lobby e classifiche.',
     news1: 'Introduzione per i nuovi arrivati e partita demo.',
@@ -1012,6 +1023,16 @@ const I = {
     summaryNone: 'No points this time.',
     roomPlayers: 'online',
     roomCopy: 'Copy code',
+  roomPin: 'Room PIN',
+  roomPinShort: 'PIN',
+  roomPinOn: 'PIN on',
+  roomPinSet: 'Set PIN',
+  roomPinRemove: 'Remove PIN',
+  roomPinHint: 'Room PIN: 4 digits, empty to remove it',
+  qrBig: 'Big QR',
+  qrSmall: 'Small QR',
+  qrSave: 'Download QR',
+  qrSaved: 'QR downloaded.',
     roomVersion: 'version',
     roomNoticeNew: 'The code changed: share the new invite.',
     settings: 'Settings',
@@ -1093,7 +1114,7 @@ const I = {
     installed: 'App installed',
     offline: 'Offline',
     news: 'What’s new',
-    newsTitle: 'What’s new in 1.15.0',
+    newsTitle: 'What’s new in 1.16.0',
     news9: 'Rename players and undo a removal.',
     news10: 'Statistics with recent games and CSV export.',
     news11: 'Backup: merge or replace, with a version warning.',
@@ -1105,6 +1126,7 @@ const I = {
     news17: 'Crown on the host, flame for winning streaks and different confetti per game.',
     news18: 'Three sound packs, adjustable volume, better haptics and timer beeps at 10 seconds and zero.',
     news19: 'Results shared as an image, PWA shortcuts for the games, screen kept awake during timers and a privacy page.',
+    news20: 'Host tools: pass control, reorder players, room PIN and a bigger or downloadable QR. Banner for offline players.',
     news7: 'Dedicated colours and symbols for every game.',
     news8: 'Avatars and colours for players in lists, lobbies and standings.',
     news1: 'A welcome intro for newcomers and a demo game.',
@@ -1232,6 +1254,7 @@ const NET = {
   host: false,
   code: '',
   name: '',
+  pin: '',
   hostName: '',
   origHost: '',
   players: [],
@@ -1257,7 +1280,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.15.0';
+const APP_VERSION = '1.16.0';
 // Ripresa dopo reload/standby: la sessione dura al massimo due ore.
 const RESUME_TTL = 2 * 60 * 60 * 1000;
 let RESUME = { room: null, snap: null, savedAt: 0, lastKey: '' };
@@ -1367,6 +1390,7 @@ function netReset() {
     code: '',
     hostName: '',
     origHost: '',
+    pin: '',
     players: [],
     order: [],
     peers: {},
@@ -1435,6 +1459,7 @@ function tryCode(k) {
     RESUME.muted = '';
     NET.host = true;
     NET.code = code;
+    NET.pin = '';
     NET.hostName = NET.name;
     NET.origHost = NET.name;
     NET.players = [NET.name];
@@ -1532,6 +1557,11 @@ function hostMsg(c, m) {
   }
   if (!n) {
     c.send({ t: 'rej', why: 'name' });
+    setTimeout(() => c.close(), 100);
+    return;
+  }
+  if (!pinOk(m.pin)) {
+    c.send({ t: 'rej', why: 'pin' });
     setTimeout(() => c.close(), 100);
     return;
   }
@@ -1690,6 +1720,8 @@ function netJoin(codeArg, nameArg) {
     NET.err = X('Inserisci il codice stanza (5 caratteri).', 'Enter the room code (5 characters).');
     return render();
   }
+  const pe = $('on-pin');
+  NET.pin = pinClean(pe ? pe.value : NET.pin);
   NET.lastCode = code;
   netLoad(() => {
     const p = new Peer();
@@ -1784,6 +1816,7 @@ function restoreState(s, code, p) {
   NET.order = Array.isArray(s.order) && s.order.length ? s.order.slice() : NET.players.slice();
   NET.peers = { ...(s.peers || {}) };
   if (p) NET.peers[NET.hostName] = p.id;
+  NET.pin = s.pin || '';
   NET.scores = { ...(s.scores || {}) };
   S.scores = { ...NET.scores };
   NET.offline = {};
@@ -1979,7 +2012,9 @@ function netClientMsg(m, c) {
               "La partita è già iniziata o il tuo posto è scaduto: chiedi all'host di tornare in lobby.",
               'The game has already started or your seat expired: ask the host to go back to the lobby.'
             )
-          : m.why === 'version'
+          : m.why === 'pin'
+            ? X('PIN della stanza errato o mancante.', 'Wrong or missing room PIN.')
+            : m.why === 'version'
             ? X(
                 'Versione non aggiornata. Ricarica la pagina!',
                 'Outdated version. Reload the page!'
@@ -2038,6 +2073,7 @@ function netSnap() {
     players: NET.players.slice(),
     order: NET.order.slice(),
     peers: { ...NET.peers },
+    pin: NET.pin,
     scores: { ...NET.scores },
     game: copy(NET.game),
     sg: copy(S.G),
@@ -2184,6 +2220,7 @@ function netPromote(snap, conn) {
     players: NET.players.slice(),
     order: NET.order.slice(),
     peers: { ...NET.peers },
+    pin: NET.pin,
     scores: { ...NET.scores },
     game: null,
     sg: null,
@@ -2204,6 +2241,7 @@ function netPromote(snap, conn) {
   NET.order = (s.order || NET.players || []).slice();
   NET.peers = { ...(s.peers || {}) };
   if (NET.peer && NET.peer.id) NET.peers[NET.name] = NET.peer.id;
+  NET.pin = s.pin || '';
   NET.scores = { ...(s.scores || NET.scores) };
   NET.origHost = s.origHost || s.host || NET.name;
   NET.game = s.game || null;
@@ -2355,7 +2393,16 @@ function joinPayload() {
   const o = { t: 'join', name: NET.name, v: APP_VERSION },
     i = S.avMap ? S.avMap[NET.name] : null;
   if (Number.isInteger(i)) o.av = i;
+  if (NET.pin) o.pin = NET.pin;
   return o;
+}
+// PIN facoltativo della stanza: 4 cifre, solo per fermare gli ingressi per sbaglio.
+function pinClean(v) {
+  const s = String(v == null ? '' : v).replace(/\D/g, '').slice(0, 4);
+  return s.length === 4 ? s : '';
+}
+function pinOk(v) {
+  return !NET.pin || pinClean(v) === NET.pin;
 }
 function netAct(m) {
   if (NET.host) hostApply(NET.name, m);
@@ -3297,6 +3344,80 @@ function netKick(i) {
   hostBc();
   netPresence();
 }
+// Ordine dei giocatori (solo host, solo lobby): cambia i turni senza ricreare la stanza.
+function netMovePlayer(i, dir) {
+  if (!NET.host || NET.game) return;
+  const j = i + (+dir || 0),
+    P = NET.players;
+  if (i < 0 || j < 0 || i >= P.length || j >= P.length) return;
+  const a = P[i],
+    b = P[j];
+  P[i] = b;
+  P[j] = a;
+  const oi = NET.order.indexOf(a),
+    oj = NET.order.indexOf(b);
+  if (oi >= 0 && oj >= 0) {
+    NET.order[oi] = b;
+    NET.order[oj] = a;
+  }
+  NET.lastSnap = '';
+  hostBc();
+  netPresence();
+}
+// Passaggio volontario del comando: l'host sceglie chi continua la stanza.
+function netPassHost(i) {
+  if (!NET.host || NET.game) return;
+  const name = NET.players[i];
+  if (!name || name === NET.name) return;
+  const c = NET.conns[name];
+  if (!c) {
+    alert(X(name + ' è offline: riprova quando rientra.', name + ' is offline: try again when they are back.'));
+    return;
+  }
+  if (!confirm(X('Passare il comando a ' + name + '?', 'Pass control to ' + name + '?'))) return;
+  const snap = netSnap();
+  snap.origHost = name;
+  c._n = name;
+  try {
+    c.send({ t: 'become', snap });
+  } catch (e) {}
+  const others = Object.values(NET.conns).filter((x) => x !== c);
+  others.forEach((x) => {
+    try {
+      x.send({ t: 'moved', host: c.peer, name });
+    } catch (e) {}
+  });
+  NET.conn = c;
+  NET.conns = {};
+  NET.view = null;
+  NET.host = false;
+  NET.hostName = name;
+  NET.peers[name] = c.peer;
+  NET.elec = true;
+  NET.st = 'elect';
+  NET.err = X('Comando passato a ' + name + '.', 'Control passed to ' + name + '.');
+  c.on('data', (m) => netClientMsg(m, c));
+  c.on('close', () => {
+    if (NET.host || NET.conn !== c) return;
+    NET.conn = null;
+    NET.elec = true;
+    NET.st = 'elect';
+    netTry([name], 0);
+  });
+  setTimeout(() => {
+    try {
+      NET.roomPeer && NET.roomPeer.destroy();
+    } catch (e) {}
+    NET.roomPeer = null;
+    clearTimeout(NET.roomT);
+    others.forEach((x) => {
+      try {
+        x.close();
+      } catch (e) {}
+    });
+  }, 150);
+  render();
+}
 function appBase() {
   let base = '';
   try {
@@ -3307,7 +3428,7 @@ function appBase() {
   return base || 'https://zhenwang21.github.io/minigames-hub/';
 }
 function inviteLink() {
-  return appBase() + '#room=' + encodeURIComponent(NET.code || '');
+  return appBase() + '#room=' + encodeURIComponent(NET.code || '') + (NET.pin ? '&pin=' + NET.pin : '');
 }
 function inviteQr() {
   try {
@@ -3319,18 +3440,51 @@ function inviteQr() {
     return '';
   }
 }
+let QR_BIG = false;
 function showInvite() {
   const m = $('modal'),
     link = inviteLink(),
     qr = inviteQr();
+  if (!m) return;
+  const size = QR_BIG ? 320 : 220;
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">📤 ${t('inviteTitle')}</h3>
   <p class="text-xs text-slate-400">${t('inviteHint')}</p>
-  ${qr ? `<div class="bg-white p-2 rounded-xl" style="max-width:220px;margin:0 auto">${qr}</div>` : ''}
+  ${qr ? `<div class="bg-white p-2 rounded-xl" style="max-width:${size}px;margin:0 auto">${qr}</div>` : ''}
+  ${qr ? `<div class="grid grid-cols-2 gap-2"><button onclick="QR_BIG=!QR_BIG;showInvite()" class="bg-slate-800 py-2 rounded-xl text-[11px] font-bold">${QR_BIG ? '🔍 ' + t('qrSmall') : '🔎 ' + t('qrBig')}</button><button onclick="qrDownload()" class="bg-slate-800 py-2 rounded-xl text-[11px] font-bold">⬇️ ${t('qrSave')}</button></div>` : ''}
   <p class="text-center text-lg font-extrabold tracking-widest gtext">${esc(NET.code)}</p>
+  ${NET.pin ? `<p class="text-center text-[11px] text-amber-300">🔒 ${t('roomPin')}: <b>${esc(NET.pin)}</b></p>` : ''}
+  ${NET.host ? `<button onclick="setRoomPin(1)" class="w-full bg-slate-800 py-2 rounded-xl text-[11px] font-bold">${NET.pin ? '🔓 ' + t('roomPinRemove') : '🔒 ' + t('roomPinSet')}</button>` : ''}
   <div class="bg-slate-900 rounded-xl p-2 text-[10px] text-slate-400 break-all select-text">${esc(link)}</div>
   <div class="grid grid-cols-2 gap-2"><button onclick="copyInvite()" class="bg-slate-800 py-2.5 rounded-xl text-xs font-bold">📋 ${t('copyLink')}</button><button onclick="shareInvite()" class="gbtn py-2.5 rounded-xl text-xs font-bold">${t('share')}</button></div>
   <button onclick="closeModal()" class="w-full bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
   modalOpen();
+}
+function qrDownload() {
+  const svg = inviteQr();
+  if (!svg) return copyInvite();
+  try {
+    const blob = new Blob([svg], { type: 'image/svg+xml' }),
+      url = URL.createObjectURL(blob),
+      a = document.createElement('a');
+    a.href = url;
+    a.download = 'minigames-hub-qr.svg';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+    announce(t('qrSaved'));
+  } catch (e) {
+    copyInvite();
+  }
+}
+function setRoomPin(refresh) {
+  if (!NET.host || NET.game) return;
+  const v = prompt(t('roomPinHint'), NET.pin || '');
+  if (v === null) return;
+  NET.pin = pinClean(v);
+  NET.lastSnap = '';
+  render();
+  if (refresh) showInvite();
 }
 function copyText(txt, msg) {
   const done = () => alert(msg || t('copied'));
@@ -3514,6 +3668,8 @@ function parseInvite() {
     return;
   }
   NET.lastCode = m[1].toUpperCase();
+  const pm = hash.match(/pin=(\d{4})/i);
+  if (pm) NET.pin = pm[1];
   NET.err = '';
   S.hint = 'invite';
   S.screen = 'online';
@@ -3870,14 +4026,14 @@ function viewOnline() {
   if (NET.st === 'lobby' && NET.view) return noteBanner() + offBan + viewNetGame() + hostBar();
   if (NET.st === 'lobby') {
     const onN = NET.players.filter((p) => !off.includes(p)).length;
-    return noteBanner() + `<div class="space-y-4 py-2"><div class="text-center"><p class="text-xs text-slate-400">${X('Codice stanza', 'Room code')}</p><h2 class="text-4xl font-extrabold tracking-widest gtext">${esc(NET.code)}</h2><button onclick="copyCode()" class="mt-1 text-[11px] bg-slate-800 px-3 py-1.5 rounded-lg font-bold" aria-label="${t('roomCopy')} ${esc(NET.code)}">📋 ${t('roomCopy')}</button><p class="text-[11px] text-slate-500 mt-2">${X('Gli altri aprono la stessa pagina, scelgono Online e inseriscono il codice.', 'Others open the same page, choose Online and enter the code.')}</p><p class="text-[11px] text-slate-500 mt-1">${X('Se ricarichi la pagina, rientra con lo stesso nome entro 60 secondi.', 'If you reload, rejoin with the same name within 60 seconds.')}</p><button onclick="showInvite()" class="mt-2 w-full bg-slate-800 py-2.5 rounded-xl text-xs font-bold">📤 ${t('inviteTitle')}</button></div>
+    return noteBanner() + offBan + `<div class="space-y-4 py-2"><div class="text-center"><p class="text-xs text-slate-400">${X('Codice stanza', 'Room code')}</p><h2 class="text-4xl font-extrabold tracking-widest gtext">${esc(NET.code)}</h2><button onclick="copyCode()" class="mt-1 text-[11px] bg-slate-800 px-3 py-1.5 rounded-lg font-bold" aria-label="${t('roomCopy')} ${esc(NET.code)}">📋 ${t('roomCopy')}</button><p class="text-[11px] text-slate-500 mt-2">${X('Gli altri aprono la stessa pagina, scelgono Online e inseriscono il codice.', 'Others open the same page, choose Online and enter the code.')}</p><p class="text-[11px] text-slate-500 mt-1">${X('Se ricarichi la pagina, rientra con lo stesso nome entro 60 secondi.', 'If you reload, rejoin with the same name within 60 seconds.')}</p><div class="grid grid-cols-2 gap-2 mt-2"><button onclick="showInvite()" class="bg-slate-800 py-2.5 rounded-xl text-xs font-bold">📤 ${t('inviteTitle')}</button>${NET.host ? `<button onclick="setRoomPin(0)" class="bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${NET.pin ? '🔒 ' + t('roomPinOn') : '🔓 ' + t('roomPin')}</button>` : ''}</div></div>
   ${NET.err ? `<p class="text-[11px] text-amber-300 text-center">${esc(NET.err)}</p>` : ''}
   ${NET.notice ? `<div class="text-[11px] bg-amber-500/10 border border-amber-500/40 text-amber-200 rounded-xl px-3 py-2 text-center space-y-1"><p>${esc(NET.notice)}</p><button onclick="showInvite()" class="underline font-bold">${t('roomNoticeNew')}</button></div>` : ''}
   <div class="flex justify-between text-[11px] text-slate-400 px-1"><span>🟢 ${onN}/${NET.players.length} ${t('roomPlayers')}</span><span>${t('roomVersion')} ${APP_VERSION}</span></div>
   <div class="space-y-1.5">${NET.players
     .map(
       (p, i) =>
-        `<div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl text-sm"><span class="flex items-center gap-2"><span style="width:.5rem;height:.5rem;border-radius:9999px;display:inline-block;background:${off.includes(p) ? '#fbbf24' : '#34d399'}"></span>${p === NET.name ? `<button onclick="avatarPickNet()" class="shrink-0" aria-label="${t('avatarPick')}" title="${t('avatarPick')}">${avHtml(p, p === NET.hostName ? 'host' : '')}</button>` : avHtml(p, p === NET.hostName ? 'host' : '')}<b>${esc(p)}${p === NET.name ? ' (' + X('tu', 'you') + ')' : ''}</b>${p === NET.hostName ? '<span class="text-[10px] bg-purple-600/30 text-purple-200 px-1.5 py-0.5 rounded-full">host</span>' : ''}</span><span class="flex items-center gap-2">${off.includes(p) ? `<span class="text-[10px] text-amber-300">${X('offline', 'offline')}</span>` : ''}${NET.host && p !== NET.hostName ? `<button onclick="netKick(${i})" class="text-rose-400/80 hover:text-rose-300 text-xs px-1" aria-label="${X('Espelli', 'Kick')} ${esc(p)}" title="${X('Espelli', 'Kick')}">✕</button>` : ''}</span></div>`
+        `<div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl text-sm"><span class="flex items-center gap-2"><span style="width:.5rem;height:.5rem;border-radius:9999px;display:inline-block;background:${off.includes(p) ? '#fbbf24' : '#34d399'}"></span>${p === NET.name ? `<button onclick="avatarPickNet()" class="shrink-0" aria-label="${t('avatarPick')}" title="${t('avatarPick')}">${avHtml(p, p === NET.hostName ? 'host' : '')}</button>` : avHtml(p, p === NET.hostName ? 'host' : '')}<b>${esc(p)}${p === NET.name ? ' (' + X('tu', 'you') + ')' : ''}</b>${p === NET.hostName ? '<span class="text-[10px] bg-purple-600/30 text-purple-200 px-1.5 py-0.5 rounded-full">host</span>' : ''}</span><span class="flex items-center gap-1">${off.includes(p) ? `<span class="text-[10px] text-amber-300">${X('offline', 'offline')}</span>` : ''}${NET.host && p !== NET.hostName ? `${i > 0 ? `<button onclick="netMovePlayer(${i},-1)" class="text-slate-400 hover:text-white text-xs px-0.5" aria-label="${X('Sposta su', 'Move up')} ${esc(p)}" title="${X('Sposta su', 'Move up')}">↑</button>` : ''}${i < NET.players.length - 1 ? `<button onclick="netMovePlayer(${i},1)" class="text-slate-400 hover:text-white text-xs px-0.5" aria-label="${X('Sposta giù', 'Move down')} ${esc(p)}" title="${X('Sposta giù', 'Move down')}">↓</button>` : ''}<button onclick="netPassHost(${i})" class="text-amber-300/80 hover:text-amber-200 text-xs px-0.5" aria-label="${X('Passa host a', 'Pass host to')} ${esc(p)}" title="${X('Passa host a', 'Pass host to')} ${esc(p)}">👑</button><button onclick="netKick(${i})" class="text-rose-400/80 hover:text-rose-300 text-xs px-1" aria-label="${X('Espelli', 'Kick')} ${esc(p)}" title="${X('Espelli', 'Kick')}">✕</button>` : ''}</span></div>`
     )
     .join('')}</div>
   ${
@@ -3912,7 +4068,7 @@ function viewOnline() {
   ${S.hint === 'invite' ? `<p class="text-[11px] text-emerald-300 bg-emerald-600/10 border border-emerald-500/30 rounded-xl px-3 py-2 text-center"><b>${t('joinInvite')}</b><br>${t('joinInviteHint')}</p>` : ''}
   <input id="on-name" autocomplete="off" maxlength="16" value="${esc(NET.name)}" placeholder="${X('Il tuo nome', 'Your name')}" class="w-full ${inp}">${err}
   <button onclick="netHost()" class="${BTN}">${X('Crea stanza', 'Create room')}</button>
-  <div class="flex gap-2"><input id="on-code" autocomplete="off" maxlength="5" value="${esc(NET.lastCode || '')}" placeholder="${X('Codice', 'Code')}" class="flex-1 uppercase tracking-widest text-center ${inp}"><button onclick="netJoin()" class="px-5 rounded-xl bg-slate-800 text-sm font-bold">${X('Entra', 'Join')}</button></div></div>`;
+  <div class="flex gap-2"><input id="on-code" autocomplete="off" maxlength="5" value="${esc(NET.lastCode || '')}" placeholder="${X('Codice', 'Code')}" class="flex-1 uppercase tracking-widest text-center ${inp}"><input id="on-pin" inputmode="numeric" autocomplete="off" maxlength="4" value="${esc(NET.pin || '')}" placeholder="${t('roomPinShort')}" aria-label="${t('roomPin')}" class="w-16 text-center ${inp}"><button onclick="netJoin()" class="px-4 rounded-xl bg-slate-800 text-sm font-bold">${X('Entra', 'Join')}</button></div></div>`;
 }
 let CUST = [],
   CF = null,
@@ -11069,7 +11225,7 @@ function clearLocalData() {
 function showNews() {
   const m = $('modal');
   if (!m) return;
-  const items = ['news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
+  const items = ['news20', 'news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">✨ ${t('newsTitle')}</h3><ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">${items.map((k) => `<li>${t(k)}</li>`).join('')}</ul><button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
   modalOpen();
 }

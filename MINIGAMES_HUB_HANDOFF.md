@@ -242,6 +242,16 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 
 ## 11. Cosa è stato corretto nell'ultima revisione
 
+### Versione 1.16.0 (strumenti host)
+- **Passaggio host**: `netPassHost(i)` riusa il percorso di `netHandback`/`netPromote`: invia `become` al giocatore scelto con lo snapshot, avvisa gli altri con `moved`, poi l'host precedente diventa client sulla stessa connessione, distrugge il room peer e lascia che il nuovo host riapra `netRoomPeer`. `snap.origHost` diventa il nuovo host per evitare un ritorno automatico.
+- **Ordine**: `netMovePlayer(i, dir)` scambia due nomi in `NET.players` e `NET.order`, poi `hostBc()`/`netPresence()`; solo host e solo lobby.
+- **PIN stanza**: `NET.pin` (4 cifre) con `pinClean`/`pinOk`; `joinPayload` lo manda, `netIncoming` rifiuta con `why:'pin'` (messaggio in `netClientMsg`), `setRoomPin` lo imposta/toglie con `prompt`, il link invito aggiunge `&pin=`, `parseInvite` lo precompila e la schermata di ingresso ha `#on-pin`. Il PIN viaggia nello snapshot e quindi sopravvive a passaggio host/recupero. Non è sicurezza: solo un filtro per ingressi sbagliati.
+- **QR**: `QR_BIG` alterna 220/320 px in `showInvite`; `qrDownload()` scarica l'SVG generato, con fallback alla copia del link.
+- **Offline**: `offBan` ora compare anche nella lobby semplice.
+- **Novità**: `news20` IT/EN in testa.
+- **Test**: `features.test.js` sale a **240** (toolbar host, riordino e limiti, passaggio a offline innocuo, `pinClean`/`pinOk`, link con PIN, modale invito, boot da `#room=...&pin=`, input PIN, QR e chiavi i18n). **12/12 suite** verdi su sorgente e minificato.
+- `APP_VERSION` e `VERSION` portate a **1.16.0**; build: sorgente **517.431** byte, minificato **424.049** byte.
+
 ### Versione 1.15.0 (condivisione e PWA)
 - **Immagine risultato**: `resultLines()` estrae gioco, righe e vincitori dal riepilogo; `shareResultImage()` disegna un PNG 1080×1080 su canvas (sfondo del tema, barre podio, testi IT/EN, URL) e usa `navigator.share` con `File` se disponibile, altrimenti scarica il file; in caso di errore ricade su `shareSummary()`. Nessun asset né upload.
 - **Scorciatoie PWA**: `manifest.webmanifest` ha tre `shortcuts` (`#game=impostore`, `#game=lupus`, `#game=preferisci`); `gameFromHash()` valida l'id contro `PLAYABLE` e `parseInvite()` apre il setup con `selectGame` dopo 80 ms, senza interferire con `#room=`.

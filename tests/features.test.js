@@ -171,7 +171,7 @@ const lobby = resApp.run('viewOnline()');
 check(lobby.includes('copyCode()'), 'lobby con copia del codice');
 check(lobby.includes('1/2') && lobby.includes('connessi'), 'lobby mostra i giocatori connessi');
 check(lobby.includes('offline') && lobby.includes('host'), 'lobby distingue offline e host');
-check(lobby.includes('1.15.0'), 'lobby mostra la versione');
+check(lobby.includes('1.16.0'), 'lobby mostra la versione');
 // riepilogo condivisibile
 RS.scores = { Anna: 300, Bruno: 100 };
 RN.game = { g: 'impostore' };
@@ -394,7 +394,7 @@ check(q.run('backupReminder()') === '', 'senza dati il promemoria non compare');
 q.run('resetPrefs()');
 check(QS.timerPref === 120 && QS.mode === 'auto' && QS.ncPref.length === 0, 'ripristino preferenze giochi');
 q.run('showNews()');
-check(q.els.modal.innerHTML.includes('Novità 1.15.0'), 'la modale Novità è alla versione 1.15.0');
+check(q.els.modal.innerHTML.includes('Novità 1.16.0'), 'la modale Novità è alla versione 1.16.0');
 check(q.els.modal.innerHTML.includes('Colori e simboli dedicati'), 'le novità elencano i cosmetics');
 q.run('closeModal()');
 
@@ -740,6 +740,49 @@ check(
 check(
   typeof c15.run('showPrivacy') === 'function' && /onclick="showPrivacy\(\)"/.test(srcHtml),
   'la Privacy è raggiungibile dalle impostazioni'
+);
+
+// --- 1.16.0: host, ordine, PIN stanza, QR e offline ---
+const c16 = boot();
+c16.run(
+  "NET.host = true; NET.game = null; NET.code = 'ABCDE'; NET.hostName = 'Anna'; NET.name = 'Anna'; NET.players = ['Anna','Bruno','Carla']; NET.order = ['Anna','Bruno','Carla']; NET.st = 'lobby'; NET.view = null; NET.off = ['Bruno']; S.screen = 'online'"
+);
+const lob16 = c16.run('viewOnline()');
+check(
+  lob16.includes('netPassHost(1)') && lob16.includes('netMovePlayer(1,-1)') && lob16.includes('netKick(1)'),
+  'la lobby host ha passa comando, frecce e espulsione'
+);
+check(lob16.includes('Offline') && lob16.includes('Bruno'), 'la lobby mostra il banner degli offline');
+c16.run('netMovePlayer(1,-1)');
+check(
+  c16.run('NET.players.join(",")') === 'Bruno,Anna,Carla' &&
+    c16.run('NET.order.join(",")') === 'Bruno,Anna,Carla',
+  'l’host riordina giocatori e turni insieme'
+);
+c16.run('netMovePlayer(0,-1)');
+check(c16.run('NET.players.join(",")') === 'Bruno,Anna,Carla', 'il riordino non esce dai limiti');
+c16.run('netPassHost(1)');
+check(c16.run('NET.host') === true && c16.run('NET.hostName') === 'Anna', 'passare host a un offline non cambia nulla');
+
+check(c16.run("pinClean('12a34')") === '1234' && c16.run("pinClean('12')") === '', 'il PIN accetta solo quattro cifre');
+c16.ctx.prompt = () => '1234';
+c16.run('setRoomPin(0)');
+check(c16.run('NET.pin') === '1234' && c16.run("pinOk('1234')") === true, 'il PIN si imposta e accetta il valore giusto');
+check(c16.run("pinOk('0000')") === false && c16.run("pinOk('')") === false, 'un PIN sbagliato o assente viene rifiutato');
+check(c16.run('inviteLink()').endsWith('&pin=1234'), 'il link invito porta il PIN');
+check(c16.run('showInvite() || 1') && c16.els.modal.innerHTML.includes('1234'), 'la modale invito mostra il PIN');
+c16.ctx.prompt = () => '';
+c16.run('setRoomPin(0)');
+check(c16.run('NET.pin') === '' && c16.run("pinOk('')") === true, 'svuotando il campo il PIN si toglie');
+const c16b = boot({ hash: '#room=ABCDE&pin=4321' });
+check(c16b.S.screen === 'online' && c16b.NET.pin === '4321' && c16b.NET.lastCode === 'ABCDE', 'il link invito con PIN precompila tutto');
+check(
+  /id="on-pin"/.test(srcHtml) && /function qrDownload/.test(srcHtml) && /qrBig/.test(srcHtml),
+  'la schermata di ingresso e il QR hanno le nuove opzioni'
+);
+check(
+  c16.run("!!I.it.roomPin && !!I.en.roomPin && !!I.it.qrSave && !!I.en.news20"),
+  'PIN, QR e novità sono tradotti'
 );
 
 check(c.run("joinPayload().name") === CS.players[0] || typeof c.run('joinPayload()') === 'object', 'il join include il payload avatar');

@@ -4,6 +4,30 @@
 release number; `sw.js` must follow it. Older history (1.2–1.5) is described in
 `MINIGAMES_HUB_HANDOFF.md`.
 
+## 1.16.0 — 2026-11-18
+
+### Added
+- **Host hand-over** — the host can give control to another connected player from
+  the lobby; the new host receives the room state, the others follow it and the
+  old host becomes a normal client on the same connection.
+- **Player order** — the host can move players up or down in the lobby; the
+  player list and the join/turn order change together for every phone.
+- **Optional room PIN** — the host can set a 4-digit PIN (or remove it); joiners
+  need the PIN and invited links carry it as `#room=CODE&pin=1234`. It is a
+  guard against accidental entries, not a security boundary, and it travels
+  with snapshots when control changes.
+- **QR options** — the invite sheet can switch between a small and a large QR
+  and download it as an SVG.
+- **Offline banner in the lobby** — the plain lobby now lists offline players,
+  matching what the in-game view already showed.
+
+### Changed
+- Minified build: 424,049 bytes; source: 517,431 bytes.
+
+### Tests
+- `features.test.js` at 240 checks; 12/12 suites green on source and minified
+  build.
+
 ## 1.15.0 — 2026-11-18
 
 ### Added
