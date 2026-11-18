@@ -569,6 +569,16 @@ const I = {
     thSunset: 'Tramonto',
     thForest: 'Bosco',
     statsTitle: 'Statistiche',
+    chartTitle: 'Partite per gioco',
+    chartDays: 'Ultimi 7 giorni',
+    achTitle: 'Obiettivi',
+    dailyTitle: 'Sfida del giorno',
+    dailyPlay: 'Gioca la sfida',
+    dailyDone: 'Fatta oggi',
+    dailyAgain: 'Rigioca la sfida',
+    dailyStreak: 'giorni di fila',
+    mixStart: 'Modalità mix: scegli un gioco a caso',
+    mixChosen: 'Gioco scelto',
     statsGames: 'partite',
     statsGame1: 'partita',
     statsWin1: 'vittoria',
@@ -631,7 +641,7 @@ const I = {
     installed: 'App installata',
     offline: 'Offline',
     news: 'Novità',
-    newsTitle: 'Novità 1.16.0',
+    newsTitle: 'Novità 1.17.0',
     news9: 'Rinomina e annulla rimozione dei giocatori.',
     news10: 'Statistiche con ultime partite ed export CSV.',
     news11: 'Backup: unisci o sostituisci, con avviso di versione.',
@@ -644,6 +654,7 @@ const I = {
     news18: 'Tre pacchetti suoni, volume regolabile, vibrazioni più curate e beep del timer a 10 secondi e a zero.',
     news19: 'Risultati condivisibili come immagine, scorciatoie PWA per i giochi, schermo acceso durante i timer e una pagina Privacy.',
     news20: 'Host: passa il comando, riordina i giocatori, PIN stanza e QR più grande o scaricabile. Banner per chi è offline.',
+    news21: 'Sfida del giorno, modalità mix, grafici delle partite e obiettivi in impostazioni.',
     news7: 'Colori e simboli dedicati per ogni gioco.',
     news8: 'Avatar e colori per i giocatori in liste, lobby e classifiche.',
     news1: 'Introduzione per i nuovi arrivati e partita demo.',
@@ -1052,6 +1063,16 @@ const I = {
     thSunset: 'Sunset',
     thForest: 'Forest',
     statsTitle: 'Statistics',
+    chartTitle: 'Games per game',
+    chartDays: 'Last 7 days',
+    achTitle: 'Achievements',
+    dailyTitle: 'Daily challenge',
+    dailyPlay: 'Play the challenge',
+    dailyDone: 'Done today',
+    dailyAgain: 'Play the challenge again',
+    dailyStreak: 'days in a row',
+    mixStart: 'Mix mode: pick a random game',
+    mixChosen: 'Picked game',
     statsGames: 'games',
     statsGame1: 'game',
     statsWin1: 'win',
@@ -1114,7 +1135,7 @@ const I = {
     installed: 'App installed',
     offline: 'Offline',
     news: 'What’s new',
-    newsTitle: 'What’s new in 1.16.0',
+    newsTitle: 'What’s new in 1.17.0',
     news9: 'Rename players and undo a removal.',
     news10: 'Statistics with recent games and CSV export.',
     news11: 'Backup: merge or replace, with a version warning.',
@@ -1127,6 +1148,7 @@ const I = {
     news18: 'Three sound packs, adjustable volume, better haptics and timer beeps at 10 seconds and zero.',
     news19: 'Results shared as an image, PWA shortcuts for the games, screen kept awake during timers and a privacy page.',
     news20: 'Host tools: pass control, reorder players, room PIN and a bigger or downloadable QR. Banner for offline players.',
+    news21: 'Daily challenge, mix mode, game charts and achievements in settings.',
     news7: 'Dedicated colours and symbols for every game.',
     news8: 'Avatars and colours for players in lists, lobbies and standings.',
     news1: 'A welcome intro for newcomers and a demo game.',
@@ -1280,7 +1302,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.16.0';
+const APP_VERSION = '1.17.0';
 // Ripresa dopo reload/standby: la sessione dura al massimo due ore.
 const RESUME_TTL = 2 * 60 * 60 * 1000;
 let RESUME = { room: null, snap: null, savedAt: 0, lastKey: '' };
@@ -9176,6 +9198,8 @@ function viewHome() {
   ${resumeCard()}
   ${onboardCard()}
   ${backupReminder()}
+  ${dailyCard()}
+  <button onclick="mixGame()" class="w-full bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">🎲 ${t('mixStart')}</button>
   ${GAMES.map(
     ([
       id,
@@ -10832,6 +10856,108 @@ function statsRecentHtml(n) {
     )
     .join('')}</div>`;
 }
+// Grafici leggeri: barre per gioco e attività degli ultimi 7 giorni, senza librerie.
+function dayKey(ts) {
+  const d = new Date(ts == null ? Date.now() : ts);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function dayHash(k) {
+  let h = 0;
+  for (let i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) % 9973;
+  return h;
+}
+function dailyPick(ts) {
+  return PLAYABLE[dayHash(dayKey(ts)) % PLAYABLE.length];
+}
+function dailyDone() {
+  const g = dailyPick(),
+    k = dayKey();
+  return ((S.stats && S.stats.recent) || []).some((e) => e.g === g && dayKey(e.t) === k);
+}
+function dailyStreak() {
+  const rec = (S.stats && S.stats.recent) || [];
+  let n = 0;
+  for (let i = 0; i < 20; i++) {
+    const ts = Date.now() - i * 86400000,
+      g = dailyPick(ts),
+      k = dayKey(ts),
+      hit = rec.some((e) => e.g === g && dayKey(e.t) === k);
+    if (hit) n++;
+    else if (i > 0) break;
+  }
+  return n;
+}
+function dailyCard() {
+  const g = dailyPick(),
+    done = dailyDone(),
+    streak = dailyStreak();
+  return `<div class="glass p-4 rounded-2xl border ${done ? 'border-emerald-500/40' : 'border-amber-500/30'} space-y-2"><div class="flex justify-between items-center"><h3 class="font-bold text-white text-sm">📅 ${t('dailyTitle')}</h3><span class="text-[10px] font-bold ${done ? 'text-emerald-300' : 'text-amber-300'}">${done ? '✅ ' + t('dailyDone') : '🎯 ' + t('dailyPlay')}</span></div><p class="text-xs text-slate-300"><b>${t('g_' + g)}</b>${streak > 1 ? ` · 🔥 ${streak} ${t('dailyStreak')}` : ''}</p><button onclick="selectGame('${g}')" class="w-full bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">${done ? '🔁 ' + t('dailyAgain') : '▶️ ' + t('dailyPlay')}</button></div>`;
+}
+function mixGame() {
+  const ok = PLAYABLE.filter((g) => {
+    const min = (GAME_START[g] && GAME_START[g][1]) || 2;
+    return !S.players.length || S.players.length >= min;
+  });
+  const pool = ok.length ? ok : PLAYABLE,
+    g = pool[Math.floor(rnd(pool.length))];
+  selectGame(g);
+  announce(t('mixChosen') + ': ' + t('g_' + g));
+}
+function statsChartsHtml() {
+  const st = S.stats || {},
+    bg = st.byGame || {},
+    entries = Object.entries(bg)
+      .filter(([g, v]) => GAME_START[g] && +v > 0)
+      .sort((a, b) => +b[1] - +a[1])
+      .slice(0, 8);
+  if (!entries.length) return '';
+  const max = Math.max(1, ...entries.map((e) => +e[1])),
+    rows = entries
+      .map(
+        ([g, v]) =>
+          `<div class="flex items-center gap-2 text-[10px]"><span class="w-24 truncate text-slate-400">${esc(t('g_' + g))}</span><div class="flex-1 bg-slate-800 rounded-full h-2 overflow-hidden"><div class="h-2 rounded-full" style="width:${Math.max(6, Math.round((+v / max) * 100))}%;background:linear-gradient(90deg,var(--acc1),var(--acc2))"></div></div><b class="w-6 text-right text-slate-300">${+v}</b></div>`
+      )
+      .join('');
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const ts = Date.now() - i * 86400000,
+      k = dayKey(ts);
+    days.push({ n: (st.recent || []).filter((e) => dayKey(e.t) === k).length, lab: new Date(ts).getDate() });
+  }
+  const dmax = Math.max(1, ...days.map((d) => d.n));
+  return `<div class="space-y-1.5"><p class="text-[11px] font-bold text-slate-400">📊 ${t('chartTitle')}</p>${rows}<p class="text-[11px] font-bold text-slate-400 pt-1">📈 ${t('chartDays')}</p><div class="flex items-end gap-1 h-12">${days
+    .map(
+      (d) =>
+        `<div class="flex-1 flex flex-col items-center gap-0.5"><div class="w-full h-8 bg-slate-800 rounded-sm relative overflow-hidden"><div class="absolute bottom-0 w-full rounded-sm" style="height:${Math.round((d.n / dmax) * 100)}%;background:var(--acc2)"></div></div><span class="text-[9px] text-slate-500">${d.lab}</span></div>`
+    )
+    .join('')}</div></div>`;
+}
+// Obiettivi derivati dalle statistiche: nessun dato extra da salvare.
+const ACH = [
+  { id: 'first', icon: '🥇', it: 'Prima vittoria', en: 'First win', test: (st) => Object.values(st.wins || {}).some((v) => +v > 0) },
+  { id: 'wins5', icon: '🏅', it: '5 vittorie', en: '5 wins', test: (st) => Object.values(st.wins || {}).reduce((a, v) => a + (+v || 0), 0) >= 5 },
+  { id: 'wins15', icon: '🏆', it: '15 vittorie', en: '15 wins', test: (st) => Object.values(st.wins || {}).reduce((a, v) => a + (+v || 0), 0) >= 15 },
+  { id: 'streak3', icon: '🔥', it: '3 di fila', en: '3 in a row', test: (st) => Object.values(st.best || {}).some((v) => +v >= 3) },
+  { id: 'streak5', icon: '⚡', it: '5 di fila', en: '5 in a row', test: (st) => Object.values(st.best || {}).some((v) => +v >= 5) },
+  { id: 'games10', icon: '🎲', it: '10 partite', en: '10 games', test: (st) => +st.games >= 10 },
+  { id: 'games50', icon: '📚', it: '50 partite', en: '50 games', test: (st) => +st.games >= 50 },
+  { id: 'allgames', icon: '🌍', it: 'Tutti i giochi', en: 'Every game', test: (st) => Object.keys(st.byGame || {}).filter((g) => GAME_START[g] && +st.byGame[g] > 0).length >= 8 },
+  { id: 'night', icon: '🌙', it: 'Partita notturna', en: 'Night owl', test: (st) => (st.recent || []).some((e) => { const h = new Date(e.t).getHours(); return h >= 0 && h < 5; }) }
+];
+function achList() {
+  const st = S.stats || {};
+  return ACH.map((a) => ({ id: a.id, icon: a.icon, name: X(a.it, a.en), got: !!a.test(st) }));
+}
+function achHtml() {
+  const list = achList(),
+    got = list.filter((a) => a.got).length;
+  return `<div class="space-y-1.5"><div class="flex justify-between items-baseline"><p class="text-[11px] font-bold text-slate-400">🏅 ${t('achTitle')}</p><span class="text-[10px] text-slate-500">${got}/${list.length}</span></div><div class="grid grid-cols-3 gap-1.5">${list
+    .map(
+      (a) =>
+        `<div class="rounded-lg px-1.5 py-1 text-[9px] text-center border ${a.got ? 'bg-amber-500/10 border-amber-500/40 text-amber-200' : 'bg-slate-900 border-slate-700/60 text-slate-500'}" title="${esc(a.name)}"><div class="text-base leading-5">${a.icon}</div><div class="truncate">${esc(a.name)}</div></div>`
+    )
+    .join('')}</div></div>`;
+}
 function statsCsv() {
   try {
     const head =
@@ -11225,7 +11351,7 @@ function clearLocalData() {
 function showNews() {
   const m = $('modal');
   if (!m) return;
-  const items = ['news20', 'news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
+  const items = ['news21', 'news20', 'news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">✨ ${t('newsTitle')}</h3><ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">${items.map((k) => `<li>${t(k)}</li>`).join('')}</ul><button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
   modalOpen();
 }
@@ -11401,6 +11527,8 @@ function showSettings() {
         : `<p class="text-[11px] text-slate-500 italic">${t('statsNone')}</p>`
     }</div>
     ${statsRecentHtml(4)}
+    ${statsChartsHtml()}
+    ${achHtml()}
     <div class="flex flex-wrap gap-2 items-center">${+S.stats.games ? `<button onclick="statsCsv()" class="text-[11px] text-emerald-300 font-bold">⬇️ ${t('statsCsv')}</button>` : ''}${+S.stats.games ? `<button onclick="resetStats()" class="text-[11px] text-rose-400 font-bold">↺ ${t('statsReset')}</button>` : ''}</div>
   </div>
   <div class="space-y-2"><p class="text-xs font-bold text-slate-300">🧩 ${t('setGames')}</p><p class="text-[11px] text-slate-400">${t('setGamesHint')}</p><div class="flex flex-wrap gap-2"><button onclick="resetPrefs()" class="text-[11px] text-rose-400 font-bold">↺ ${t('resetPrefs')}</button><button onclick="forgetSeen()" class="text-[11px] text-amber-300 font-bold">🧹 ${t('forgetSeen')}</button><button onclick="showDbTip(true)" class="text-[11px] text-slate-300 font-bold">✍️ ${t('dbWhy')}</button><button onclick="myQOpen()" class="text-[11px] text-cyan-300 font-bold">✍️ ${t('myQ')} (${S.myQ.who.length + S.myQ.pv.length})</button></div></div>

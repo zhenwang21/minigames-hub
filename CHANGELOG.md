@@ -4,6 +4,27 @@
 release number; `sw.js` must follow it. Older history (1.2–1.5) is described in
 `MINIGAMES_HUB_HANDOFF.md`.
 
+## 1.17.0 — 2026-11-18
+
+### Added
+- **Daily challenge** — the home screen suggests a deterministic game for the
+  local day, marks it done when that game appears in the recent results and
+  counts consecutive days; the button opens its setup.
+- **Mix mode** — one button picks a random offline-playable game that fits the
+  players currently in the list and opens its setup.
+- **Statistics charts** — settings show a bar per game and a seven-day activity
+  chart built from the local statistics, without libraries or extra data.
+- **Achievements** — nine badges derived from wins, streaks, total games, games
+  played across the catalogue and late-night sessions; earned ones are
+  highlighted and the card shows how many are unlocked.
+
+### Changed
+- Minified build: 429,988 bytes; source: 524,604 bytes.
+
+### Tests
+- `features.test.js` at 255 checks; 12/12 suites green on source and minified
+  build.
+
 ## 1.16.0 — 2026-11-18
 
 ### Added

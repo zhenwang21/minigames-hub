@@ -171,7 +171,7 @@ const lobby = resApp.run('viewOnline()');
 check(lobby.includes('copyCode()'), 'lobby con copia del codice');
 check(lobby.includes('1/2') && lobby.includes('connessi'), 'lobby mostra i giocatori connessi');
 check(lobby.includes('offline') && lobby.includes('host'), 'lobby distingue offline e host');
-check(lobby.includes('1.16.0'), 'lobby mostra la versione');
+check(lobby.includes('1.17.0'), 'lobby mostra la versione');
 // riepilogo condivisibile
 RS.scores = { Anna: 300, Bruno: 100 };
 RN.game = { g: 'impostore' };
@@ -394,7 +394,7 @@ check(q.run('backupReminder()') === '', 'senza dati il promemoria non compare');
 q.run('resetPrefs()');
 check(QS.timerPref === 120 && QS.mode === 'auto' && QS.ncPref.length === 0, 'ripristino preferenze giochi');
 q.run('showNews()');
-check(q.els.modal.innerHTML.includes('Novità 1.16.0'), 'la modale Novità è alla versione 1.16.0');
+check(q.els.modal.innerHTML.includes('Novità 1.17.0'), 'la modale Novità è alla versione 1.17.0');
 check(q.els.modal.innerHTML.includes('Colori e simboli dedicati'), 'le novità elencano i cosmetics');
 q.run('closeModal()');
 
@@ -783,6 +783,41 @@ check(
 check(
   c16.run("!!I.it.roomPin && !!I.en.roomPin && !!I.it.qrSave && !!I.en.news20"),
   'PIN, QR e novità sono tradotti'
+);
+
+// --- 1.17.0: sfida del giorno, mix, grafici e obiettivi ---
+const c17 = boot();
+check(/^\d{4}-\d{2}-\d{2}$/.test(c17.run('dayKey()')), 'la chiave del giorno è una data locale');
+check(c17.run('dayKey(1700000000000)') === c17.run('dayKey(1700000000000)'), 'la chiave del giorno è stabile');
+check(c17.run('dayKey(1700000000000)') !== c17.run('dayKey(1700000000000 + 86400000)'), 'giorni diversi hanno chiavi diverse');
+check(c17.run('PLAYABLE.includes(dailyPick())'), 'la sfida del giorno sceglie un gioco giocabile offline');
+check(c17.run('dailyPick(1700000000000)') === c17.run('dailyPick(1700000000000)'), 'la sfida è deterministica');
+c17.run("S.stats.recent = [{ g: dailyPick(), t: Date.now() }]");
+check(c17.run('dailyDone()') === true && c17.run('dailyStreak()') === 1, 'la sfida di oggi risulta fatta');
+c17.run("S.stats.recent.push({ g: dailyPick(Date.now() - 86400000), t: Date.now() - 86400000 })");
+check(c17.run('dailyStreak()') === 2, 'due giorni consecutivi fanno una serie');
+check(c17.run('dailyCard()').includes(c17.run("t('dailyTitle')")) && c17.run('dailyCard()').includes(c17.run("t('g_' + dailyPick())")), 'la card della sfida mostra gioco e titolo');
+c17.run("S.players = []; S.screen = 'home'; S.game = null");
+c17.run('mixGame()');
+check(c17.run('S.screen') === 'setup' && c17.run('PLAYABLE.includes(S.game)'), 'la modalità mix apre un gioco a caso');
+c17.run("S.stats.byGame = { impostore: 3, lupus: 1 }; S.stats.games = 4; S.stats.recent = [{ g: 'impostore', t: Date.now() }]");
+const charts = c17.run('statsChartsHtml()');
+check(
+  charts.includes(c17.run("t('chartTitle')")) && charts.includes('width:') && charts.includes(c17.run("t('g_impostore')")),
+  'il grafico per gioco disegna barre proporzionali'
+);
+check(charts.includes(c17.run("t('chartDays')")), 'il grafico degli ultimi giorni è presente');
+c17.run(
+  "S.stats = { games: 10, byGame: { impostore: 1, mrwhite: 1, who_said: 1, preferisci: 1, lupus: 1, nomicose: 1, taboo: 1, chisono: 1 }, wins: { Anna: 5 }, played: { Anna: 10 }, streak: { Anna: 3 }, best: { Anna: 3 }, recent: [] }"
+);
+const ach = c17.run('achList()');
+const gotAch = ach.filter((a) => a.got).map((a) => a.id);
+check(ach.length === 9 && gotAch.includes('first') && gotAch.includes('wins5') && gotAch.includes('streak3'), 'gli obiettivi si sbloccano dalle statistiche');
+check(gotAch.includes('games10') && gotAch.includes('allgames') && !gotAch.includes('games50'), 'gli obiettivi non ancora raggiunti restano bloccati');
+check(c17.run('achHtml()').includes(`${gotAch.length}/9`), 'la griglia mostra quanti obiettivi sono sbloccati');
+check(
+  c17.run("!!I.it.dailyTitle && !!I.en.mixStart && !!I.it.achTitle && !!I.en.news21"),
+  'sfida, mix, obiettivi e novità sono tradotti'
 );
 
 check(c.run("joinPayload().name") === CS.players[0] || typeof c.run('joinPayload()') === 'object', 'il join include il payload avatar');

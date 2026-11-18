@@ -242,6 +242,15 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 
 ## 11. Cosa è stato corretto nell'ultima revisione
 
+### Versione 1.17.0 (statistiche e coinvolgimento)
+- **Sfida del giorno**: `dayKey`/`dayHash`/`dailyPick(ts)` scelgono un gioco di `PLAYABLE` in modo deterministico per data locale; `dailyDone()` controlla `S.stats.recent`, `dailyStreak()` conta i giorni consecutivi (al massimo 20, senza stato extra) e `dailyCard()` mostra la card in home con lo stato.
+- **Modalità mix**: `mixGame()` filtra i giochi con abbastanza giocatori, sceglie con `rnd` e apre `selectGame`, annunciando la scelta.
+- **Grafici**: `statsChartsHtml()` disegna barre per gioco (da `byGame`) e attività degli ultimi 7 giorni (da `recent`) con soli div e variabili del tema.
+- **Obiettivi**: `ACH` (9 badge) con funzioni `test(stats)`; `achList()`/`achHtml()` li derivano da vittorie, serie, partite totali, catalogo completo e partite notturne. Nessun campo nuovo nel salvataggio.
+- **Novità**: `news21` IT/EN in testa.
+- **Test**: `features.test.js` sale a **255** (chiave e stabilità del giorno, sfida fatta e serie di 2, card, mix che apre il setup, barre per gioco e 7 giorni, sblocco/selezione obiettivi, chiavi i18n). **12/12 suite** verdi su sorgente e minificato.
+- `APP_VERSION` e `VERSION` portate a **1.17.0**; build: sorgente **524.604** byte, minificato **429.988** byte.
+
 ### Versione 1.16.0 (strumenti host)
 - **Passaggio host**: `netPassHost(i)` riusa il percorso di `netHandback`/`netPromote`: invia `become` al giocatore scelto con lo snapshot, avvisa gli altri con `moved`, poi l'host precedente diventa client sulla stessa connessione, distrugge il room peer e lascia che il nuovo host riapra `netRoomPeer`. `snap.origHost` diventa il nuovo host per evitare un ritorno automatico.
 - **Ordine**: `netMovePlayer(i, dir)` scambia due nomi in `NET.players` e `NET.order`, poi `hostBc()`/`netPresence()`; solo host e solo lobby.
