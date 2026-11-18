@@ -171,7 +171,7 @@ const lobby = resApp.run('viewOnline()');
 check(lobby.includes('copyCode()'), 'lobby con copia del codice');
 check(lobby.includes('1/2') && lobby.includes('connessi'), 'lobby mostra i giocatori connessi');
 check(lobby.includes('offline') && lobby.includes('host'), 'lobby distingue offline e host');
-check(lobby.includes('1.14.0'), 'lobby mostra la versione');
+check(lobby.includes('1.15.0'), 'lobby mostra la versione');
 // riepilogo condivisibile
 RS.scores = { Anna: 300, Bruno: 100 };
 RN.game = { g: 'impostore' };
@@ -394,7 +394,7 @@ check(q.run('backupReminder()') === '', 'senza dati il promemoria non compare');
 q.run('resetPrefs()');
 check(QS.timerPref === 120 && QS.mode === 'auto' && QS.ncPref.length === 0, 'ripristino preferenze giochi');
 q.run('showNews()');
-check(q.els.modal.innerHTML.includes('Novità 1.14.0'), 'la modale Novità è alla versione 1.14.0');
+check(q.els.modal.innerHTML.includes('Novità 1.15.0'), 'la modale Novità è alla versione 1.15.0');
 check(q.els.modal.innerHTML.includes('Colori e simboli dedicati'), 'le novità elencano i cosmetics');
 q.run('closeModal()');
 
@@ -658,6 +658,89 @@ c.run('tmTick()');
 check(c.run('TMR.done') === true && c.run('TMR.iv') === null, 'a zero il timer si chiude');
 check(JSON.stringify(vib[vib.length - 1]) === '[240,120,240]', 'la fine del timer vibra con lo schema lungo');
 check(typeof c.run('previewSnd') === 'function' && c.run('typeof setSndPack') === 'function', 'anteprima e scelta del pacchetto sono collegate');
+
+// --- 1.15.0: immagine risultato, scorciatoie, wake lock, privacy ---
+const c15 = boot();
+const srcHtml = fs.readFileSync(sourceFile(), 'utf8');
+check(
+  srcHtml.includes('property="og:title"') &&
+    srcHtml.includes('name="twitter:card"') &&
+    srcHtml.includes('name="description"'),
+  'la pagina ha meta description, Open Graph e Twitter'
+);
+const manifest = JSON.parse(
+  fs.readFileSync(require('path').join(__dirname, '..', 'manifest.webmanifest'), 'utf8')
+);
+check(
+  Array.isArray(manifest.shortcuts) &&
+    manifest.shortcuts.length === 3 &&
+    manifest.shortcuts.every((x) => /#game=[a-z_]+$/.test(x.url)),
+  'il manifest offre tre scorciatoie con deep link #game='
+);
+check(
+  manifest.shortcuts.some((x) => x.url.endsWith('#game=impostore')) &&
+    manifest.shortcuts.every((x) => x.icons && x.icons.length === 1),
+  'le scorciatoie puntano ai giochi e hanno un’icona'
+);
+check(c15.run("gameFromHash('#game=lupus')") === 'lupus', 'il deep link riconosce un gioco offline');
+check(
+  c15.run("gameFromHash('#game=nomicose')") === '' && c15.run("gameFromHash('#game=altro')") === '',
+  'i giochi solo online e gli id sconosciuti non aprono il setup'
+);
+check(c15.run("gameFromHash('#room=ABCDE')") === '', 'il link stanza non viene scambiato per un gioco');
+check(
+  typeof c15.run('shareResultImage') === 'function' &&
+    typeof c15.run('resultLines') === 'function' &&
+    c15.run('resultLines()') === null,
+  'l’immagine del risultato è pronta e senza riepilogo non fa nulla'
+);
+
+const wk = { calls: 0, released: 0 };
+c15.ctx.navigator.wakeLock = {
+  request() {
+    wk.calls++;
+    return {
+      then(fn) {
+        fn({
+          release() {
+            wk.released++;
+          },
+          addEventListener() {}
+        });
+        return this;
+      },
+      catch() {
+        return this;
+      }
+    };
+  }
+};
+c15.run("S.screen = 'play'; S.game = 'impostore'");
+c15.run('tmClear()');
+check(c15.run('wakeWanted()') === false, 'senza timer non serve tenere acceso lo schermo');
+c15.run('tmStart(60)');
+check(wk.calls === 1 && c15.run('!!WAKE'), 'durante il timer lo schermo resta acceso');
+c15.run('tmClear()');
+check(wk.released === 1 && c15.run('!WAKE'), 'alla fine del timer il wake lock viene rilasciato');
+
+check(
+  c15.run("!!I.it.privacyTitle && !!I.en.privacyTitle && !!I.it.privacyLocal && !!I.en.privacyBackup"),
+  'i testi privacy esistono in italiano e inglese'
+);
+check(
+  c15.run("!!I.it.summaryImage && !!I.en.summaryImage && !!I.it.imgSaved && !!I.en.news19"),
+  'immagine risultato e novità sono tradotte'
+);
+c15.run('showPrivacy()');
+check(
+  c15.els.modal.innerHTML.includes(c15.run("t('privacyTitle')")) &&
+    c15.els.modal.innerHTML.includes(c15.run("t('privacyLocal')")),
+  'la modale Privacy mostra i testi locali'
+);
+check(
+  typeof c15.run('showPrivacy') === 'function' && /onclick="showPrivacy\(\)"/.test(srcHtml),
+  'la Privacy è raggiungibile dalle impostazioni'
+);
 
 check(c.run("joinPayload().name") === CS.players[0] || typeof c.run('joinPayload()') === 'object', 'il join include il payload avatar');
 check(c.run("sanitizeStats({recent:[{g:'lupus',t:1,w:'Anna'}]}).recent.length") === 1, 'recenti valide');

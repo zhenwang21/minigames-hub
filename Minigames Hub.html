@@ -4,6 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Minigames Hub</title>
+<meta name="description" content="8 party games for one phone or several phones in the same room. Play offline by passing the phone, or online with a room code.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Minigames Hub">
+<meta property="og:title" content="Minigames Hub">
+<meta property="og:description" content="8 party games for one phone or several phones in the same room. Play offline by passing the phone, or online with a room code.">
+<meta property="og:url" content="https://zhenwang21.github.io/minigames-hub/">
+<meta property="og:image" content="https://zhenwang21.github.io/minigames-hub/icons/icon-512.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Minigames Hub">
+<meta name="twitter:description" content="8 party games for one phone or several phones in the same room.">
+<meta name="twitter:image" content="https://zhenwang21.github.io/minigames-hub/icons/icon-512.png">
 <meta name="theme-color" content="#0b0f19">
 <meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -610,7 +621,7 @@ const I = {
     installed: 'App installata',
     offline: 'Offline',
     news: 'Novità',
-    newsTitle: 'Novità 1.14.0',
+    newsTitle: 'Novità 1.15.0',
     news9: 'Rinomina e annulla rimozione dei giocatori.',
     news10: 'Statistiche con ultime partite ed export CSV.',
     news11: 'Backup: unisci o sostituisci, con avviso di versione.',
@@ -621,6 +632,7 @@ const I = {
     news16: 'Tema chiaro Carta, anteprime dei temi, font arrotondato e accento personalizzato.',
     news17: 'Corona all’host, fiamma per le serie vincenti e coriandoli diversi per gioco.',
     news18: 'Tre pacchetti suoni, volume regolabile, vibrazioni più curate e beep del timer a 10 secondi e a zero.',
+    news19: 'Risultati condivisibili come immagine, scorciatoie PWA per i giochi, schermo acceso durante i timer e una pagina Privacy.',
     news7: 'Colori e simboli dedicati per ogni gioco.',
     news8: 'Avatar e colori per i giocatori in liste, lobby e classifiche.',
     news1: 'Introduzione per i nuovi arrivati e partita demo.',
@@ -636,6 +648,13 @@ const I = {
     summaryRank: 'Classifica',
     summaryAgain: 'Rigioca',
     summaryShare: 'Condividi',
+    summaryImage: 'Condividi come immagine',
+    imgSaved: 'Immagine salvata.',
+    privacyTitle: 'Privacy',
+    privacyLocal: 'Nome, punteggi, statistiche e preferenze restano sul telefono. Non c’è nessun account e nessun tracciamento.',
+    privacyOnline: 'Online la stanza usa un collegamento diretto tra telefoni: il codice stanza e i nomi dei giocatori passano solo ai partecipanti. Se la stanza usa un server di segnalazione, vede solo i codici tecnici necessari alla connessione.',
+    privacyNoTrack: 'Nessun cookie pubblicitario, nessun profilo e nessun invio dei risultati a terzi.',
+    privacyBackup: 'Il backup è un file che scarichi tu: contiene preferenze, giocatori e statistiche e resta dove lo salvi.',
     hostNotes: 'Note host',
     hostNotesPh: 'Promemoria, regole della casa, ordine dei turni…',
     hostNotesSave: 'Salva nota',
@@ -1074,7 +1093,7 @@ const I = {
     installed: 'App installed',
     offline: 'Offline',
     news: 'What’s new',
-    newsTitle: 'What’s new in 1.14.0',
+    newsTitle: 'What’s new in 1.15.0',
     news9: 'Rename players and undo a removal.',
     news10: 'Statistics with recent games and CSV export.',
     news11: 'Backup: merge or replace, with a version warning.',
@@ -1085,6 +1104,7 @@ const I = {
     news16: 'Light Paper theme, theme previews, rounded font and a custom accent.',
     news17: 'Crown on the host, flame for winning streaks and different confetti per game.',
     news18: 'Three sound packs, adjustable volume, better haptics and timer beeps at 10 seconds and zero.',
+    news19: 'Results shared as an image, PWA shortcuts for the games, screen kept awake during timers and a privacy page.',
     news7: 'Dedicated colours and symbols for every game.',
     news8: 'Avatars and colours for players in lists, lobbies and standings.',
     news1: 'A welcome intro for newcomers and a demo game.',
@@ -1100,6 +1120,13 @@ const I = {
     summaryRank: 'Standings',
     summaryAgain: 'Play again',
     summaryShare: 'Share',
+    summaryImage: 'Share as image',
+    imgSaved: 'Image saved.',
+    privacyTitle: 'Privacy',
+    privacyLocal: 'Name, scores, statistics and preferences stay on the phone. There is no account and no tracking.',
+    privacyOnline: 'Online, a room is a direct link between phones: the room code and player names only reach the participants. If a signalling server is used, it only sees the technical codes needed to connect.',
+    privacyNoTrack: 'No advertising cookies, no profiling and no results sent to third parties.',
+    privacyBackup: 'The backup is a file you download yourself: it holds preferences, players and statistics and stays wherever you save it.',
     hostNotes: 'Host notes',
     hostNotesPh: 'Reminders, house rules, turn order…',
     hostNotesSave: 'Save note',
@@ -1230,7 +1257,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.14.0';
+const APP_VERSION = '1.15.0';
 // Ripresa dopo reload/standby: la sessione dura al massimo due ore.
 const RESUME_TTL = 2 * 60 * 60 * 1000;
 let RESUME = { room: null, snap: null, savedAt: 0, lastKey: '' };
@@ -3363,13 +3390,129 @@ function shareSummary() {
   }
   copyText(txt, X('Risultato copiato!', 'Result copied!'));
 }
+// Riga di testo usata sia dal riepilogo sia dall'immagine.
+function resultLines() {
+  const d = summaryData();
+  if (!d) return null;
+  return {
+    gid: d.gid,
+    rows: d.rows.slice(0, 8).map((r) => ({ n: clip(r.n, 22), d: r.d })),
+    winner: d.winners.map((w) => w.n).join(', '),
+    max: d.max
+  };
+}
+// Immagine 1080×1080 disegnata al volo: nessun asset scaricato, nessun dato inviato.
+function shareResultImage() {
+  try {
+    const m = resultLines();
+    if (!m) return;
+    const cv = document.createElement('canvas');
+    if (!cv || !cv.getContext) return shareSummary();
+    const W = 1080,
+      H = 1080;
+    cv.width = W;
+    cv.height = H;
+    const x = cv.getContext('2d');
+    if (!x) return shareSummary();
+    const light = S.theme === 'carta',
+      ink = light ? '#1c1917' : '#f8fafc',
+      sub = light ? '#57534e' : '#cbd5e1',
+      bg = THEME_BG[S.theme] || THEME_BG.viola,
+      pair = THEME_ACC[S.theme] || THEME_ACC.viola,
+      grad = x.createLinearGradient(0, 0, W, H);
+    grad.addColorStop(0, bg);
+    grad.addColorStop(1, mixHex(bg, pair[1], 0.35));
+    x.fillStyle = grad;
+    x.fillRect(0, 0, W, H);
+    x.fillStyle = pair[0];
+    x.fillRect(0, 0, W, 14);
+    x.textBaseline = 'alphabetic';
+    x.fillStyle = ink;
+    x.font = '800 52px system-ui, Segoe UI, sans-serif';
+    x.fillText('🎭 MINIGAMES HUB', 70, 120);
+    x.fillStyle = sub;
+    x.font = '600 36px system-ui, Segoe UI, sans-serif';
+    x.fillText(t('g_' + m.gid) + ' · ' + new Date().toLocaleDateString(S.lang === 'en' ? 'en-GB' : 'it-IT'), 70, 180);
+    x.fillStyle = pair[0];
+    x.font = '800 64px system-ui, Segoe UI, sans-serif';
+    const winTxt = m.winner ? '🎉 ' + t('summaryWinner') + ': ' + clip(m.winner, 24) : '🏁 ' + t('summaryNoPoints');
+    x.fillText(winTxt, 70, 300);
+    x.fillStyle = light ? 'rgba(28,25,23,.08)' : 'rgba(255,255,255,.07)';
+    x.fillRect(60, 350, W - 120, 590);
+    m.rows.forEach((r, i) => {
+      const y = 440 + i * 68;
+      if (i < 3) {
+        x.fillStyle = ['#fbbf24', '#cbd5e1', '#d97706'][i];
+        x.fillRect(60, y - 34, 10, 48);
+      }
+      x.fillStyle = sub;
+      x.font = '700 36px system-ui, Segoe UI, sans-serif';
+      x.fillText(i < 3 ? ['🥇', '🥈', '🥉'][i] : '#' + (i + 1), 90, y);
+      x.fillStyle = ink;
+      x.font = '700 40px system-ui, Segoe UI, sans-serif';
+      x.fillText(r.n, 170, y);
+      x.fillStyle = r.d > 0 && r.d === m.max ? pair[0] : sub;
+      x.font = '800 40px system-ui, Segoe UI, sans-serif';
+      x.textAlign = 'right';
+      x.fillText(r.d > 0 ? '+' + r.d : '0', W - 100, y);
+      x.textAlign = 'left';
+    });
+    x.fillStyle = sub;
+    x.font = '600 30px system-ui, Segoe UI, sans-serif';
+    x.fillText('zhenwang21.github.io/minigames-hub', 70, 1020);
+    const done = (blob) => {
+      if (!blob) return shareSummary();
+      try {
+        if (navigator.share && navigator.canShare && typeof File === 'function') {
+          const file = new File([blob], 'minigames-hub.png', { type: 'image/png' });
+          if (navigator.canShare({ files: [file] })) {
+            navigator.share({ files: [file], title: 'Minigames Hub', text: summaryText() }).catch(() => {});
+            return;
+          }
+        }
+      } catch (e) {}
+      try {
+        const url = URL.createObjectURL(blob),
+          a = document.createElement('a');
+        a.href = url;
+        a.download = 'minigames-hub.png';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+        announce(t('imgSaved'));
+      } catch (e) {
+        shareSummary();
+      }
+    };
+    if (cv.toBlob) cv.toBlob(done, 'image/png');
+    else done(null);
+  } catch (e) {
+    shareSummary();
+  }
+}
+function gameFromHash(h) {
+  const m = String(h == null ? '' : h).match(/game=([a-z_]+)/i),
+    id = m ? m[1].toLowerCase() : '';
+  return PLAYABLE.includes(id) ? id : '';
+}
 function parseInvite() {
   let hash = '';
   try {
     hash = (location.hash || '').toString();
   } catch (e) {}
   const m = hash.match(/room=([A-Z0-9]{5})/i);
-  if (!m) return;
+  if (!m) {
+    // Scorciatoia PWA: #game=<id> apre direttamente il setup del gioco.
+    const gid = gameFromHash(hash);
+    if (gid)
+      setTimeout(() => {
+        try {
+          selectGame(gid);
+        } catch (e) {}
+      }, 80);
+    return;
+  }
   NET.lastCode = m[1].toUpperCase();
   NET.err = '';
   S.hint = 'invite';
@@ -6535,10 +6678,12 @@ function tmClear() {
   TMR.end = 0;
   TMR.done = false;
   TMR.beep10 = false;
+  wakeSync();
 }
 function tmDraw() {
   const el = $('tmr');
   if (!el) return;
+  wakeSync();
   const on = tmAllowed();
   el.className = on ? 'on' : '';
   if (document.body && document.body.classList) document.body.classList.toggle('tmon', on);
@@ -10840,7 +10985,7 @@ function summaryBar() {
           `<div class="flex justify-between bg-slate-900 px-3 py-1.5 rounded-lg text-[11px]${i < 3 ? ' podium-' + (i + 1) : ''}"><span class="flex items-center gap-1.5 min-w-0"><span class="text-slate-500">${i < 3 ? ['🥇', '🥈', '🥉'][i] : '#' + (i + 1)}</span>${avHtml(r.n, i === 0 && d.max > 0 ? 'win' : '')}<b class="truncate">${esc(r.n)}</b>${streakTag(r.n)}</span><span class="${r.d === d.max && r.d > 0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">${r.d > 0 ? '+' + r.d : '0'}</span></div>`
       )
       .join('');
-  return `<section class="glass p-4 rounded-2xl space-y-2 border border-emerald-500/30"><div class="flex justify-between items-center"><h3 class="font-bold text-white text-sm">📊 ${t('summaryTitle')}</h3><span class="text-[10px] text-slate-400">${t('g_' + d.gid)}</span></div>${win}<details class="bg-slate-900/40 rounded-xl p-2"><summary class="text-[11px] font-bold cursor-pointer">${t('summaryRank')}</summary><div class="space-y-1 mt-1.5">${rows}</div></details><div class="flex gap-2"><button onclick="shareSummary()" class="flex-1 bg-slate-800 py-2 rounded-xl text-[11px] font-bold">📤 ${t('summaryShare')}</button><button onclick="rematchSummary()" class="flex-1 gbtn py-2 rounded-xl text-[11px] font-bold">🔁 ${t('summaryAgain')}</button></div></section>`;
+  return `<section class="glass p-4 rounded-2xl space-y-2 border border-emerald-500/30"><div class="flex justify-between items-center"><h3 class="font-bold text-white text-sm">📊 ${t('summaryTitle')}</h3><span class="text-[10px] text-slate-400">${t('g_' + d.gid)}</span></div>${win}<details class="bg-slate-900/40 rounded-xl p-2"><summary class="text-[11px] font-bold cursor-pointer">${t('summaryRank')}</summary><div class="space-y-1 mt-1.5">${rows}</div></details><div class="flex gap-2"><button onclick="shareResultImage()" class="flex-1 bg-slate-800 py-2 rounded-xl text-[11px] font-bold" title="${t('summaryImage')}">🖼️ ${t('summaryShare')}</button><button onclick="rematchSummary()" class="flex-1 gbtn py-2 rounded-xl text-[11px] font-bold">🔁 ${t('summaryAgain')}</button></div></section>`;
 }
 function rematchSummary() {
   const d = summaryData();
@@ -10924,7 +11069,7 @@ function clearLocalData() {
 function showNews() {
   const m = $('modal');
   if (!m) return;
-  const items = ['news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
+  const items = ['news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">✨ ${t('newsTitle')}</h3><ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">${items.map((k) => `<li>${t(k)}</li>`).join('')}</ul><button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
   modalOpen();
 }
@@ -11107,6 +11252,7 @@ function showSettings() {
     <p class="text-[11px] text-slate-400">${t('backupLast')}: <b class="text-slate-200">${fmtDate(S.lastBackup)}</b> · ${t('storageUse')}: <b class="text-slate-200">${fmtBytes(storageBytes())}</b></p>
     <div class="grid grid-cols-2 gap-2"><button onclick="exportBackup()" class="bg-slate-800 py-2 rounded-xl text-[11px] font-bold">⬇️ ${t('exportBtn')}</button><button onclick="importBackup()" class="bg-slate-800 py-2 rounded-xl text-[11px] font-bold">⬆️ ${t('importBtn')}</button></div>
     <div class="grid grid-cols-2 gap-2"><button onclick="installApp()" class="bg-slate-800 py-2 rounded-xl text-[11px] font-bold">📲 ${isStandalone() ? t('installed') : t('install')}</button><button onclick="clearLocalData()" class="bg-slate-900 border border-rose-500/30 py-2 rounded-xl text-[11px] font-bold text-rose-400">🗑 ${t('clearLocal')}</button></div>
+    <button onclick="showPrivacy()" class="text-[11px] text-slate-300 font-bold">🔒 ${t('privacyTitle')}</button>
   </div>
   <div class="flex gap-2"><button onclick="showNews()" class="flex-1 bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">✨ ${t('news')}</button><button onclick="restartOnboard()" class="flex-1 bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">👋 ${t('onboardAgain')}</button></div>
   <button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button>
@@ -11345,6 +11491,50 @@ function hideUpd() {
   const el = $('upd');
   if (el) el.classList.remove('on');
 }
+// --- Wake Lock: tiene acceso lo schermo mentre gira un timer ---
+let WAKE = null,
+  WAKE_ASK = null;
+function wakeWanted() {
+  try {
+    return !!(tmAllowed() && (TMR.iv || TMR.done || tmAuto()));
+  } catch (e) {
+    return false;
+  }
+}
+function wakeSync() {
+  try {
+    if (!navigator.wakeLock || !navigator.wakeLock.request) return;
+    if (wakeWanted()) {
+      if (WAKE || WAKE_ASK) return;
+      WAKE_ASK = navigator.wakeLock
+        .request('screen')
+        .then((s) => {
+          WAKE = s;
+          try {
+            s.addEventListener('release', () => {
+              WAKE = null;
+            });
+          } catch (e) {}
+        })
+        .catch(() => {})
+        .then(() => {
+          WAKE_ASK = null;
+        });
+    } else if (WAKE) {
+      const s = WAKE;
+      WAKE = null;
+      try {
+        s.release();
+      } catch (e) {}
+    }
+  } catch (e) {}
+}
+function showPrivacy() {
+  const m = $('modal');
+  if (!m) return;
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3 max-h-[85vh] overflow-y-auto"><h3 class="font-bold text-white">🔒 ${t('privacyTitle')}</h3><div class="text-xs text-slate-300 space-y-2 leading-relaxed"><p>${t('privacyLocal')}</p><p>${t('privacyOnline')}</p><p>${t('privacyNoTrack')}</p><p>${t('privacyBackup')}</p></div><button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
+  modalOpen();
+}
 function pwaInit() {
   try {
     if (!/^https?:$/.test(String(location.protocol || ''))) return;
@@ -11418,6 +11608,7 @@ document.addEventListener('visibilitychange', () => {
 });
 // Rientro in primo piano o rete tornata: ricalcolo i timer e richiedo lo stato.
 function netWake() {
+  wakeSync();
   if (TMR.iv) tmTick();
   if (NET.host && NET.game && NET.game.g === 'nc' && NET.game.ph === 'play') ncTick();
   if (NET.host && NET.game && NET.game.g === 'tb' && NET.game.ph === 'play') tbTick();

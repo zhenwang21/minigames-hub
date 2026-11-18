@@ -242,6 +242,16 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 
 ## 11. Cosa è stato corretto nell'ultima revisione
 
+### Versione 1.15.0 (condivisione e PWA)
+- **Immagine risultato**: `resultLines()` estrae gioco, righe e vincitori dal riepilogo; `shareResultImage()` disegna un PNG 1080×1080 su canvas (sfondo del tema, barre podio, testi IT/EN, URL) e usa `navigator.share` con `File` se disponibile, altrimenti scarica il file; in caso di errore ricade su `shareSummary()`. Nessun asset né upload.
+- **Scorciatoie PWA**: `manifest.webmanifest` ha tre `shortcuts` (`#game=impostore`, `#game=lupus`, `#game=preferisci`); `gameFromHash()` valida l'id contro `PLAYABLE` e `parseInvite()` apre il setup con `selectGame` dopo 80 ms, senza interferire con `#room=`.
+- **Wake Lock**: `wakeWanted()`/`wakeSync()` chiedono `navigator.wakeLock.request('screen')` quando c'è un timer attivo o un round online con timer, rilasciano su `tmClear()` e riprovano da `netWake()`. Tutto dentro try/catch: browser senza API restano identici.
+- **Anteprima link**: `description`, `og:type/site_name/title/description/url/image` e `twitter:card/title/description/image` nell'head.
+- **Privacy**: `showPrivacy()` apre una modale con quattro paragrafi (dati locali, stanza online, niente tracciamento, backup) e un pulsante nelle impostazioni; testi IT/EN.
+- **Novità**: `news19` IT/EN in testa alla modale.
+- **Test**: `features.test.js` sale a **226** (meta OG/Twitter, JSON del manifest e shortcut, `gameFromHash`, immagine senza riepilogo, richiesta/rilascio wake lock con API finta, chiavi privacy IT/EN, modale e pulsante). **12/12 suite** verdi su sorgente e minificato.
+- `APP_VERSION` e `VERSION` portate a **1.15.0**; build: sorgente **511.143** byte, minificato **418.994** byte.
+
 ### Versione 1.14.0 (suoni, vibrazioni, timer)
 - **Pacchetti suoni**: `SND_PACK` (`soft` sine, `arcade` square, `chime` triangle) con `sndCfg()`, `sndLevel()` (volume 0–100, mai zero per le rampe esponenziali), `sndCtx()`/`tone()`/`releaseCtx()` condivisi. `winChime()` e `tmRing()` usano pacchetto e volume; `S.sndPack` e `S.vol` sono salvati, inclusi nel backup e ripristinati.
 - **Volume**: slider 0–100 in impostazioni (`setVol`), anteprima (`previewSnd`), `sndReady()` blocca l'audio a volume zero senza perdere l'impostazione.

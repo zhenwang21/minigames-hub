@@ -4,6 +4,31 @@
 release number; `sw.js` must follow it. Older history (1.2–1.5) is described in
 `MINIGAMES_HUB_HANDOFF.md`.
 
+## 1.15.0 — 2026-11-18
+
+### Added
+- **Shareable result image** — the summary gains an image button that draws a
+  1080×1080 PNG on a canvas (winner, top rows, theme colours) and opens the
+  system share sheet or downloads the file. Nothing is uploaded and the text
+  summary stays as a fallback.
+- **PWA shortcuts** — long-pressing the installed icon offers Impostor,
+  Werewolf and Would You Rather; `#game=<id>` deep links open the right setup
+  directly, while `#room=` invites keep working.
+- **Screen wake lock** — while a discussion or online round timer is running the
+  app asks the browser to keep the screen on, releases it when the timer stops
+  and asks again when the page comes back to the foreground.
+- **Link previews** — description, Open Graph and Twitter meta tags so shared
+  links show a proper title, text and icon.
+- **Privacy page** — a short in-app explanation of what stays on the phone, what
+  the online room shares, the absence of tracking and how backups work.
+
+### Changed
+- Minified build: 418,994 bytes; source: 511,143 bytes.
+
+### Tests
+- `features.test.js` at 226 checks; 12/12 suites green on source and minified
+  build.
+
 ## 1.14.0 — 2026-11-17
 
 ### Added
