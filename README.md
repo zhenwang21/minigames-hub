@@ -45,7 +45,7 @@ No install, no account, no backend.
 - **Questions written by the players** — a one-time note (plus a permanent hint in the setup screen) explains that the built-in databases are only a starting point and the games work best with original questions written by the group; it can be dismissed permanently and reopened from the settings. **My questions** adds your own lines for Who Said That? and Would You Rather (one per line / `A | B` pairs), used alongside the built-in ones and saved in the backup.
 - **Host notes** — a private memo in the host bar, plus **Share with everyone** to send it read-only to every phone in the room; guests see it as a dismissible banner.
 - **Player management** — rename a player inline (the score follows the new name), remove one by mistake and tap **Undo removal**, or clear the whole list.
-- **Settings panel** — sound on/off plus three sound packs, a volume slider and vibration, seven themes (Purple / Ocean / Sunset / Forest / Neon / Ice / light Paper) with preview cards and matching page backgrounds, a standard or rounded font, a custom accent that keeps text readable, accessibility, default timer, content tools, backup data, a local statistics card and a privacy page, all saved on the phone and included in the backup.
+- **Settings panel** — sound on/off plus three sound packs, a volume slider and vibration, seven themes (Purple / Ocean / Sunset / Forest / Neon / Ice / light Paper) with preview cards and matching page backgrounds, a standard or rounded font, a custom accent that keeps text readable, accessibility, default timer, content tools, backup data, a local statistics card and a privacy page, all saved on the phone and included in the backup. Dialogs trap Tab inside them, close on Escape and give focus back to the button that opened them.
 - **Local stats** — finished games, wins, current streak and best streak per player, counted from the points each player gains during a game; the most played game, the last few games with their winners, and a CSV export are included too.
 - **Victory sounds** — a short chime at the end of a game, with a different three-note pattern per game; it follows the existing sound switch.
 - **Play again** — the host's lobby offers one tap to restart the last game with the same players.
@@ -87,6 +87,10 @@ Online needs 3 players (Werewolf and Forbidden Words 4, Would You Rather and Nam
 | `tools/make-icons.js` | Regenerates the PNG icons with no dependencies. |
 | `tools/bump-version.js` | `node tools/bump-version.js 1.12.0` updates `APP_VERSION`, both “What’s new” titles, `sw.js` and the version assertions, then rebuilds. |
 | `tools/size-report.js` | Prints raw/gzip sizes of the main files plus the inline JS/CSS split of the minified build. |
+| `tools/serve.js` | `node tools/serve.js` serves the folder on http://localhost:8080 so the service worker and the share sheet can be tested. |
+| `package.json` | npm scripts (`test`, `test:min`, `build`, `size`, `serve`, `test:e2e`, `lh`) and optional dev dependencies. |
+| `playwright.config.js`, `tests/e2e/` | Optional Playwright smoke test on a mobile viewport; not run in CI. |
+| `.github/dependabot.yml` | Weekly GitHub Actions updates and monthly npm updates. |
 | `tests/` | Node test suites (`node tests/run-all.js`, add `--min` for the minified build). |
 | `.github/workflows/ci.yml` | Rebuilds, fails on a stale build and runs both test suites on every push/PR. |
 | `CHANGELOG.md` | Release notes starting at 1.11.0 (older history in the handoff). |
@@ -116,7 +120,14 @@ node tests/run-all.js             # all suites on the source
 node tests/run-all.js --min       # all suites on the minified build
 node tools/bump-version.js 1.12.0 # bump version, titles, sw.js and rebuild
 node tools/size-report.js         # raw/gzip sizes and inline JS/CSS split
+node tools/serve.js               # static server on :8080 for PWA/share tests
 ```
+
+With `npm install` the same commands are available as `npm test`, `npm run
+test:min`, `npm run build`, `npm run size` and `npm run serve`. Two optional
+extras need the dev dependencies: `npm run test:e2e` (Playwright smoke test on
+a mobile viewport, start `npm run serve` first or let the config do it) and
+`npm run lh` (Lighthouse against the local server, while it is running).
 
 Terser must be available (`npm i terser` or `npm i terser --prefix "%TEMP%\mgast"`);
 the CI pins 5.51.2 because the build is reproducible with that version.

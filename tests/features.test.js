@@ -171,7 +171,7 @@ const lobby = resApp.run('viewOnline()');
 check(lobby.includes('copyCode()'), 'lobby con copia del codice');
 check(lobby.includes('1/2') && lobby.includes('connessi'), 'lobby mostra i giocatori connessi');
 check(lobby.includes('offline') && lobby.includes('host'), 'lobby distingue offline e host');
-check(lobby.includes('1.17.0'), 'lobby mostra la versione');
+check(lobby.includes('1.18.0'), 'lobby mostra la versione');
 // riepilogo condivisibile
 RS.scores = { Anna: 300, Bruno: 100 };
 RN.game = { g: 'impostore' };
@@ -394,7 +394,7 @@ check(q.run('backupReminder()') === '', 'senza dati il promemoria non compare');
 q.run('resetPrefs()');
 check(QS.timerPref === 120 && QS.mode === 'auto' && QS.ncPref.length === 0, 'ripristino preferenze giochi');
 q.run('showNews()');
-check(q.els.modal.innerHTML.includes('Novità 1.17.0'), 'la modale Novità è alla versione 1.17.0');
+check(q.els.modal.innerHTML.includes('Novità 1.18.0'), 'la modale Novità è alla versione 1.18.0');
 check(q.els.modal.innerHTML.includes('Colori e simboli dedicati'), 'le novità elencano i cosmetics');
 q.run('closeModal()');
 
@@ -818,6 +818,31 @@ check(c17.run('achHtml()').includes(`${gotAch.length}/9`), 'la griglia mostra qu
 check(
   c17.run("!!I.it.dailyTitle && !!I.en.mixStart && !!I.it.achTitle && !!I.en.news21"),
   'sfida, mix, obiettivi e novità sono tradotti'
+);
+
+// --- 1.18.0: focus trap e tooling ---
+const c18 = boot();
+check(typeof c18.run('trapFocus') === 'function' && typeof c18.run('modalFocusables') === 'function', 'la modale ha il gestore del focus');
+c18.run(
+  "const M=$('modal'); M.style.display='flex'; __A={focus(){this.f=1}}; __B={focus(){this.f=1}}; M.querySelectorAll=()=>[__A,__B]; document.activeElement=__B; __p=0; trapFocus({key:'Tab',shiftKey:false,preventDefault(){__p++}})"
+);
+check(c18.ctx.__A.f === 1 && c18.ctx.__p === 1, 'Tab sull’ultimo elemento torna al primo');
+c18.run("document.activeElement=__A; trapFocus({key:'Tab',shiftKey:true,preventDefault(){__p++}})");
+check(c18.ctx.__B.f === 1 && c18.ctx.__p === 2, 'Shift+Tab sul primo elemento va all’ultimo');
+c18.run("M.style.display='flex'; trapFocus({key:'Escape'})");
+check(c18.els.modal.style.display === 'none', 'Escape chiude la modale');
+
+const pkg = JSON.parse(fs.readFileSync(require('path').join(__dirname, '..', 'package.json'), 'utf8'));
+const repo = require('path').join(__dirname, '..');
+check(
+  !!pkg.scripts.test && !!pkg.scripts['test:min'] && !!pkg.scripts.build && !!pkg.scripts.serve,
+  'package.json offre script per test, build e server locale'
+);
+check(fs.existsSync(require('path').join(repo, '.github', 'dependabot.yml')), 'Dependabot è configurato');
+check(
+  fs.existsSync(require('path').join(repo, 'tests', 'e2e', 'smoke.spec.js')) &&
+    fs.existsSync(require('path').join(repo, 'playwright.config.js')),
+  'i test browser Playwright sono pronti'
 );
 
 check(c.run("joinPayload().name") === CS.players[0] || typeof c.run('joinPayload()') === 'object', 'il join include il payload avatar');

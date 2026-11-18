@@ -641,7 +641,7 @@ const I = {
     installed: 'App installata',
     offline: 'Offline',
     news: 'Novità',
-    newsTitle: 'Novità 1.17.0',
+    newsTitle: 'Novità 1.18.0',
     news9: 'Rinomina e annulla rimozione dei giocatori.',
     news10: 'Statistiche con ultime partite ed export CSV.',
     news11: 'Backup: unisci o sostituisci, con avviso di versione.',
@@ -655,6 +655,7 @@ const I = {
     news19: 'Risultati condivisibili come immagine, scorciatoie PWA per i giochi, schermo acceso durante i timer e una pagina Privacy.',
     news20: 'Host: passa il comando, riordina i giocatori, PIN stanza e QR più grande o scaricabile. Banner per chi è offline.',
     news21: 'Sfida del giorno, modalità mix, grafici delle partite e obiettivi in impostazioni.',
+    news22: 'Tastiera e schermo: Tab resta nella finestra aperta ed Esc la chiude.',
     news7: 'Colori e simboli dedicati per ogni gioco.',
     news8: 'Avatar e colori per i giocatori in liste, lobby e classifiche.',
     news1: 'Introduzione per i nuovi arrivati e partita demo.',
@@ -1135,7 +1136,7 @@ const I = {
     installed: 'App installed',
     offline: 'Offline',
     news: 'What’s new',
-    newsTitle: 'What’s new in 1.17.0',
+    newsTitle: 'What’s new in 1.18.0',
     news9: 'Rename players and undo a removal.',
     news10: 'Statistics with recent games and CSV export.',
     news11: 'Backup: merge or replace, with a version warning.',
@@ -1149,6 +1150,7 @@ const I = {
     news19: 'Results shared as an image, PWA shortcuts for the games, screen kept awake during timers and a privacy page.',
     news20: 'Host tools: pass control, reorder players, room PIN and a bigger or downloadable QR. Banner for offline players.',
     news21: 'Daily challenge, mix mode, game charts and achievements in settings.',
+    news22: 'Keyboard and screen: Tab stays inside the open dialog and Esc closes it.',
     news7: 'Dedicated colours and symbols for every game.',
     news8: 'Avatars and colours for players in lists, lobbies and standings.',
     news1: 'A welcome intro for newcomers and a demo game.',
@@ -1302,7 +1304,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.17.0';
+const APP_VERSION = '1.18.0';
 // Ripresa dopo reload/standby: la sessione dura al massimo due ore.
 const RESUME_TTL = 2 * 60 * 60 * 1000;
 let RESUME = { room: null, snap: null, savedAt: 0, lastKey: '' };
@@ -11351,7 +11353,7 @@ function clearLocalData() {
 function showNews() {
   const m = $('modal');
   if (!m) return;
-  const items = ['news21', 'news20', 'news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
+  const items = ['news22', 'news21', 'news20', 'news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">✨ ${t('newsTitle')}</h3><ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">${items.map((k) => `<li>${t(k)}</li>`).join('')}</ul><button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
   modalOpen();
 }
@@ -11544,6 +11546,40 @@ function showSettings() {
   modalOpen();
 }
 // Apre la modale e porta il focus dentro; closeModal ripristina il focus dopo.
+function modalFocusables() {
+  try {
+    const m = $('modal');
+    if (!m || !m.querySelectorAll) return [];
+    return Array.from(
+      m.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+    ).filter((el) => el && !el.disabled);
+  } catch (e) {
+    return [];
+  }
+}
+// Tab resta dentro la modale, Escape la chiude.
+function trapFocus(e) {
+  const m = $('modal');
+  if (!m || m.style.display !== 'flex' || !e) return;
+  if (e.key === 'Escape') {
+    if (e.preventDefault) e.preventDefault();
+    closeModal();
+    return;
+  }
+  if (e.key !== 'Tab') return;
+  const f = modalFocusables();
+  if (!f.length) return;
+  const first = f[0],
+    last = f[f.length - 1],
+    active = document.activeElement;
+  if (e.shiftKey && active === first) {
+    if (e.preventDefault) e.preventDefault();
+    if (last.focus) last.focus();
+  } else if (!e.shiftKey && active === last) {
+    if (e.preventDefault) e.preventDefault();
+    if (first.focus) first.focus();
+  }
+}
 function modalOpen() {
   const m = $('modal');
   if (!m) return;
@@ -11907,6 +11943,7 @@ function netWake() {
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) netWake();
 });
+if (document.addEventListener) document.addEventListener('keydown', trapFocus);
 if (window.addEventListener) window.addEventListener('online', netWake);
 // Sblocco audio su iOS al primo gesto (timer di discussione).
 if (document.addEventListener)

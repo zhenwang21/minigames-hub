@@ -242,6 +242,13 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 
 ## 11. Cosa è stato corretto nell'ultima revisione
 
+### Versione 1.18.0 (accessibilità da tastiera e tooling)
+- **Focus trap**: `modalFocusables()` raccoglie gli elementi focalizzabili dentro `#modal`; `trapFocus(e)` gestisce Tab/Shift+Tab mantenendo il focus nella finestra e `Escape` che chiama `closeModal()` (che già ripristinava `MODAL_PREV`). Listener `keydown` registrato una volta a fine script, innocuo su touch.
+- **Tooling**: `package.json` con script `test`, `test:min`, `build`, `size`, `serve`, `test:e2e`, `lh` e devDependencies Playwright/Lighthouse; `tools/serve.js` server statico senza dipendenze (porta 8080, cache disattivata, path traversal bloccato); `playwright.config.js` con viewport Pixel 5 e `webServer`; `tests/e2e/smoke.spec.js` copre home, sfida del giorno, impostazioni con Esc e modalità mix, fallendo su errori JS. `.github/dependabot.yml` per actions (settimanale) e npm (mensile).
+- **Novità**: `news22` IT/EN in testa.
+- **Test**: `features.test.js` sale a **262** (Tab avanti/indietro, Escape che chiude, script e file di tooling presenti, Dependabot). **12/12 suite** verdi su sorgente e minificato; 4 run online senza fallimenti.
+- `APP_VERSION` e `VERSION` portate a **1.18.0**; build: sorgente **525.867** byte, minificato **430.955** byte.
+
 ### Versione 1.17.0 (statistiche e coinvolgimento)
 - **Sfida del giorno**: `dayKey`/`dayHash`/`dailyPick(ts)` scelgono un gioco di `PLAYABLE` in modo deterministico per data locale; `dailyDone()` controlla `S.stats.recent`, `dailyStreak()` conta i giorni consecutivi (al massimo 20, senza stato extra) e `dailyCard()` mostra la card in home con lo stato.
 - **Modalità mix**: `mixGame()` filtra i giochi con abbastanza giocatori, sceglie con `rnd` e apre `selectGame`, annunciando la scelta.

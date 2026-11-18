@@ -4,6 +4,28 @@
 release number; `sw.js` must follow it. Older history (1.2–1.5) is described in
 `MINIGAMES_HUB_HANDOFF.md`.
 
+## 1.18.0 — 2026-11-18
+
+### Added
+- **Keyboard-friendly dialogs** — focus stays inside the open dialog with Tab and
+  Shift+Tab, Escape closes it and the focus returns to the button that opened
+  it.
+- **npm scripts and a local server** — `package.json` exposes `test`, `test:min`,
+  `build`, `size`, `serve` and `lh`; `tools/serve.js` is a dependency-free
+  static server so the service worker and the share sheet can be tried over
+  http.
+- **Optional browser tooling** — a Playwright smoke test (`tests/e2e/`) drives
+  home, the daily challenge, settings and mix mode on a mobile viewport, and a
+  Lighthouse command is documented. Neither is part of CI.
+- **Dependabot** — weekly updates for GitHub Actions and monthly for npm.
+
+### Changed
+- Minified build: 430,955 bytes; source: 525,867 bytes.
+
+### Tests
+- `features.test.js` at 262 checks; 12/12 suites green on source and minified
+  build.
+
 ## 1.17.0 — 2026-11-18
 
 ### Added
