@@ -171,7 +171,7 @@ const lobby = resApp.run('viewOnline()');
 check(lobby.includes('copyCode()'), 'lobby con copia del codice');
 check(lobby.includes('1/2') && lobby.includes('connessi'), 'lobby mostra i giocatori connessi');
 check(lobby.includes('offline') && lobby.includes('host'), 'lobby distingue offline e host');
-check(lobby.includes('1.18.0'), 'lobby mostra la versione');
+check(lobby.includes('1.19.0'), 'lobby mostra la versione');
 // riepilogo condivisibile
 RS.scores = { Anna: 300, Bruno: 100 };
 RN.game = { g: 'impostore' };
@@ -394,7 +394,7 @@ check(q.run('backupReminder()') === '', 'senza dati il promemoria non compare');
 q.run('resetPrefs()');
 check(QS.timerPref === 120 && QS.mode === 'auto' && QS.ncPref.length === 0, 'ripristino preferenze giochi');
 q.run('showNews()');
-check(q.els.modal.innerHTML.includes('Novità 1.18.0'), 'la modale Novità è alla versione 1.18.0');
+check(q.els.modal.innerHTML.includes('Novità 1.19.0'), 'la modale Novità è alla versione 1.19.0');
 check(q.els.modal.innerHTML.includes('Colori e simboli dedicati'), 'le novità elencano i cosmetics');
 q.run('closeModal()');
 
@@ -887,6 +887,130 @@ c.run('syncPvMine()');
 check(
   !c.run('PV_DB.mine') && CS.favPV.join(',') === 'classic',
   'senza domande personali il pacchetto mine sparisce anche dai preferiti'
+);
+
+// --- 1.19.0: aptica giusta/sbagliata, vittorie per gioco, riconnessione e setup QR ---
+const c19 = boot();
+c19.run(`
+  S.vibOn = true;
+  navigator.vibrate = function (p) { globalThis.__vib = (globalThis.__vib || []).concat([p]); };
+  NET.host = true; NET.players = ['Anna'];
+  NET.game = { g: 'nc', ph: 'review', cats: [{ k: 'a' }], ok: {} };
+  ncBc = function () {};
+  VIB_LAST = 0; ncToggleAt(0, 0);
+`);
+check(JSON.stringify(c19.run('__vib[0]')) === '[45,70,45]', 'segnare una risposta sbagliata vibra con lo schema wrong');
+c19.run('VIB_LAST = 0; ncToggleAt(0, 0)');
+check(JSON.stringify(c19.run('__vib[1]')) === '[20,55,20]', 'segnare una risposta giusta vibra con lo schema correct');
+c19.run(`
+  NET.game = { g: 'chi', ph: 'play', lives: { Anna: 2 }, done: {}, last: 'Anna', res: null };
+  chiBc = function () {}; scoreSnap = function () {}; netScore = function () {};
+  VIB_LAST = 0; chiResolve(false);
+`);
+check(
+  JSON.stringify(c19.run('__vib[2]')) === '[45,70,45]' && c19.run('NET.game.lives.Anna') === 1,
+  'Chi sono io? vibra e toglie una vita quando la risposta è sbagliata'
+);
+c19.run('VIB_LAST = 0; NET.game.ph = "play"; NET.game.lives.Anna = 2; chiResolve(true)');
+check(JSON.stringify(c19.run('__vib[3]')) === '[20,55,20]', 'Chi sono io? vibra quando la risposta è giusta');
+
+const c19b = boot();
+c19b.run(`
+  S.screen = 'play'; S.game = 'impostore'; S.players = ['Anna', 'Bruno'];
+  S.scores = { Anna: 3, Bruno: 0 };
+  S.stats = { games: 0, byGame: {}, wby: {}, wins: {}, played: {}, streak: {}, best: {}, recent: [] };
+  winChime = function () {}; statsRecord('impostore', { scores: { Anna: 0, Bruno: 0 } });
+`);
+check(c19b.run('S.stats.wby.impostore') === 1, 'una partita con un vincitore conta la vittoria per gioco');
+check(c19b.run('S.stats.wby.impostore') === 1 && c19b.run('S.stats.byGame.impostore') === 1, 'partite e vittorie per gioco sono contatori separati');
+c19b.run("S.scores = { Anna: 3, Bruno: 3 }; statsRecord('impostore', { scores: { Anna: 3, Bruno: 3 } })");
+check(c19b.run('S.stats.wby.impostore') === 1, 'una partita senza punti nuovi non aggiunge vittorie');
+check(
+  c19b.run("sanitizeStats({ wby: { impostore: 2, nope: 5 } }).wby.impostore") === 2 &&
+    c19b.run("sanitizeStats({ wby: { impostore: 2, nope: 5 } }).wby.nope") === undefined,
+  'il backup accetta solo vittorie di giochi conosciuti'
+);
+c19b.run("S.stats.wby = { impostore: 2 }; S.stats.byGame = { impostore: 5 }; S.stats.recent = []");
+const chart19 = c19b.run('statsChartsHtml()');
+check(
+  chart19.includes(c19b.run("t('chartWins')")) && chart19.includes('width:'),
+  'il grafico delle vittorie per gioco è presente'
+);
+
+const c19c = boot();
+c19c.run("NET.st = 'recover'; NET.recTries = 3; NET.lastCode = 'ABCDE'; NET.host = false");
+const rec19 = c19c.run('viewOnline()');
+check(
+  rec19.includes(c19c.run("X('Tentativo', 'Attempt')")) &&
+    rec19.includes('3') &&
+    rec19.includes('netRetryNow()'),
+  'la riconnessione mostra il numero di tentativi e il retry manuale'
+);
+
+check(
+  c19c.run("setupPayload().g") === '' || typeof c19c.run('setupPayload()') === 'object',
+  'il payload del setup è un oggetto'
+);
+c19c.run("S.players = ['Anna', 'Bruno']; S.game = 'lupus'; S.quick = true; S.timerPref = 180");
+check(
+  c19c.run('setupPayload().p.join(",")') === 'Anna,Bruno' &&
+    c19c.run('setupPayload().q') === 1 &&
+    c19c.run('setupPayload().t') === 180,
+  'il payload porta gioco, giocatori, modalità veloce e timer'
+);
+check(c19c.run('setupLink()').includes('#setup='), 'il link di setup usa il frammento #setup=');
+check(
+  c19c.run("applySetup({ g: 'lupus', p: ['Anna', 'anna', 'Bruno'], q: 1, t: 120 })") === true &&
+    c19c.run('S.players.join(",")') === 'Anna,Bruno' &&
+    c19c.run('S.quick') === true &&
+    c19c.run('S.timerPref') === 120 &&
+    c19c.run('S.screen') === 'setup',
+  'aprire un setup condiviso applica gioco, nomi senza duplicati, veloce e timer'
+);
+check(c19c.run("applySetup({ g: 'non_esiste' })") === false, 'un setup con gioco sconosciuto viene rifiutato');
+const setupHash = '#setup=' + encodeURIComponent(JSON.stringify({ g: 'impostore', p: ['Zoe'], q: 0, t: 60 }));
+check(
+  c19c.run(`parseSetupHash(${JSON.stringify(setupHash)})`) === true && c19c.run('S.game') === 'impostore',
+  'il frammento #setup= viene letto all’avvio'
+);
+const bootSetup = boot({ hash: setupHash });
+check(
+  bootSetup.run('S.game') === 'impostore' && bootSetup.run('S.players.join(",")') === 'Zoe',
+  'aprire il link di setup carica il gioco e i giocatori'
+);
+c19c.run("S.game = 'lupus'; S.players = ['Anna']; showSetupShare()");
+check(
+  c19c.els.modal.innerHTML.includes('#setup=') && c19c.els.modal.innerHTML.includes(c19c.run("t('shareSetup')")),
+  'la modale di condivisione mostra QR, link e titolo'
+);
+check(
+  /onclick="showSetupShare\(\)"/.test(srcHtml) || /showSetupShare\(\)/.test(srcHtml),
+  'il pulsante di condivisione è nel setup'
+);
+
+const ogFile = require('path').join(__dirname, '..', 'icons', 'og.png');
+const ogBuf = fs.readFileSync(ogFile);
+check(
+  ogBuf[0] === 0x89 && ogBuf[1] === 0x50 && ogBuf.readUInt32BE(16) === 1200 && ogBuf.readUInt32BE(20) === 630,
+  'l’immagine Open Graph è un PNG 1200x630'
+);
+check(
+  srcHtml.includes('icons/og.png') &&
+    srcHtml.includes('og:image:width') &&
+    srcHtml.includes('summary_large_image'),
+  'i meta tag puntano alla card Open Graph grande'
+);
+const pkg19 = JSON.parse(fs.readFileSync(require('path').join(__dirname, '..', 'package.json'), 'utf8'));
+check(!!pkg19.scripts.icons && !!pkg19.devDependencies['@playwright/test'], 'package.json ha icone e Playwright fissato');
+check(
+  fs.existsSync(require('path').join(__dirname, '..', 'lighthouserc.json')) &&
+    fs.existsSync(require('path').join(__dirname, '..', 'tests', 'e2e', 'visual.spec.js')),
+  'ci sono budget Lighthouse e diff di screenshot'
+);
+const ciYml = fs.readFileSync(require('path').join(__dirname, '..', '.github', 'workflows', 'ci.yml'), 'utf8');
+check(
+  ciYml.includes('playwright install') && ciYml.includes('lighthouse-ci-action') && ciYml.includes('npm ci'),
+  'la CI esegue Playwright, Lighthouse e installa dal lockfile'
 );
 
 done();

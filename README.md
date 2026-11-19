@@ -26,7 +26,7 @@ No install, no account, no backend.
 - **Pass & Play or Online** — one device in the middle of the table, or a P2P room (PeerJS) without creating an account.
 - **Host migration** — if the host's phone drops, another player takes over and the game continues from the same point; the original host can rejoin with the room code.
 - **QR / link invite** — the lobby shows a QR code and a shareable link containing `#room=CODE`. Opening it fills in the room code; the guest only picks a name and taps Join. The QR can be enlarged or downloaded as SVG, and an optional 4-digit room PIN is carried in the link (`&pin=`) and required to join. When the page is opened from `file://`, the link falls back to the published GitHub Pages URL so the QR still works.
-- **Fast recovery** — a client whose connection blips reconnects to the room by itself instead of triggering an election, then asks the host to re-send the current screen (`{t:'sync'}`). Coming back from standby or mobile-data hiccups no longer leaves a stuck or out-of-date screen. A dropped player keeps their seat for 60 seconds.
+- **Fast recovery** — a client whose connection blips reconnects to the room by itself instead of triggering an election, then asks the host to re-send the current screen (`{t:'sync'}`). The retry screen shows the attempt number and a manual “Retry now”. Coming back from standby or mobile-data hiccups no longer leaves a stuck or out-of-date screen. A dropped player keeps their seat for 60 seconds.
 - **Host controls** — the host can pass control to another player, reorder players (and turn order), set or remove a 4-digit room PIN, kick someone from the lobby, and end the game at any time (scores are kept), close a Names, Things and Cities round or a Forbidden Words turn before the timer runs out, and end/reveal Who Am I?.
 - **Score tools** — 🏆 shows the table with "Undo last round" (up to 20 snapshots) and "Edit scores" for manual corrections. Host edits are pushed to every phone, and the panel can share or copy the summary.
 - **Backup & restore** — export players, scores, custom roles, custom Names, Things and Cities categories and personal questions to a JSON file. Importing shows the file version and offers **merge** (adds players, scores, statistics and content without touching settings) or **replace**; a backup from a different app version is flagged first.
@@ -39,7 +39,8 @@ No install, no account, no backend.
 - **First-run intro & demo** — a short welcome card explains the flow and offers a demo game; the demo never touches saved scores or statistics.
 - **End-of-game summary** — when a game ends, the winner and the points each player gained in that game are shown at the top, with share, share-as-image and play-again buttons. The image is drawn on a canvas and goes through the system share sheet or a download; nothing is uploaded.
 - **Daily challenge and mix mode** — the home screen suggests a deterministic game for the day (marked done when it appears in the local recent results, with a consecutive-day count) and a mix button opens a random offline game that fits the current player count.
-- **Statistics and achievements** — settings keep the per-player table, add a bar chart per game and a seven-day activity chart, plus nine badges derived from wins, streaks, total games, catalogue coverage and late-night sessions.
+- **Statistics and achievements** — settings keep the per-player table, add a bar chart per game, a wins-per-game chart and a seven-day activity chart, plus nine badges derived from wins, streaks, total games, catalogue coverage and late-night sessions.
+- **Share a setup** — a button in the game setup turns the current table into a QR/link (`#setup=`) with the game, player names, quick mode and default timer, so another phone starts from the same point; roles and categories stay on the first phone.
 - **Timers keep the screen awake** — while a discussion or online round timer runs, the app asks for a screen wake lock and releases it when the timer stops; browsers without the API simply ignore it.
 - **Remembered preferences** — mode, role counts, categories, Would You Rather pack, discussion timer, favourite packs and already-seen questions are restored on the next visit and included in the backup.
 - **Questions written by the players** — a one-time note (plus a permanent hint in the setup screen) explains that the built-in databases are only a starting point and the games work best with original questions written by the group; it can be dismissed permanently and reopened from the settings. **My questions** adds your own lines for Who Said That? and Would You Rather (one per line / `A | B` pairs), used alongside the built-in ones and saved in the backup.
@@ -83,13 +84,16 @@ Online needs 3 players (Werewolf and Forbidden Words 4, Would You Rather and Nam
 | `Minigames Hub.html` | Source of truth, readable and formatted. Edit this one. |
 | `Minigames Hub.min.html` | Same build as `index.html`, kept with an explicit name for offline sharing. |
 | `build-min.js` | `node build-min.js` regenerates both builds from the source (needs [terser](https://terser.org/)). |
-| `manifest.webmanifest`, `sw.js`, `icons/` | PWA install and offline shell; the cache version in `sw.js` must follow `APP_VERSION`. |
+| `manifest.webmanifest`, `sw.js`, `icons/` | PWA install and offline shell; the cache version in `sw.js` must follow `APP_VERSION`. `icons/og.png` is the 1200×630 link-preview card. |
 | `tools/make-icons.js` | Regenerates the PNG icons with no dependencies. |
+| `tools/make-og.js` | Regenerates `icons/og.png` (1200×630) with the same dependency-free PNG encoder. |
 | `tools/bump-version.js` | `node tools/bump-version.js 1.12.0` updates `APP_VERSION`, both “What’s new” titles, `sw.js` and the version assertions, then rebuilds. |
 | `tools/size-report.js` | Prints raw/gzip sizes of the main files plus the inline JS/CSS split of the minified build. |
 | `tools/serve.js` | `node tools/serve.js` serves the folder on http://localhost:8080 so the service worker and the share sheet can be tested. |
-| `package.json` | npm scripts (`test`, `test:min`, `build`, `size`, `serve`, `test:e2e`, `lh`) and optional dev dependencies. |
-| `playwright.config.js`, `tests/e2e/` | Optional Playwright smoke test on a mobile viewport; not run in CI. |
+| `package.json` | npm scripts (`test`, `test:min`, `build`, `size`, `serve`, `test:e2e`, `icons`, `lh`) and pinned dev dependencies. |
+| `package-lock.json` | Pins the browser tooling; CI installs with `npm ci`. |
+| `playwright.config.js`, `tests/e2e/` | Playwright smoke test and same-run screenshot diff on a mobile viewport, run in CI. |
+| `lighthouserc.json` | Lighthouse score thresholds and resource budgets, run in CI. |
 | `.github/dependabot.yml` | Weekly GitHub Actions updates and monthly npm updates. |
 | `tests/` | Node test suites (`node tests/run-all.js`, add `--min` for the minified build). |
 | `.github/workflows/ci.yml` | Rebuilds, fails on a stale build and runs both test suites on every push/PR. |
@@ -104,7 +108,7 @@ Online needs 3 players (Werewolf and Forbidden Words 4, Would You Rather and Nam
 - [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) 1.4.4 (MIT), embedded inline to draw the invite QR without external calls.
 - Google Font *Plus Jakarta Sans*.
 - `node build-min.js` minifies only the inline JS with terser (`mangle: false`, because function names are referenced by inline handlers) and writes `index.html` + `Minigames Hub.min.html`. Building from a clean LF checkout with terser 5.51.2 is byte-for-byte reproducible; CI rebuilds and fails if the committed build is stale.
-- GitHub Actions (`.github/workflows/ci.yml`) runs the rebuild, the stale-build check and both test suites on every push to `main` and on pull requests.
+- GitHub Actions (`.github/workflows/ci.yml`) runs the rebuild, the stale-build check, both Node test suites, a Playwright job (smoke and same-run screenshot diff) and a Lighthouse budget job on every push to `main` and on pull requests.
 - PWA install and the offline shell are served by `sw.js`; the service worker cache name follows `APP_VERSION`, so each release replaces the old cache. Service workers only run over http(s), not from `file://`.
 - Themes are seven CSS-variable sets (`--acc1/--acc2/--acc3` for gradients, `--btn1/--btn2` for buttons) plus a matching page background, switched by `data-theme` on `<html>`; no per-screen styles are duplicated for each theme. Paper adds light-surface overrides for `.glass`, the slate utility classes and inputs. `THEME_BG` also updates the `theme-color` meta tag so the browser/PWA bar follows the theme.
 - A custom accent (`S.accent`) sets the same five variables inline on `<html>`; `accentColors()` derives the shades and runs a WCAG contrast loop (`ensureContrast`) so the gradient stays visible on the theme background and button labels stay readable. Removing the accent drops the inline variables and returns to the theme defaults.
@@ -124,10 +128,11 @@ node tools/serve.js               # static server on :8080 for PWA/share tests
 ```
 
 With `npm install` the same commands are available as `npm test`, `npm run
-test:min`, `npm run build`, `npm run size` and `npm run serve`. Two optional
-extras need the dev dependencies: `npm run test:e2e` (Playwright smoke test on
-a mobile viewport, start `npm run serve` first or let the config do it) and
-`npm run lh` (Lighthouse against the local server, while it is running).
+test:min`, `npm run build`, `npm run size` and `npm run serve`. Browser checks
+run in CI and locally: `npm run test:e2e` (Playwright smoke plus a same-run
+screenshot diff on a mobile viewport) and `npm run lh` (Lighthouse against the
+local server while `npm run serve` is running). `npm run icons` regenerates the
+PNG icons and the Open Graph card.
 
 Terser must be available (`npm i terser` or `npm i terser --prefix "%TEMP%\mgast"`);
 the CI pins 5.51.2 because the build is reproducible with that version.

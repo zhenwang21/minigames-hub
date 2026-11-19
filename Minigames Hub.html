@@ -10,11 +10,15 @@
 <meta property="og:title" content="Minigames Hub">
 <meta property="og:description" content="8 party games for one phone or several phones in the same room. Play offline by passing the phone, or online with a room code.">
 <meta property="og:url" content="https://zhenwang21.github.io/minigames-hub/">
-<meta property="og:image" content="https://zhenwang21.github.io/minigames-hub/icons/icon-512.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://zhenwang21.github.io/minigames-hub/icons/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Minigames Hub - 8 party games for one phone or many">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Minigames Hub">
 <meta name="twitter:description" content="8 party games for one phone or several phones in the same room.">
-<meta name="twitter:image" content="https://zhenwang21.github.io/minigames-hub/icons/icon-512.png">
+<meta name="twitter:image" content="https://zhenwang21.github.io/minigames-hub/icons/og.png">
 <meta name="theme-color" content="#0b0f19">
 <meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -394,6 +398,9 @@ const I = {
     copyLink: 'Copia link',
     share: 'Condividi',
     copied: 'Link copiato!',
+  shareSetup: 'Condividi impostazioni',
+  shareSetupHint: 'Inquadra il QR o apri il link su un altro telefono: stesso gioco, stessi giocatori, modalità veloce e timer. Ruoli e categorie restano su questo telefono.',
+  setupLoaded: 'Impostazioni caricate.',
     joinInvite: 'Sei stato invitato nella stanza',
     joinInviteHint: 'Scrivi il tuo nome e tocca Entra per partecipare.',
     backupTitle: 'Backup impostazioni',
@@ -570,6 +577,7 @@ const I = {
     thForest: 'Bosco',
     statsTitle: 'Statistiche',
     chartTitle: 'Partite per gioco',
+    chartWins: 'Vittorie per gioco',
     chartDays: 'Ultimi 7 giorni',
     achTitle: 'Obiettivi',
     dailyTitle: 'Sfida del giorno',
@@ -641,7 +649,7 @@ const I = {
     installed: 'App installata',
     offline: 'Offline',
     news: 'Novità',
-    newsTitle: 'Novità 1.18.0',
+    newsTitle: 'Novità 1.19.0',
     news9: 'Rinomina e annulla rimozione dei giocatori.',
     news10: 'Statistiche con ultime partite ed export CSV.',
     news11: 'Backup: unisci o sostituisci, con avviso di versione.',
@@ -656,6 +664,7 @@ const I = {
     news20: 'Host: passa il comando, riordina i giocatori, PIN stanza e QR più grande o scaricabile. Banner per chi è offline.',
     news21: 'Sfida del giorno, modalità mix, grafici delle partite e obiettivi in impostazioni.',
     news22: 'Tastiera e schermo: Tab resta nella finestra aperta ed Esc la chiude.',
+    news23: 'Condividi il setup con un QR, vittorie per gioco nelle statistiche, vibrazioni su risposta giusta o sbagliata e riconnessione con tentativi.',
     news7: 'Colori e simboli dedicati per ogni gioco.',
     news8: 'Avatar e colori per i giocatori in liste, lobby e classifiche.',
     news1: 'Introduzione per i nuovi arrivati e partita demo.',
@@ -890,6 +899,9 @@ const I = {
     copyLink: 'Copy link',
     share: 'Share',
     copied: 'Link copied!',
+  shareSetup: 'Share setup',
+  shareSetupHint: 'Scan the QR or open the link on another phone: same game, same players, quick mode and timer. Roles and categories stay on this phone.',
+  setupLoaded: 'Setup loaded.',
     joinInvite: 'You were invited to the room',
     joinInviteHint: 'Type your name and tap Join to take part.',
     backupTitle: 'Settings backup',
@@ -1065,6 +1077,7 @@ const I = {
     thForest: 'Forest',
     statsTitle: 'Statistics',
     chartTitle: 'Games per game',
+    chartWins: 'Wins per game',
     chartDays: 'Last 7 days',
     achTitle: 'Achievements',
     dailyTitle: 'Daily challenge',
@@ -1136,7 +1149,7 @@ const I = {
     installed: 'App installed',
     offline: 'Offline',
     news: 'What’s new',
-    newsTitle: 'What’s new in 1.18.0',
+    newsTitle: 'What’s new in 1.19.0',
     news9: 'Rename players and undo a removal.',
     news10: 'Statistics with recent games and CSV export.',
     news11: 'Backup: merge or replace, with a version warning.',
@@ -1151,6 +1164,7 @@ const I = {
     news20: 'Host tools: pass control, reorder players, room PIN and a bigger or downloadable QR. Banner for offline players.',
     news21: 'Daily challenge, mix mode, game charts and achievements in settings.',
     news22: 'Keyboard and screen: Tab stays inside the open dialog and Esc closes it.',
+    news23: 'Share the setup as a QR, wins per game in the stats, correct/wrong vibrations and reconnection attempts.',
     news7: 'Dedicated colours and symbols for every game.',
     news8: 'Avatars and colours for players in lists, lobbies and standings.',
     news1: 'A welcome intro for newcomers and a demo game.',
@@ -1290,6 +1304,7 @@ const NET = {
   roomT: null,
   recT: null,
   recovering: false,
+  recTries: 0,
   lastSnap: '',
   st: 'idle',
   err: '',
@@ -1304,7 +1319,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.18.0';
+const APP_VERSION = '1.19.0';
 // Ripresa dopo reload/standby: la sessione dura al massimo due ore.
 const RESUME_TTL = 2 * 60 * 60 * 1000;
 let RESUME = { room: null, snap: null, savedAt: 0, lastKey: '' };
@@ -1424,6 +1439,7 @@ function netReset() {
     roomT: null,
     recT: null,
     recovering: false,
+    recTries: 0,
     lastSnap: '',
     st: 'idle',
     view: null,
@@ -1886,6 +1902,8 @@ function resumeTimers() {
 function netAdopt(c, m, code) {
   NET.conn = c;
   NET.host = false;
+  NET.recTries = 0;
+  NET.recovering = false;
   NET.code = m.code || code || NET.code;
   NET.players = m.players || [];
   NET.order = m.order || m.players || [];
@@ -1911,8 +1929,9 @@ function netRecover() {
   render();
   clearTimeout(NET.recT);
   let tries = 0;
-  const attempt = () =>
-    netRejoin(0, (ok) => {
+  const attempt = () => {
+    NET.recTries = (+NET.recTries || 0) + 1;
+    return netRejoin(0, (ok) => {
       if (ok || NET.host || NET.elec) return;
       // Un host che ricarica la pagina impiega qualche secondo: prima di eleggere
       // un nuovo host provo ancora una volta lo stesso codice.
@@ -1923,7 +1942,23 @@ function netRecover() {
       NET.recovering = false;
       netElect();
     });
+  };
   NET.recT = setTimeout(attempt, 600);
+}
+// Riprova subito: chiude la connessione rimasta appesa e riparte senza aspettare il timer.
+function netRetryNow() {
+  if (NET.host) return;
+  const c = NET.conn;
+  NET.conn = null;
+  try {
+    c && c.close();
+  } catch (e) {}
+  try {
+    NET.peer && NET.peer.reconnect && NET.peer.reconnect();
+  } catch (e) {}
+  NET.recovering = false;
+  NET.elec = false;
+  netRecover();
 }
 function netRejoin(tryN, cb) {
   const code = NET.code || NET.lastCode;
@@ -2236,6 +2271,7 @@ function netDial(name, cb) {
 function netPromote(snap, conn) {
   if (NET.host) return;
   NET.elec = false;
+  NET.recTries = 0;
   clearTimeout(NET.elecT);
   const s = snap || {
     code: NET.code,
@@ -3454,15 +3490,18 @@ function appBase() {
 function inviteLink() {
   return appBase() + '#room=' + encodeURIComponent(NET.code || '') + (NET.pin ? '&pin=' + NET.pin : '');
 }
-function inviteQr() {
+function qrSvg(text, cell) {
   try {
     const q = qrcode(0, 'M');
-    q.addData(inviteLink());
+    q.addData(String(text || ''));
     q.make();
-    return q.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+    return q.createSvgTag({ cellSize: cell || 4, margin: 2, scalable: true });
   } catch (e) {
     return '';
   }
+}
+function inviteQr() {
+  return qrSvg(inviteLink(), 4);
 }
 let QR_BIG = false;
 function showInvite() {
@@ -3681,6 +3720,8 @@ function parseInvite() {
   } catch (e) {}
   const m = hash.match(/room=([A-Z0-9]{5})/i);
   if (!m) {
+    // Link di setup: stesso gioco, giocatori e opzioni leggere su un altro telefono.
+    if (parseSetupHash(hash)) return;
     // Scorciatoia PWA: #game=<id> apre direttamente il setup del gioco.
     const gid = gameFromHash(hash);
     if (gid)
@@ -3706,6 +3747,64 @@ function parseInvite() {
       }
     }, 120);
   } catch (e) {}
+}
+// --- condivisione delle impostazioni offline ---
+// Il link porta gioco, nomi, modalità veloce e timer: le opzioni che stanno nel
+// setup. I ruoli di Lupus e le categorie non viaggiano (restano sul telefono).
+function setupPayload() {
+  return { g: S.game || '', p: S.players.slice(0, 16), q: S.quick ? 1 : 0, t: S.timerPref || 0 };
+}
+function setupLink() {
+  return appBase() + '#setup=' + encodeURIComponent(JSON.stringify(setupPayload()));
+}
+function applySetup(d) {
+  if (!d || typeof d !== 'object' || !PLAYABLE.includes(d.g)) return false;
+  const names = (Array.isArray(d.p) ? d.p : [])
+    .slice(0, 16)
+    .map((n) => cleanName(n, 16))
+    .filter(Boolean);
+  const uniq = [];
+  names.forEach((n) => {
+    if (!uniq.some((x) => x.toLowerCase() === n.toLowerCase())) uniq.push(n);
+  });
+  selectGame(d.g);
+  S.players = uniq;
+  S.quick = !!d.q;
+  if ([60, 120, 180, 300].includes(+d.t)) S.timerPref = +d.t;
+  render();
+  return true;
+}
+function parseSetupHash(hash) {
+  const m = String(hash || '').match(/setup=([^&]+)/);
+  if (!m) return false;
+  try {
+    const ok = applySetup(JSON.parse(decodeURIComponent(m[1])));
+    if (ok) announce(t('setupLoaded'));
+    return ok;
+  } catch (e) {
+    return false;
+  }
+}
+function showSetupShare() {
+  const m = $('modal'),
+    link = setupLink(),
+    qr = qrSvg(link, 3);
+  if (!m) return;
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">📲 ${t('shareSetup')}</h3>
+  <p class="text-xs text-slate-400">${t('shareSetupHint')}</p>
+  ${qr ? `<div class="bg-white p-2 rounded-xl" style="max-width:220px;margin:0 auto">${qr}</div>` : ''}
+  <div class="bg-slate-900 rounded-xl p-2 text-[10px] text-slate-400 break-all select-text">${esc(link)}</div>
+  <div class="grid grid-cols-2 gap-2"><button onclick="copyText(setupLink(), t('copied'))" class="bg-slate-800 py-2.5 rounded-xl text-xs font-bold">📋 ${t('copyLink')}</button><button onclick="shareSetup()" class="gbtn py-2.5 rounded-xl text-xs font-bold">${t('share')}</button></div>
+  <button onclick="closeModal()" class="w-full bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
+  modalOpen();
+}
+function shareSetup() {
+  const url = setupLink();
+  if (navigator.share)
+    navigator
+      .share({ title: 'Minigames Hub', text: t('shareSetup'), url: url })
+      .catch(() => {});
+  else copyText(url, t('copied'));
 }
 function backupData() {
   return {
@@ -4046,7 +4145,7 @@ function viewOnline() {
   if (NET.st === 'elect')
     return `<div class="space-y-4 text-center py-10"><p class="text-slate-200 text-sm font-bold">🔄 ${X('Host disconnesso: scelgo il nuovo host…', 'Host disconnected: electing a new host…')}</p><p class="text-xs text-slate-500 px-6">${X('La stanza continua da sola. Aspetta qualche secondo senza chiudere la pagina.', 'The room carries on by itself. Wait a few seconds without closing the page.')}</p>${back}</div>`;
   if (NET.st === 'recover')
-    return `<div class="space-y-4 text-center py-10"><p class="text-slate-200 text-sm font-bold">🔄 ${X('Connessione persa: riprovo…', 'Connection lost: retrying…')}</p><p class="text-xs text-slate-500 px-6">${X('Se non torna subito, un altro giocatore prende il comando della stanza.', 'If it does not come back at once, another player takes over the room.')}</p>${back}</div>`;
+    return `<div class="space-y-4 text-center py-10"><p class="text-slate-200 text-sm font-bold">🔄 ${X('Connessione persa: riprovo…', 'Connection lost: retrying…')}</p><p class="text-xs text-slate-400">${X('Tentativo', 'Attempt')} <b>${NET.recTries || 1}</b> ${X('verso la stanza', 'to the room')} ${esc(NET.lastCode || NET.code || '')}</p><p class="text-xs text-slate-500 px-6">${X('Se non torna subito, un altro giocatore prende il comando della stanza.', 'If it does not come back at once, another player takes over the room.')}</p><div class="grid grid-cols-2 gap-2 px-4"><button onclick="netRetryNow()" class="bg-slate-800 py-2.5 rounded-xl text-xs font-bold">🔁 ${X('Riprova ora', 'Retry now')}</button><button onclick="netClose();home()" class="bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${X('Esci', 'Leave')}</button></div>${back}</div>`;
   if (NET.st === 'lobby' && NET.view) return noteBanner() + offBan + viewNetGame() + hostBar();
   if (NET.st === 'lobby') {
     const onN = NET.players.filter((p) => !off.includes(p)).length;
@@ -6778,7 +6877,7 @@ const S = {
   vol: 70,
   vibOn: true,
   lastGame: '',
-  stats: { games: 0, byGame: {}, wins: {}, played: {}, streak: {}, best: {}, recent: [] },
+  stats: { games: 0, byGame: {}, wby: {}, wins: {}, played: {}, streak: {}, best: {}, recent: [] },
   onboarded: false,
   dbAck: 0,
   textSize: 'm',
@@ -9249,6 +9348,7 @@ function viewSetup() {
   ${PLAYABLE.includes(g) && g !== 'preferisci' ? modeUI(g) : ''}${g !== 'lupus' && g !== 'preferisci' && PLAYABLE.includes(g) ? quickUI() : ''}${['impostore', 'who_said', 'mrwhite'].includes(g) ? dbHint() : ''}${cfg}
   ${PLAYABLE.includes(g) ? '' : `<p class="text-xs text-amber-300 text-center">${t('comingSoon')}</p>`}
   ${g === 'mrwhite' && e.und + e.mw === 0 ? `<p class="text-xs text-amber-300 text-center">${t('needRole')}</p>` : ''}
+  ${PLAYABLE.includes(g) && pl.length ? `<button onclick="showSetupShare()" class="w-full bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">📲 ${t('shareSetup')}</button>` : ''}
   <button id="start-btn" onclick="startGame()" ${canStart() ? '' : 'disabled'} class="${BTN}">${t(g === 'lupus' ? 'next' : 'start')}</button></section>`;
 }
 function chip(i) {
@@ -9935,6 +10035,7 @@ function ncToggleAt(pi, ci) {
   if (!p || !c) return;
   G.ok = G.ok || {};
   (G.ok[p] = G.ok[p] || {})[c.k] = G.ok[p][c.k] === false;
+  haptic(G.ok[p][c.k] ? 'correct' : 'wrong');
   ncBc();
 }
 // Applica i punti (solo host): unica accettata +10, duplicato +5, resto 0.
@@ -10271,6 +10372,7 @@ function tbResolve(r) {
     G.ts[G.turn] = (G.ts[G.turn] || 0) + 100;
     G.teams[G.turn].forEach((p) => netScore(p, 100));
   }
+  haptic(r === 'w' ? 'correct' : 'wrong');
   tbBc();
 }
 function tbStartTimer() {
@@ -10507,6 +10609,7 @@ function chiResolve(ok) {
     if (!G.lives[p]) G.out[p] = true;
     G.res = 'no';
   }
+  haptic(ok ? 'correct' : 'wrong');
   G.ph = 'res';
   chiBc();
 }
@@ -10804,8 +10907,11 @@ function statsRecord(gid, base, onlyIfScored) {
   if (onlyIfScored && max <= 0) return;
   const st = S.stats;
   if (!st || typeof st !== 'object') return;
+  if (!st.byGame) st.byGame = {};
+  if (!st.wby) st.wby = {};
   st.games = (+st.games || 0) + 1;
   st.byGame[gid] = (+st.byGame[gid] || 0) + 1;
+  if (max > 0) st.wby[gid] = (+st.wby[gid] || 0) + 1;
   const winners = [];
   P.forEach((p) => {
     const n = cleanName(p, 20);
@@ -10914,12 +11020,16 @@ function statsChartsHtml() {
       .slice(0, 8);
   if (!entries.length) return '';
   const max = Math.max(1, ...entries.map((e) => +e[1])),
-    rows = entries
-      .map(
-        ([g, v]) =>
-          `<div class="flex items-center gap-2 text-[10px]"><span class="w-24 truncate text-slate-400">${esc(t('g_' + g))}</span><div class="flex-1 bg-slate-800 rounded-full h-2 overflow-hidden"><div class="h-2 rounded-full" style="width:${Math.max(6, Math.round((+v / max) * 100))}%;background:linear-gradient(90deg,var(--acc1),var(--acc2))"></div></div><b class="w-6 text-right text-slate-300">${+v}</b></div>`
-      )
-      .join('');
+    bar = (g, v, top) =>
+      `<div class="flex items-center gap-2 text-[10px]"><span class="w-24 truncate text-slate-400">${esc(t('g_' + g))}</span><div class="flex-1 bg-slate-800 rounded-full h-2 overflow-hidden"><div class="h-2 rounded-full" style="width:${Math.max(6, Math.round((+v / top) * 100))}%;background:linear-gradient(90deg,var(--acc1),var(--acc2))"></div></div><b class="w-6 text-right text-slate-300">${+v}</b></div>`,
+    rows = entries.map(([g, v]) => bar(g, v, max)).join('');
+  // Vittorie per gioco: contatore dedicato (wby), indipendente dai nomi dei giocatori.
+  const wEntries = Object.entries(st.wby || {})
+    .filter(([g, v]) => GAME_START[g] && +v > 0)
+    .sort((a, b) => +b[1] - +a[1])
+    .slice(0, 8);
+  const wmax = Math.max(1, ...wEntries.map((e) => +e[1])),
+    wRows = wEntries.map(([g, v]) => bar(g, v, wmax)).join('');
   const days = [];
   for (let i = 6; i >= 0; i--) {
     const ts = Date.now() - i * 86400000,
@@ -10927,7 +11037,7 @@ function statsChartsHtml() {
     days.push({ n: (st.recent || []).filter((e) => dayKey(e.t) === k).length, lab: new Date(ts).getDate() });
   }
   const dmax = Math.max(1, ...days.map((d) => d.n));
-  return `<div class="space-y-1.5"><p class="text-[11px] font-bold text-slate-400">📊 ${t('chartTitle')}</p>${rows}<p class="text-[11px] font-bold text-slate-400 pt-1">📈 ${t('chartDays')}</p><div class="flex items-end gap-1 h-12">${days
+  return `<div class="space-y-1.5"><p class="text-[11px] font-bold text-slate-400">📊 ${t('chartTitle')}</p>${rows}${wEntries.length ? `<p class="text-[11px] font-bold text-slate-400 pt-1">🏆 ${t('chartWins')}</p>${wRows}` : ''}<p class="text-[11px] font-bold text-slate-400 pt-1">📈 ${t('chartDays')}</p><div class="flex items-end gap-1 h-12">${days
     .map(
       (d) =>
         `<div class="flex-1 flex flex-col items-center gap-0.5"><div class="w-full h-8 bg-slate-800 rounded-sm relative overflow-hidden"><div class="absolute bottom-0 w-full rounded-sm" style="height:${Math.round((d.n / dmax) * 100)}%;background:var(--acc2)"></div></div><span class="text-[9px] text-slate-500">${d.lab}</span></div>`
@@ -10984,7 +11094,7 @@ function statsCsv() {
 }
 // Le statistiche arrivano anche da un backup: vanno validate come tutto il resto.
 function sanitizeStats(x) {
-  const out = { games: 0, byGame: {}, wins: {}, played: {}, streak: {}, best: {}, recent: [] };
+  const out = { games: 0, byGame: {}, wby: {}, wins: {}, played: {}, streak: {}, best: {}, recent: [] };
   if (!x || typeof x !== 'object') return out;
   out.games = Math.max(0, Math.min(99999, Math.round(+x.games || 0)));
   out.recent = (Array.isArray(x.recent) ? x.recent : [])
@@ -10999,6 +11109,7 @@ function sanitizeStats(x) {
     .slice(0, 20);
   [
     ['byGame', 400],
+    ['wby', 400],
     ['wins', 9999],
     ['played', 9999],
     ['streak', 9999],
@@ -11009,10 +11120,10 @@ function sanitizeStats(x) {
     Object.keys(src)
       .slice(0, 80)
       .forEach((key) => {
-        const name = k === 'byGame' ? String(key).slice(0, 20) : cleanName(key, 20);
+        const name = k === 'byGame' || k === 'wby' ? String(key).slice(0, 20) : cleanName(key, 20);
         const v = Math.round(+src[key]);
         if (!name || !isFinite(v) || v < 0) return;
-        if (k === 'byGame' && !GAME_START[name]) return;
+        if ((k === 'byGame' || k === 'wby') && !GAME_START[name]) return;
         out[k][name] = Math.min(cap, v);
       });
   });
@@ -11020,7 +11131,7 @@ function sanitizeStats(x) {
 }
 function resetStats() {
   if (!confirm(t('statsResetConfirm'))) return;
-  S.stats = { games: 0, byGame: {}, wins: {}, played: {}, streak: {}, best: {}, recent: [] };
+  S.stats = { games: 0, byGame: {}, wby: {}, wins: {}, played: {}, streak: {}, best: {}, recent: [] };
   STATS_BASE = null;
   saveLocal();
   alert(t('statsResetOk'));
@@ -11353,7 +11464,7 @@ function clearLocalData() {
 function showNews() {
   const m = $('modal');
   if (!m) return;
-  const items = ['news22', 'news21', 'news20', 'news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
+  const items = ['news23', 'news22', 'news21', 'news20', 'news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">✨ ${t('newsTitle')}</h3><ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">${items.map((k) => `<li>${t(k)}</li>`).join('')}</ul><button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
   modalOpen();
 }

@@ -41,6 +41,25 @@ function boot(opts = {}) {
   const store = {};
   const alerts = [];
   let timers = 0;
+  // Orologio finto opzionale: i test dei timeout possono avanzare a mano.
+  let clock = 0,
+    clockSeq = 0;
+  const queue = new Map();
+  const advance = (ms) => {
+    const target = clock + Math.max(0, +ms || 0);
+    let guard = 0;
+    for (;;) {
+      let pick = null;
+      for (const [id, t] of queue)
+        if (t.at <= target && (!pick || t.at < pick[1].at)) pick = [id, t];
+      if (!pick) break;
+      queue.delete(pick[0]);
+      clock = Math.max(clock, pick[1].at);
+      pick[1].fn();
+      if (++guard > 5000) break;
+    }
+    clock = target;
+  };
 
   const document = {
     getElementById: (id) => els[id] || (els[id] = makeElement(id)),
@@ -93,12 +112,19 @@ function boot(opts = {}) {
     URL: { createObjectURL: () => 'blob:test', revokeObjectURL() {} },
     Blob: function Blob() {},
     FileReader: function FileReader() {},
-    setTimeout: (fn) => {
+    setTimeout: (fn, ms) => {
+      if (opts.fakeTimers) {
+        const id = ++clockSeq;
+        queue.set(id, { at: clock + Math.max(0, +ms || 0), fn });
+        return id;
+      }
       timers++;
       if (opts.realTimers) return setTimeout(fn, 0);
       return timers;
     },
-    clearTimeout() {},
+    clearTimeout: (id) => {
+      if (opts.fakeTimers) queue.delete(id);
+    },
     setInterval: () => {
       timers++;
       return timers;
@@ -122,6 +148,9 @@ function boot(opts = {}) {
     els,
     alerts,
     run,
+    advance,
+    pending: () => queue.size,
+    now: () => clock,
     get: (name) => run(name),
     call: (expr, ...args) => run(expr)(...args),
     S: run('S'),

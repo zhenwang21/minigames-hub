@@ -242,6 +242,17 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 
 ## 11. Cosa è stato corretto nell'ultima revisione
 
+### Versione 1.19.0 (chiusura dei buchi della lista)
+- **Vittorie per gioco**: nuovo contatore `stats.wby` (default, sanitize, reset, backup) incrementato in `statsRecord` solo quando `max > 0`; `statsChartsHtml` disegna una seconda serie con `chartWins`. `statsRecord` ora crea `byGame`/`wby` se mancano, così i salvataggi vecchi o parziali non rompono.
+- **Aptica giusta/sbagliata**: `haptic('correct'|'wrong')` collegata a `ncToggleAt` (revisione Nomi Cose e Città), `chiResolve` (Chi sono io?) e `tbResolve` (Parole vietate). I pattern esistevano già in `VIB_PATTERN`.
+- **Riconnessione esplicita**: `NET.recTries` (azzerato in `netAdopt`/`netPromote`) conta i tentativi dentro `netRecover`; la schermata `recover` mostra il numero, il codice stanza e `netRetryNow()`, che chiude `NET.conn`, richiama `peer.reconnect()` e riparte senza aspettare il timer.
+- **Setup condiviso**: `setupPayload`/`setupLink` (`#setup=` + JSON urlencoded), `applySetup` (valida gioco, nomi 16 char, dedupe case-insensitive, quick, timer 60/120/180/300), `parseSetupHash` chiamato da `parseInvite`, `showSetupShare`/`shareSetup` con QR `qrSvg`. Ruoli Lupus e categorie non viaggiano.
+- **OG image**: `tools/make-og.js` genera `icons/og.png` 1200×630 (gradiente, maschera, font bitmap 5×7, PNG RGB senza dipendenze); meta `og:image:type/width/height/alt` e `twitter:card=summary_large_image`.
+- **Test timer finti**: harness con orologio finto opzionale (`advance`, `pending`, `now`); `tests/timers.test.js` copre retry di `netTry`, `netSettle`, ritardi di `netRecover` e `netRetryNow` (17 check).
+- **CI**: job `e2e` (npm ci + Playwright chromium + smoke e diff screenshot nella stessa run) e job `lighthouse` (`lighthouserc.json`: soglie a11y 0.8, best-practices 0.75, performance/SEO warning, budget documento 700 KB e totale 1,6 MB). Lockfile aggiunto; `npm run icons` rigenera icone e OG.
+- **Novità**: `news23` IT/EN in testa.
+- `APP_VERSION` e `VERSION` portate a **1.19.0**; build: sorgente **531.555** byte, minificato **435.506** byte. Verifiche locali: 13/13 suite su sorgente e minificato, Playwright 3/3, Lighthouse 100/100/100 (a11y, best-practices, SEO).
+
 ### Versione 1.18.0 (accessibilità da tastiera e tooling)
 - **Focus trap**: `modalFocusables()` raccoglie gli elementi focalizzabili dentro `#modal`; `trapFocus(e)` gestisce Tab/Shift+Tab mantenendo il focus nella finestra e `Escape` che chiama `closeModal()` (che già ripristinava `MODAL_PREV`). Listener `keydown` registrato una volta a fine script, innocuo su touch.
 - **Tooling**: `package.json` con script `test`, `test:min`, `build`, `size`, `serve`, `test:e2e`, `lh` e devDependencies Playwright/Lighthouse; `tools/serve.js` server statico senza dipendenze (porta 8080, cache disattivata, path traversal bloccato); `playwright.config.js` con viewport Pixel 5 e `webServer`; `tests/e2e/smoke.spec.js` copre home, sfida del giorno, impostazioni con Esc e modalità mix, fallendo su errori JS. `.github/dependabot.yml` per actions (settimanale) e npm (mensile).

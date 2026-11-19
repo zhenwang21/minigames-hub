@@ -2,6 +2,12 @@
 *.backup.html
 *.preformat.html
 
+# Tooling opzionale
+node_modules/
+test-results/
+playwright-report/
+.lighthouseci/
+
 # Sistema
 Thumbs.db
 desktop.ini

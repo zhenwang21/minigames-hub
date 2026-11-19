@@ -1,6 +1,6 @@
 {
   "name": "minigames-hub",
-  "version": "1.18.0",
+  "version": "1.19.0",
   "private": true,
   "description": "Party games for one phone or several phones in the same room.",
   "scripts": {
@@ -10,10 +10,11 @@
     "test:e2e": "playwright test",
     "size": "node tools/size-report.js",
     "serve": "node tools/serve.js",
+    "icons": "node tools/make-icons.js && node tools/make-og.js",
     "lh": "lighthouse http://localhost:8080/index.html --only-categories=performance,accessibility,best-practices,seo --view"
   },
   "devDependencies": {
-    "@playwright/test": "^1.49.0",
-    "lighthouse": "^12.2.1"
+    "@playwright/test": "1.65.1",
+    "lighthouse": "12.8.2"
   }
 }
