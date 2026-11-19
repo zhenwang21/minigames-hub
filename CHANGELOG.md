@@ -4,6 +4,26 @@
 release number; `sw.js` must follow it. Older history (1.2–1.5) is described in
 `MINIGAMES_HUB_HANDOFF.md`.
 
+## 1.22.0 — 2026-11-19
+
+### Added
+- **Turn wheel** — a `conic-gradient` wheel on the setup screen picks who
+  starts with `crypto` randomness (`spinTurn`), keeps a cumulative rotation and
+  shows the result when the spin ends; it is instant with animations off.
+- **Player card** — tapping a name in the statistics table opens `showPlayer`
+  with wins, games, best streak and a bar per game. Wins per game are stored in
+  the new `stats.pgw` counters, saved with the rest and validated on import.
+
+### Changed
+- The setup screen pairs the wheel with the share-setup button.
+- Minified build: 457,604 bytes; source: 559,126 bytes.
+
+### Tests
+- `features.test.js` at 330 checks: wheel names, random bounds, rotation and
+  delayed result, per-game win counting, player summary, modal content, safe
+  names with apostrophes and `pgw` validation. 13/13 suites green on source and
+  minified build. Playwright: 3/3 passed locally.
+
 ## 1.21.0 — 2026-11-19
 
 ### Added

@@ -137,6 +137,12 @@ html[data-motion="off"] .gcard.tilt{transform:none}
 #app.card-flip{animation:cardflip .34s ease-out}
 html[data-motion="off"] #app.card-flip{animation:none}
 @media (prefers-reduced-motion:reduce){#app.card-flip{animation:none}}
+/* ruota del turno: segmenti conici, puntatore fisso in alto */
+.wheel-wrap{position:relative;width:200px;height:200px;margin:0 auto;filter:drop-shadow(0 10px 24px rgba(0,0,0,.45))}
+.wheel{width:100%;height:100%;border-radius:50%;border:4px solid #1e293b;transition:transform 2.6s cubic-bezier(.12,.72,.06,1)}
+.wheel-pin{position:absolute;top:-9px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:16px solid #fbbf24;z-index:2}
+html[data-motion="off"] .wheel{transition:none}
+@media (prefers-reduced-motion:reduce){.wheel{transition:none}}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 #upd{position:fixed;left:.6rem;right:.6rem;bottom:calc(env(safe-area-inset-bottom,0px) + .6rem);z-index:70;display:none;align-items:center;gap:.5rem;background:#111827;border:1px solid var(--acc1);border-radius:1rem;padding:.55rem .8rem;box-shadow:0 12px 34px rgba(0,0,0,.55);font-size:.75rem;font-weight:700}
 #upd.on{display:flex}
@@ -676,7 +682,7 @@ const I = {
     installed: 'App installata',
     offline: 'Offline',
     news: 'Novità',
-    newsTitle: 'Novità 1.21.0',
+    newsTitle: 'Novità 1.22.0',
     news9: 'Rinomina e annulla rimozione dei giocatori.',
     news10: 'Statistiche con ultime partite ed export CSV.',
     news11: 'Backup: unisci o sostituisci, con avviso di versione.',
@@ -694,6 +700,7 @@ const I = {
     news23: 'Condividi il setup con un QR, vittorie per gioco nelle statistiche, vibrazioni su risposta giusta o sbagliata e riconnessione con tentativi.',
     news24: 'Sfondi animati per tema, cornici avatar, podio con punti animati, micro-suoni e tema Mezzanotte OLED.',
     news25: 'Serata a punti con classifica cumulativa, storico di tutte le partite con filtro e “rigioca con gli stessi”.',
+    news26: 'Ruota del turno per scegliere chi inizia e scheda giocatore con vittorie per gioco e serie migliore.',
     news7: 'Colori e simboli dedicati per ogni gioco.',
     news8: 'Avatar e colori per i giocatori in liste, lobby e classifiche.',
     news1: 'Introduzione per i nuovi arrivati e partita demo.',
@@ -757,6 +764,17 @@ const I = {
     historyAll: 'Tutte',
     historyReplay: 'Rigioca con gli stessi',
     historyEmpty: 'Nessuna partita registrata.',
+    spinTitle: 'Chi inizia?',
+    spinHint: 'La ruota sceglie a caso chi apre la partita.',
+    spinGo: 'Gira la ruota',
+    spinResult: 'Inizia',
+    spinEmpty: 'Aggiungi almeno un giocatore.',
+    playerTitle: 'Scheda giocatore',
+    playerWins: 'Vittorie',
+    playerPlayed: 'Partite',
+    playerBest: 'Serie migliore',
+    playerPerGame: 'Vittorie per gioco',
+    playerNoGames: 'Nessuna vittoria registrata.',
     statsCsvOk: 'Statistiche esportate in CSV.',
     shareNote: 'Mostra a tutti',
     noteShared: 'Nota condivisa con la stanza.',
@@ -1196,7 +1214,7 @@ const I = {
     installed: 'App installed',
     offline: 'Offline',
     news: 'What’s new',
-    newsTitle: 'What’s new in 1.21.0',
+    newsTitle: 'What’s new in 1.22.0',
     news9: 'Rename players and undo a removal.',
     news10: 'Statistics with recent games and CSV export.',
     news11: 'Backup: merge or replace, with a version warning.',
@@ -1214,6 +1232,7 @@ const I = {
     news23: 'Share the setup as a QR, wins per game in the stats, correct/wrong vibrations and reconnection attempts.',
     news24: 'Animated theme backgrounds, avatar frames, a podium with animated points, UI sounds and a Midnight OLED theme.',
     news25: 'A game-night ladder with cumulative standings, a filterable match history and “replay with the same players”.',
+    news26: 'A turn wheel to pick who starts and a player card with wins per game and best streak.',
     news7: 'Dedicated colours and symbols for every game.',
     news8: 'Avatars and colours for players in lists, lobbies and standings.',
     news1: 'A welcome intro for newcomers and a demo game.',
@@ -1277,6 +1296,17 @@ const I = {
     historyAll: 'All',
     historyReplay: 'Replay with same players',
     historyEmpty: 'No matches recorded yet.',
+    spinTitle: 'Who starts?',
+    spinHint: 'The wheel picks who opens the game at random.',
+    spinGo: 'Spin the wheel',
+    spinResult: 'Starts',
+    spinEmpty: 'Add at least one player.',
+    playerTitle: 'Player card',
+    playerWins: 'Wins',
+    playerPlayed: 'Games',
+    playerBest: 'Best streak',
+    playerPerGame: 'Wins per game',
+    playerNoGames: 'No wins recorded yet.',
     statsCsvOk: 'Statistics exported as CSV.',
     shareNote: 'Share with everyone',
     noteShared: 'Note shared with the room.',
@@ -1385,7 +1415,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.21.0';
+const APP_VERSION = '1.22.0';
 // Ripresa dopo reload/standby: la sessione dura al massimo due ore.
 const RESUME_TTL = 2 * 60 * 60 * 1000;
 let RESUME = { room: null, snap: null, savedAt: 0, lastKey: '' };
@@ -6963,7 +6993,7 @@ const S = {
   vibOn: true,
   uiSnd: true,
   lastGame: '',
-  stats: { games: 0, byGame: {}, wby: {}, wins: {}, played: {}, streak: {}, best: {}, recent: [] },
+  stats: { games: 0, byGame: {}, wby: {}, wins: {}, played: {}, streak: {}, best: {}, pgw: {}, recent: [] },
   tour: null,
   onboarded: false,
   dbAck: 0,
@@ -9451,7 +9481,7 @@ function viewSetup() {
   ${PLAYABLE.includes(g) && g !== 'preferisci' ? modeUI(g) : ''}${g !== 'lupus' && g !== 'preferisci' && PLAYABLE.includes(g) ? quickUI() : ''}${['impostore', 'who_said', 'mrwhite'].includes(g) ? dbHint() : ''}${cfg}
   ${PLAYABLE.includes(g) ? '' : `<p class="text-xs text-amber-300 text-center">${t('comingSoon')}</p>`}
   ${g === 'mrwhite' && e.und + e.mw === 0 ? `<p class="text-xs text-amber-300 text-center">${t('needRole')}</p>` : ''}
-  ${PLAYABLE.includes(g) && pl.length ? `<button onclick="showSetupShare()" class="w-full bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">📲 ${t('shareSetup')}</button>` : ''}
+  ${PLAYABLE.includes(g) && pl.length ? `<div class="grid grid-cols-2 gap-2"><button onclick="showSpin()" class="bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">🎡 ${t('spinTitle')}</button><button onclick="showSetupShare()" class="bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">📲 ${t('shareSetup')}</button></div>` : ''}
   <button id="start-btn" onclick="startGame()" ${canStart() ? '' : 'disabled'} class="${BTN}">${t(g === 'lupus' ? 'next' : 'start')}</button></section>`;
 }
 function chip(i) {
@@ -11024,6 +11054,9 @@ function statsRecord(gid, base, onlyIfScored) {
       st.wins[n] = (+st.wins[n] || 0) + 1;
       st.streak[n] = (+st.streak[n] || 0) + 1;
       st.best[n] = Math.max(+st.best[n] || 0, st.streak[n]);
+      if (!st.pgw) st.pgw = {};
+      if (!st.pgw[n]) st.pgw[n] = {};
+      st.pgw[n][gid] = (+st.pgw[n][gid] || 0) + 1;
       if (!winners.some((w) => w.toLowerCase() === n.toLowerCase())) winners.push(n);
     } else st.streak[n] = 0;
   });
@@ -11056,6 +11089,7 @@ function statsPrune() {
       delete st.wins[k];
       delete st.streak[k];
       delete st.best[k];
+      delete st.pgw[k];
     });
 }
 function statsTop(n) {
@@ -11238,6 +11272,107 @@ function replayHistory(i) {
   selectGame(e.g);
   saveLocal();
 }
+// --- 1.22.0: ruota del turno e scheda giocatore ---
+let SPIN_ROT = 0,
+  SPIN_LAST = '';
+function spinNames() {
+  const list = (S.screen === 'online' && NET.players.length ? NET.players : S.players).slice(0, 12);
+  return list.map((n) => cleanName(n, 16)).filter(Boolean);
+}
+function spinPick(n) {
+  return n > 0 ? rnd(n) : 0;
+}
+function spinTurn() {
+  const names = spinNames();
+  if (!names.length) return '';
+  const i = spinPick(names.length),
+    seg = 360 / names.length,
+    target = (360 - (i * seg + seg / 2)) % 360,
+    cur = ((SPIN_ROT % 360) + 360) % 360;
+  SPIN_ROT += 1440 + ((target - cur + 360) % 360);
+  SPIN_LAST = names[i];
+  try {
+    const w = $('wheel');
+    if (w && w.style) w.style.transform = 'rotate(' + SPIN_ROT + 'deg)';
+  } catch (e) {}
+  // Il risultato arriva quando la rotazione finisce; i test possono avanzare i timer.
+  setTimeout(() => {
+    try {
+      const r = $('spin-res');
+      if (r) r.textContent = SPIN_LAST;
+      announce(t('spinResult') + ': ' + SPIN_LAST);
+    } catch (e) {}
+  }, S.reduceMotion ? 0 : 2650);
+  return SPIN_LAST;
+}
+function showSpin() {
+  const m = $('modal');
+  if (!m) return;
+  const names = spinNames(),
+    seg = names.length ? 360 / names.length : 360,
+    stops = names
+      .map((n, i) => `${AV_C[i % AV_C.length]} ${(i * seg).toFixed(2)}deg ${((i + 1) * seg).toFixed(2)}deg`)
+      .join(','),
+    legend = names
+      .map(
+        (n, i) =>
+          `<span class="flex items-center gap-1 min-w-0"><i class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:${AV_C[i % AV_C.length]}"></i><span class="truncate">${esc(n)}</span></span>`
+      )
+      .join('');
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-4"><h3 class="font-bold text-white">🎡 ${t('spinTitle')}</h3>
+  <p class="text-xs text-slate-400">${t('spinHint')}</p>
+  ${
+    names.length
+      ? `<div class="wheel-wrap"><div class="wheel-pin"></div><div id="wheel" class="wheel" style="background:conic-gradient(from -90deg,${stops})"></div></div>
+  <div class="grid grid-cols-2 gap-1.5 text-[11px]">${legend}</div>
+  <p class="text-center text-sm font-extrabold text-amber-300 min-h-[1.25rem]" id="spin-res" aria-live="polite"></p>
+  <button onclick="spinTurn()" class="w-full gbtn py-2.5 rounded-xl text-xs font-bold">🎡 ${t('spinGo')}</button>`
+      : `<p class="text-xs text-slate-500 italic text-center py-3">${t('spinEmpty')}</p>`
+  }
+  <button onclick="closeModal()" class="w-full bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
+  modalOpen();
+}
+// Scheda personale: vittorie per gioco e serie migliore, dai dati locali.
+function playerArg(n) {
+  return encodeURIComponent(n).replace(/'/g, '%27').replace(/\\/g, '%5C');
+}
+function playerSummary(name) {
+  const st = S.stats || {},
+    n = cleanName(name, 20),
+    games = Object.entries((st.pgw || {})[n] || {})
+      .filter(([g, v]) => GAME_START[g] && +v > 0)
+      .map(([g, v]) => [g, +v])
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  return {
+    n,
+    wins: +((st.wins || {})[n] || 0),
+    played: +((st.played || {})[n] || 0),
+    best: +((st.best || {})[n] || 0),
+    games
+  };
+}
+function showPlayer(name) {
+  const s = playerSummary(name),
+    m = $('modal');
+  if (!m) return;
+  const max = Math.max(1, ...s.games.map((g) => g[1]));
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3 max-h-[85vh] overflow-y-auto">
+  <div class="flex justify-between items-center"><h3 class="font-bold text-white">👤 ${t('playerTitle')}</h3><button onclick="closeModal()" class="text-xs bg-slate-800 px-3 py-1.5 rounded-xl">${t('close')}</button></div>
+  <div class="flex items-center gap-2.5">${avHtml(s.n)}<b class="text-lg text-white truncate">${esc(s.n)}</b></div>
+  <div class="grid grid-cols-3 gap-1.5 text-center text-[10px]"><div class="bg-slate-900 rounded-xl py-2"><b class="block text-base text-amber-400">${s.wins}</b>${t('playerWins')}</div><div class="bg-slate-900 rounded-xl py-2"><b class="block text-base text-slate-200">${s.played}</b>${t('playerPlayed')}</div><div class="bg-slate-900 rounded-xl py-2"><b class="block text-base text-emerald-400">${s.best}</b>${t('playerBest')}</div></div>
+  <div class="space-y-1.5"><p class="text-[11px] font-bold text-slate-400">${t('playerPerGame')}</p>${
+    s.games.length
+      ? s.games
+          .map(
+            ([g, v]) =>
+              `<div class="flex items-center gap-2 text-[11px]"><span class="w-24 truncate text-slate-300">${esc(t('g_' + g))}</span><div class="flex-1 bg-slate-800 rounded-full h-2 overflow-hidden"><div style="width:${Math.round((v / max) * 100)}%;background:linear-gradient(90deg,var(--acc1),var(--acc2))" class="h-2 rounded-full"></div></div><b class="w-5 text-right text-slate-200">${v}</b></div>`
+          )
+          .join('')
+      : `<p class="text-[11px] text-slate-500 italic py-2">${t('playerNoGames')}</p>`
+  }</div></div>`;
+  modalOpen();
+}
+
 // Grafici leggeri: barre per gioco e attività degli ultimi 7 giorni, senza librerie.
 function dayKey(ts) {
   const d = new Date(ts == null ? Date.now() : ts);
@@ -11368,7 +11503,7 @@ function statsCsv() {
 }
 // Le statistiche arrivano anche da un backup: vanno validate come tutto il resto.
 function sanitizeStats(x) {
-  const out = { games: 0, byGame: {}, wby: {}, wins: {}, played: {}, streak: {}, best: {}, recent: [] };
+  const out = { games: 0, byGame: {}, wby: {}, wins: {}, played: {}, streak: {}, best: {}, pgw: {}, recent: [] };
   if (!x || typeof x !== 'object') return out;
   out.games = Math.max(0, Math.min(99999, Math.round(+x.games || 0)));
   out.recent = (Array.isArray(x.recent) ? x.recent : [])
@@ -11405,11 +11540,27 @@ function sanitizeStats(x) {
         out[k][name] = Math.min(cap, v);
       });
   });
+  if (x.pgw && typeof x.pgw === 'object')
+    Object.keys(x.pgw)
+      .slice(0, 60)
+      .forEach((raw) => {
+        const n = cleanName(raw, 20),
+          src = x.pgw[raw];
+        if (!n || !src || typeof src !== 'object') return;
+        const row = {};
+        Object.keys(src)
+          .slice(0, 40)
+          .forEach((gid) => {
+            const v = Math.round(+src[gid]);
+            if (GAME_START[gid] && isFinite(v) && v > 0) row[gid] = Math.min(9999, v);
+          });
+        if (Object.keys(row).length) out.pgw[n] = row;
+      });
   return out;
 }
 function resetStats() {
   if (!confirm(t('statsResetConfirm'))) return;
-  S.stats = { games: 0, byGame: {}, wby: {}, wins: {}, played: {}, streak: {}, best: {}, recent: [] };
+  S.stats = { games: 0, byGame: {}, wby: {}, wins: {}, played: {}, streak: {}, best: {}, pgw: {}, recent: [] };
   STATS_BASE = null;
   saveLocal();
   alert(t('statsResetOk'));
@@ -11762,7 +11913,7 @@ function clearLocalData() {
 function showNews() {
   const m = $('modal');
   if (!m) return;
-  const items = ['news25', 'news24', 'news23', 'news22', 'news21', 'news20', 'news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
+  const items = ['news26', 'news25', 'news24', 'news23', 'news22', 'news21', 'news20', 'news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">✨ ${t('newsTitle')}</h3><ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">${items.map((k) => `<li>${t(k)}</li>`).join('')}</ul><button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
   modalOpen();
 }
@@ -11934,7 +12085,7 @@ function showSettings() {
         ? top
             .map(
               ([n, w, p, s], i) =>
-                `<div class="flex justify-between bg-slate-900 px-3 py-2 rounded-xl text-[11px]"><span class="truncate">#${i + 1} <b>${esc(n)}</b></span><span class="text-amber-400 text-right">${w} ${w === 1 ? t('statsWin1') : t('statsWins')} · ${p} ${p === 1 ? t('statsGame1') : t('statsPlayed')}${s ? ' · ' + t('statsStreak') + ' ' + s : ''}</span></div>`
+                `<button onclick="showPlayer(decodeURIComponent('${playerArg(n)}'))" class="w-full text-left flex justify-between bg-slate-900 hover:bg-slate-800 px-3 py-2 rounded-xl text-[11px]"><span class="truncate">#${i + 1} <b>${esc(n)}</b> ›</span><span class="text-amber-400 text-right">${w} ${w === 1 ? t('statsWin1') : t('statsWins')} · ${p} ${p === 1 ? t('statsGame1') : t('statsPlayed')}${s ? ' · ' + t('statsStreak') + ' ' + s : ''}</span></button>`
             )
             .join('')
         : `<p class="text-[11px] text-slate-500 italic">${t('statsNone')}</p>`

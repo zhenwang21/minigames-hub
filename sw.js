@@ -1,6 +1,6 @@
 // Service worker di Minigames Hub: rende l'app installabile e avviabile offline.
 // La versione della cache deve seguire APP_VERSION nel file HTML.
-const VERSION = '1.21.0';
+const VERSION = '1.22.0';
 const CACHE = 'mgh-' + VERSION;
 const ASSETS = [
   './',

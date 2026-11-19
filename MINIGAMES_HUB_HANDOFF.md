@@ -242,6 +242,12 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 
 ## 11. Cosa è stato corretto nell'ultima revisione
 
+### Versione 1.22.0 (ruota del turno e scheda giocatore)
+- **Ruota**: `spinNames()` legge i giocatori del tavolo (o della lobby online), `spinPick()` usa `rnd`, `spinTurn()` calcola l'angolo del segmento vincente, accumula `SPIN_ROT`, ruota `#wheel` e mostra il risultato dopo la transizione (`0` ms con animazioni spente). `showSpin()` disegna la ruota con `conic-gradient` dai colori avatar, legenda e pulsante; il setup la affianca a “Condividi setup”.
+- **Scheda giocatore**: nuovo contatore `stats.pgw[nome][gioco]`, incrementato in `statsRecord` per i vincitori del gioco, incluso in `sanitizeStats`, in `statsPrune` e nel reset. `playerSummary(name)` restituisce vittorie, partite, serie e giochi ordinati; `showPlayer(name)` apre la scheda con le barre per gioco; i nomi nella tabella statistiche sono pulsanti con `playerArg`/`decodeURIComponent` per gestire gli apostrofi.
+- **Novità**: `news26` IT/EN in testa.
+- `APP_VERSION` e `VERSION` a **1.22.0**; build: sorgente **559.126** byte, minificato **457.604** byte. Verifiche locali: 13/13 suite su sorgente e minificato, Playwright 3/3, `features.test.js` a 330 check.
+
 ### Versione 1.21.0 (serata a punti e storico partite)
 - **Serata**: `S.tour = {plan, idx, pts, done, start}` salvato in locale e backup. `tourPool()` sceglie solo giochi avviabili con i giocatori presenti; `startTour(n)` mescola (`shuffle`) e pianifica 3–9 partite, azzera `pts` e apre il setup. `tourCredit(gid, delta)` somma i punti solo se `T.plan[T.idx] === gid`, poi avanza; `tourRank()` ordina per punti; `tourCard()` in home e `tourSummaryBlock(gid)` nel riepilogo compaiono solo per la partita giusta. `sanitizeTour` valida piano, indice e punti.
 - **Storico**: `stats.recent` ora salva anche `p` (nomi, max 8). `showHistory(f)` costruisce `HIST_VIEW` filtrata e la lista con chip per gioco; `replayHistory(i)` ripristina i giocatori unici e apre il setup dello stesso gioco. `sanitizeStats` valida `p` come gli altri campi.

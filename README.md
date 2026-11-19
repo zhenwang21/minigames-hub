@@ -50,6 +50,8 @@ No install, no account, no backend.
 - **Local stats** — finished games, wins, current streak and best streak per player, counted from the points each player gains during a game; the most played game, the last few games with their winners, and a CSV export are included too.
 - **Game night** — queue three to five offline games in a row and every point earned is added to one cumulative standings table; the home card shows the current leader, the end-of-game summary shows the progress and the final standings name the winner. The queue lives in the local save, so a reload does not lose the night.
 - **Match history** — the settings and the statistics card open a list of recent games with a filter per game; **Replay with same players** restores that table and opens the setup of the same game. Only names, game, date and winners are stored, on the phone.
+- **Turn wheel** — on the setup screen a wheel built with a `conic-gradient` picks who starts at random, using the player avatars' colours; the result appears when the spin ends and the wheel is instant with animations off.
+- **Player card** — tap a name in the statistics table to see that player's wins, games, best streak and a bar for every game won. The per-game counters (`stats.pgw`) are local, saved with the rest and validated on import.
 - **Victory sounds** — a short chime at the end of a game, with a different three-note pattern per game; it follows the existing sound switch.
 - **Play again** — the host's lobby offers one tap to restart the last game with the same players.
 - **Update banner** — when a new version is deployed, an open tab offers to reload instead of silently running old code.

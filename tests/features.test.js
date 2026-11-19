@@ -171,7 +171,7 @@ const lobby = resApp.run('viewOnline()');
 check(lobby.includes('copyCode()'), 'lobby con copia del codice');
 check(lobby.includes('1/2') && lobby.includes('connessi'), 'lobby mostra i giocatori connessi');
 check(lobby.includes('offline') && lobby.includes('host'), 'lobby distingue offline e host');
-check(lobby.includes('1.21.0'), 'lobby mostra la versione');
+check(lobby.includes('1.22.0'), 'lobby mostra la versione');
 // riepilogo condivisibile
 RS.scores = { Anna: 300, Bruno: 100 };
 RN.game = { g: 'impostore' };
@@ -394,7 +394,7 @@ check(q.run('backupReminder()') === '', 'senza dati il promemoria non compare');
 q.run('resetPrefs()');
 check(QS.timerPref === 120 && QS.mode === 'auto' && QS.ncPref.length === 0, 'ripristino preferenze giochi');
 q.run('showNews()');
-check(q.els.modal.innerHTML.includes('Novità 1.21.0'), 'la modale Novità è alla versione 1.21.0');
+check(q.els.modal.innerHTML.includes('Novità 1.22.0'), 'la modale Novità è alla versione 1.22.0');
 check(q.els.modal.innerHTML.includes('Colori e simboli dedicati'), 'le novità elencano i cosmetics');
 q.run('closeModal()');
 
@@ -1141,5 +1141,75 @@ check(
 c21.run('showNews()');
 check(c21.els.modal.innerHTML.includes('Serata a punti'), 'le novità includono la serata');
 check(srcHtml.includes('news25') && srcHtml.includes('showHistory('), 'home, impostazioni e novità sono collegati');
+
+// --- 1.22.0: ruota del turno e scheda giocatore ---
+const c22 = boot({ fakeTimers: true });
+c22.run("S.players=['Anna','Bruno','Carla']; S.screen='setup'");
+check(c22.run('spinNames().length') === 3, 'la ruota usa i giocatori del tavolo');
+check(
+  [0, 1, 2].every((i) => {
+    const v = c22.run(`spinPick(3)`);
+    return v >= 0 && v < 3;
+  }),
+  'la scelta della ruota resta dentro il numero di giocatori'
+);
+c22.run('showSpin()');
+check(
+  c22.els.modal.innerHTML.includes('conic-gradient') &&
+    c22.els.modal.innerHTML.includes('id="wheel"') &&
+    c22.els.modal.innerHTML.includes('spinTurn()'),
+  'la ruota ha segmenti, puntatore e pulsante'
+);
+const spun = c22.run('spinTurn()');
+check(
+  c22.run('spinNames()').includes(spun) &&
+    c22.run('SPIN_ROT') > 1000 &&
+    c22.run('SPIN_LAST') === spun,
+  'girare la ruota sceglie un giocatore e accumula la rotazione'
+);
+c22.advance(2700);
+check(c22.els['spin-res'].textContent === spun, 'il risultato compare a rotazione finita');
+
+// Vittorie per gioco: contate sul delta come le altre statistiche.
+const c22b = boot();
+c22b.run(
+  "S.players=['Anna','Bruno']; S.scores={Anna:5,Bruno:2}; S.screen='play'; S.stats={games:0,byGame:{},wby:{},wins:{},played:{},streak:{},best:{},pgw:{},recent:[]}; statsRecord('impostore',{g:'impostore',scores:{Anna:0,Bruno:0}})"
+);
+check(
+  c22b.run('S.stats.pgw.Anna.impostore') === 1 && c22b.run('S.stats.pgw.Bruno') === undefined,
+  'statsRecord aggiunge la vittoria al gioco giusto'
+);
+c22b.run("S.stats.pgw.Anna.lupus = 2; S.stats.wins.Anna = 3; S.stats.played.Anna = 9; S.stats.best.Anna = 2");
+const ps22 = c22b.run("playerSummary('Anna')");
+check(
+  ps22.wins === 3 && ps22.played === 9 && ps22.best === 2 &&
+    ps22.games[0][0] === 'lupus' && ps22.games[0][1] === 2,
+  'la scheda riepiloga vittorie, partite, serie e giochi ordinati'
+);
+c22b.run("showPlayer('Anna')");
+check(
+  c22b.els.modal.innerHTML.includes('Vittorie per gioco') &&
+    c22b.els.modal.innerHTML.includes(c22b.run("t('g_lupus')")),
+  'la scheda giocatore mostra le vittorie per gioco'
+);
+check(
+  c22b.run("decodeURIComponent(playerArg(\"O'Brien\"))") === "O'Brien" &&
+    c22b.run("playerArg(\"O'Brien\").indexOf(\"'\")") === -1,
+  'i nomi con apostrofo restano cliccabili'
+);
+const pgw22 = c22b.run("sanitizeStats({pgw:{Anna:{lupus:3,nope:4,impostore:'2'},'  ':{lupus:1}}}).pgw");
+check(
+  pgw22.Anna.lupus === 3 && pgw22.Anna.impostore === 2 && !pgw22.Anna.nope && Object.keys(pgw22).length === 1,
+  'sanitizeStats valida le vittorie per gioco'
+);
+c22b.run("S.game='impostore'; S.players=['Anna','Bruno']");
+check(c22b.run('viewSetup()').includes('showSpin()'), 'il setup offre la ruota del turno');
+check(
+  srcHtml.includes('showPlayer(decodeURIComponent') &&
+    srcHtml.includes('playerPerGame') &&
+    c22b.run("t('spinTitle')") === 'Chi inizia?' &&
+    c22b.run("t('news26')").length > 20,
+  'scheda, ruota e novità sono collegate e tradotte'
+);
 
 done();
