@@ -65,12 +65,16 @@ html[data-theme="bosco"] body{background:#06140f}
 html[data-theme="neon"] body{background:#0a0616}
 html[data-theme="ghiaccio"] body{background:#07131f}
 html[data-theme="carta"] body{background:#f7f2e8}
+/* Mezzanotte: nero puro per OLED, con accenti chiari leggibili */
+html[data-theme="mezzanotte"]{--acc1:#c4b5fd;--acc2:#a78bfa;--acc3:#818cf8;--btn1:#5b21b6;--btn2:#6d28d9;color-scheme:dark}
+html[data-theme="mezzanotte"] body{background:#000}
+html[data-theme="mezzanotte"] .glass{background:rgba(8,8,12,.92);border-color:rgba(196,181,253,.16)}
 body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#0b0f19;color:#f8fafc;-webkit-tap-highlight-color:transparent}
 .glass{background:rgba(17,24,39,.85);border:1px solid rgba(255,255,255,.08)}
 .gtext{background:linear-gradient(135deg,var(--acc1),var(--acc2) 50%,var(--acc3));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .gbtn{background:linear-gradient(135deg,var(--btn1),var(--btn2));color:#fff}
 /* cosmetics: accento per gioco (identità visiva, separato dal tema scelto) */
-#app{--ga:#a855f7;--gb:#ec4899;position:relative;isolation:isolate}
+#app{--ga:#a855f7;--gb:#ec4899;position:relative;z-index:1;isolation:isolate}
 #app[data-game]:after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:1rem;background:radial-gradient(110% 45% at 50% 0,var(--ga),transparent 70%);opacity:.12}
 #app[data-game]:before{content:"";display:block;height:.28rem;border-radius:999px;background:linear-gradient(90deg,var(--ga),var(--gb));margin:0 0 .45rem;opacity:.85}
 .gtile{width:3rem;height:3rem;flex:0 0 3rem;display:flex;align-items:center;justify-content:center;border-radius:.9rem;background:linear-gradient(135deg,var(--ga),var(--gb));box-shadow:0 8px 22px -12px var(--ga);font-size:1.7rem}
@@ -104,6 +108,11 @@ html[data-motion="off"] #app.screen-in{animation:none}
 .confetti i{position:absolute;top:-12px;width:.5rem;height:.8rem;border-radius:2px;opacity:.95;animation:confetti 1.9s cubic-bezier(.2,.7,.4,1) forwards}
 .confetti[data-kind="dots"] i{border-radius:50%;width:.45rem;height:.45rem}
 .confetti[data-kind="stars"] i{clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+/* cornici avatar: si sbloccano con vittorie e serie personali (dati locali) */
+.av.f1{box-shadow:0 0 0 2px #b45309}
+.av.f2{box-shadow:0 0 0 2px #cbd5e1}
+.av.f3{box-shadow:0 0 0 2px #fbbf24,0 0 8px -2px #fbbf24}
+.av.f4{box-shadow:0 0 0 2px #f472b6,0 0 10px -1px #a855f7}
 .av.host{box-shadow:0 0 0 2px #fbbf24,0 0 10px -2px #fbbf24}
 .av.win{box-shadow:0 0 0 2px #34d399}
 html[data-theme="carta"] .av{background:rgba(28,25,23,.08);border-color:rgba(28,25,23,.3)}
@@ -112,6 +121,22 @@ html[data-motion="off"] .confetti{display:none}
 @media (prefers-reduced-motion:reduce){.confetti{display:none}}
 @keyframes flipin{0%{transform:scaleX(.88);opacity:.35}100%{transform:scaleX(1);opacity:1}}
 .flipin{animation:flipin .3s ease-out}
+/* sfondo animato: tre aloni del tema, fermi con le animazioni spente */
+#glow{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(40% 38% at 18% 14%,var(--acc1) 0,transparent 70%),radial-gradient(36% 40% at 82% 24%,var(--acc2) 0,transparent 70%),radial-gradient(46% 36% at 52% 92%,var(--acc3) 0,transparent 74%);background-size:180% 180%;opacity:.22;animation:glowdrift 24s ease-in-out infinite alternate}
+@keyframes glowdrift{0%{background-position:0% 0%,100% 0%,50% 100%}100%{background-position:22% 14%,78% 16%,38% 82%}}
+html[data-motion="off"] #glow,html[data-contrast="high"] #glow{animation:none}
+@media (prefers-reduced-motion:reduce){#glow{animation:none}}
+html[data-theme="carta"] #glow{opacity:.13}
+html[data-theme="mezzanotte"] #glow{opacity:.12}
+body>header{position:relative;z-index:1}
+/* inclinazione 3D leggera sulle card: solo con puntatore preciso */
+.gcard.tilt{transform:perspective(700px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(-2px);box-shadow:0 18px 34px -22px #000}
+html[data-motion="off"] .gcard.tilt{transform:none}
+/* passaggio setup -> partita: la scheda gira */
+@keyframes cardflip{0%{transform:perspective(900px) rotateY(-10deg) scale(.97);opacity:.35}100%{transform:none;opacity:1}}
+#app.card-flip{animation:cardflip .34s ease-out}
+html[data-motion="off"] #app.card-flip{animation:none}
+@media (prefers-reduced-motion:reduce){#app.card-flip{animation:none}}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 #upd{position:fixed;left:.6rem;right:.6rem;bottom:calc(env(safe-area-inset-bottom,0px) + .6rem);z-index:70;display:none;align-items:center;gap:.5rem;background:#111827;border:1px solid var(--acc1);border-radius:1rem;padding:.55rem .8rem;box-shadow:0 12px 34px rgba(0,0,0,.55);font-size:.75rem;font-weight:700}
 #upd.on{display:flex}
@@ -191,6 +216,7 @@ button,a,input,select,textarea{touch-action:manipulation}
 </style>
 </head>
 <body class="min-h-screen flex flex-col p-2.5 select-none">
+<div id="glow" aria-hidden="true"></div>
 <header class="w-full max-w-2xl mx-auto flex items-center justify-between gap-2 py-2.5 px-3 glass rounded-2xl mb-3">
   <button onclick="goHome()" class="flex items-center gap-2" aria-label="Minigames Hub"><span class="text-xl" aria-hidden="true">🎭</span><span class="font-extrabold text-base gtext logo-shine">MINIGAMES HUB</span></button>
   <div class="flex items-center gap-1.5">
@@ -563,6 +589,7 @@ const I = {
     setSound: 'Suoni',
     setVib: 'Vibrazione',
     setSndPack: 'Pacchetto suoni',
+    setUiSnd: 'Suoni di navigazione',
     sndSoft: 'Morbido',
     sndArcade: 'Arcade',
     sndChime: 'Campanelle',
@@ -649,7 +676,7 @@ const I = {
     installed: 'App installata',
     offline: 'Offline',
     news: 'Novità',
-    newsTitle: 'Novità 1.19.0',
+    newsTitle: 'Novità 1.20.0',
     news9: 'Rinomina e annulla rimozione dei giocatori.',
     news10: 'Statistiche con ultime partite ed export CSV.',
     news11: 'Backup: unisci o sostituisci, con avviso di versione.',
@@ -665,6 +692,7 @@ const I = {
     news21: 'Sfida del giorno, modalità mix, grafici delle partite e obiettivi in impostazioni.',
     news22: 'Tastiera e schermo: Tab resta nella finestra aperta ed Esc la chiude.',
     news23: 'Condividi il setup con un QR, vittorie per gioco nelle statistiche, vibrazioni su risposta giusta o sbagliata e riconnessione con tentativi.',
+    news24: 'Sfondi animati per tema, cornici avatar, podio con punti animati, micro-suoni e tema Mezzanotte OLED.',
     news7: 'Colori e simboli dedicati per ogni gioco.',
     news8: 'Avatar e colori per i giocatori in liste, lobby e classifiche.',
     news1: 'Introduzione per i nuovi arrivati e partita demo.',
@@ -734,6 +762,8 @@ const I = {
     thNeon: 'Neon',
     thIce: 'Ghiaccio',
     thPaper: 'Carta',
+    thMidnight: 'Mezzanotte',
+    avFrameHint: 'Cornici avatar: 1, 5 e 10 vittorie; argento e oro con le serie.',
     setFont: 'Font',
     fontSans: 'Standard',
     fontRound: 'Arrotondato',
@@ -1063,6 +1093,7 @@ const I = {
     setSound: 'Sounds',
     setVib: 'Vibration',
     setSndPack: 'Sound pack',
+    setUiSnd: 'Navigation sounds',
     sndSoft: 'Soft',
     sndArcade: 'Arcade',
     sndChime: 'Chimes',
@@ -1149,7 +1180,7 @@ const I = {
     installed: 'App installed',
     offline: 'Offline',
     news: 'What’s new',
-    newsTitle: 'What’s new in 1.19.0',
+    newsTitle: 'What’s new in 1.20.0',
     news9: 'Rename players and undo a removal.',
     news10: 'Statistics with recent games and CSV export.',
     news11: 'Backup: merge or replace, with a version warning.',
@@ -1165,6 +1196,7 @@ const I = {
     news21: 'Daily challenge, mix mode, game charts and achievements in settings.',
     news22: 'Keyboard and screen: Tab stays inside the open dialog and Esc closes it.',
     news23: 'Share the setup as a QR, wins per game in the stats, correct/wrong vibrations and reconnection attempts.',
+    news24: 'Animated theme backgrounds, avatar frames, a podium with animated points, UI sounds and a Midnight OLED theme.',
     news7: 'Dedicated colours and symbols for every game.',
     news8: 'Avatars and colours for players in lists, lobbies and standings.',
     news1: 'A welcome intro for newcomers and a demo game.',
@@ -1234,6 +1266,8 @@ const I = {
     thNeon: 'Neon',
     thIce: 'Ice',
     thPaper: 'Paper',
+    thMidnight: 'Midnight',
+    avFrameHint: 'Avatar frames: 1, 5 and 10 wins; silver and gold with streaks.',
     setFont: 'Font',
     fontSans: 'Standard',
     fontRound: 'Rounded',
@@ -1319,7 +1353,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.19.0';
+const APP_VERSION = '1.20.0';
 // Ripresa dopo reload/standby: la sessione dura al massimo due ore.
 const RESUME_TTL = 2 * 60 * 60 * 1000;
 let RESUME = { room: null, snap: null, savedAt: 0, lastKey: '' };
@@ -3824,6 +3858,7 @@ function backupData() {
     vol: S.vol,
     snd: S.sndOn ? 1 : 0,
     vib: S.vibOn ? 1 : 0,
+    uiSnd: S.uiSnd ? 1 : 0,
     lastGame: S.lastGame,
     stats: S.stats,
     onboarded: S.onboarded ? 1 : 0,
@@ -4074,6 +4109,7 @@ function applyBackup(d) {
   if (d.vol !== undefined) S.vol = Math.max(0, Math.min(100, Math.round(+d.vol || 0)));
   if (d.snd !== undefined) S.sndOn = d.snd !== 0 && d.snd !== false;
   if (d.vib !== undefined) S.vibOn = d.vib !== 0 && d.vib !== false;
+  if (d.uiSnd !== undefined) S.uiSnd = d.uiSnd !== 0 && d.uiSnd !== false;
   S.stats = sanitizeStats(d.stats);
   S.lastGame = typeof d.lastGame === 'string' && GAME_START[d.lastGame] ? d.lastGame : '';
   S.onboarded = d.onboarded === 1 || d.onboarded === true;
@@ -4493,8 +4529,20 @@ function av(name) {
   };
 }
 function avHtml(name, cls) {
-  const a = av(name);
-  return `<span class="av${cls ? ' ' + cls : ''}" style="border-color:${a.c}88;background:${a.c}26" aria-hidden="true">${a.e}</span>`;
+  const a = av(name),
+    fr = avFrame(name);
+  return `<span class="av${fr ? ' ' + fr : ''}${cls ? ' ' + cls : ''}" style="border-color:${a.c}88;background:${a.c}26" aria-hidden="true">${a.e}</span>`;
+}
+// Cornice dell'avatar: si sblocca con i risultati personali già salvati.
+function avFrame(name) {
+  const st = S.stats || {},
+    w = +(((st.wins || {})[name]) || 0),
+    b = +(((st.best || {})[name]) || 0);
+  if (b >= 5 || w >= 15) return 'f4';
+  if (b >= 3 || w >= 10) return 'f3';
+  if (w >= 5) return 'f2';
+  if (w >= 1) return 'f1';
+  return '';
 }
 // Scelta manuale dell'avatar: vale per il nome, offline e online (via lobby).
 let AV_PICK = '';
@@ -4555,7 +4603,7 @@ const GAME_FN = {
   taboo: tbHostOpen,
   chisono: chiStart
 };
-const THEMES = ['viola', 'oceano', 'tramonto', 'bosco', 'neon', 'ghiaccio', 'carta'];
+const THEMES = ['viola', 'oceano', 'tramonto', 'bosco', 'neon', 'ghiaccio', 'carta', 'mezzanotte'];
 const THEME_DOT = {
   viola: '#a855f7',
   oceano: '#22d3ee',
@@ -4563,7 +4611,8 @@ const THEME_DOT = {
   bosco: '#34d399',
   neon: '#f0abfc',
   ghiaccio: '#38bdf8',
-  carta: '#b45309'
+  carta: '#b45309',
+  mezzanotte: '#c4b5fd'
 };
 // Coppia di colori per l'anteprima del tema.
 const THEME_ACC = {
@@ -4573,7 +4622,8 @@ const THEME_ACC = {
   bosco: ['#34d399', '#84cc16'],
   neon: ['#22d3ee', '#a855f7'],
   ghiaccio: ['#93c5fd', '#38bdf8'],
-  carta: ['#b45309', '#0f766e']
+  carta: ['#b45309', '#0f766e'],
+  mezzanotte: ['#c4b5fd', '#a78bfa']
 };
 // Sfondo di ogni tema: serve al CSS e al colore della barra del browser (PWA).
 const THEME_BG = {
@@ -4583,7 +4633,8 @@ const THEME_BG = {
   bosco: '#06140f',
   neon: '#0a0616',
   ghiaccio: '#07131f',
-  carta: '#f7f2e8'
+  carta: '#f7f2e8',
+  mezzanotte: '#000000'
 };
 
 // Minigames Hub: database domande (IT)
@@ -6876,6 +6927,7 @@ const S = {
   sndPack: 'soft',
   vol: 70,
   vibOn: true,
+  uiSnd: true,
   lastGame: '',
   stats: { games: 0, byGame: {}, wby: {}, wins: {}, played: {}, streak: {}, best: {}, recent: [] },
   onboarded: false,
@@ -7119,6 +7171,21 @@ function releaseCtx(c, ms) {
         c.close();
       } catch (e) {}
     }, ms || 1200);
+}
+// Micro-suono di navigazione: brevissimo, rispetta on/off, pacchetto e volume.
+let CLICK_LAST = 0;
+function sndClick() {
+  if (!S.uiSnd || !sndReady()) return;
+  const now = Date.now();
+  if (now - CLICK_LAST < 45) return;
+  CLICK_LAST = now;
+  try {
+    const c = sndCtx();
+    if (!c) return;
+    const cfg = sndCfg();
+    tone(c, 1040, c.currentTime, 0.05, cfg.wave, sndLevel(cfg.level * 0.28));
+    releaseCtx(c, 400);
+  } catch (e) {}
 }
 // Aptica: schemi brevi e distinti, solo con la vibrazione attiva.
 let VIB_LAST = 0;
@@ -11068,7 +11135,7 @@ function achHtml() {
       (a) =>
         `<div class="rounded-lg px-1.5 py-1 text-[9px] text-center border ${a.got ? 'bg-amber-500/10 border-amber-500/40 text-amber-200' : 'bg-slate-900 border-slate-700/60 text-slate-500'}" title="${esc(a.name)}"><div class="text-base leading-5">${a.icon}</div><div class="truncate">${esc(a.name)}</div></div>`
     )
-    .join('')}</div></div>`;
+    .join('')}</div><p class="text-[10px] text-slate-500">${t('avFrameHint')}</p></div>`;
 }
 function statsCsv() {
   try {
@@ -11165,6 +11232,12 @@ function previewSnd() {
 function toggleVib() {
   S.vibOn = !S.vibOn;
   saveLocal();
+  showSettings();
+}
+function toggleUiSnd() {
+  S.uiSnd = !S.uiSnd;
+  saveLocal();
+  if (S.uiSnd) sndClick();
   showSettings();
 }
 // --- accessibilità, installazione e avvisi ---
@@ -11371,16 +11444,30 @@ function streakTag(name) {
 function summaryBar() {
   const d = summaryData();
   if (!d) return '';
-  const win = d.winners.length
+  const top = d.rows.slice(0, 3),
+    order = top.length >= 3 ? [1, 0, 2] : top.map((_, i) => i),
+    heights = [64, 46, 34],
+    // Podio vero: colonne con i primi tre, la seconda a sinistra e la terza a destra.
+    pod =
+      top.length >= 2 && d.max > 0
+        ? `<div class="flex items-end justify-center gap-2 pt-1" data-podium="1" aria-hidden="true">${order
+            .map((i) => {
+              const r = top[i];
+              if (!r) return '';
+              return `<div class="flex-1 min-w-0 flex flex-col items-center gap-1"><span class="text-base leading-none">${['🥇', '🥈', '🥉'][i]}</span>${avHtml(r.n)}<b class="text-[10px] truncate max-w-full">${esc(r.n)}</b><span class="text-[10px] text-slate-400">${r.d > 0 ? '+' + r.d : '0'}</span><div class="w-full rounded-t-lg" style="height:${heights[i]}px;background:linear-gradient(180deg,var(--acc1),var(--acc2));opacity:.4"></div></div>`;
+            })
+            .join('')}</div>`
+        : '',
+    win = d.winners.length
       ? `<p class="text-sm font-extrabold text-white celebrate">🎉 ${t('summaryWinner')}: ${d.winners.map((w) => avHtml(w.n) + ' ' + esc(w.n) + ' +' + w.d).join(', ')}</p>`
       : `<p class="text-sm font-bold text-slate-300">🏁 ${t('summaryNoPoints')}</p>`,
     rows = d.rows
       .map(
         (r, i) =>
-          `<div class="flex justify-between bg-slate-900 px-3 py-1.5 rounded-lg text-[11px]${i < 3 ? ' podium-' + (i + 1) : ''}"><span class="flex items-center gap-1.5 min-w-0"><span class="text-slate-500">${i < 3 ? ['🥇', '🥈', '🥉'][i] : '#' + (i + 1)}</span>${avHtml(r.n, i === 0 && d.max > 0 ? 'win' : '')}<b class="truncate">${esc(r.n)}</b>${streakTag(r.n)}</span><span class="${r.d === d.max && r.d > 0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">${r.d > 0 ? '+' + r.d : '0'}</span></div>`
+          `<div class="flex justify-between bg-slate-900 px-3 py-1.5 rounded-lg text-[11px]${i < 3 ? ' podium-' + (i + 1) : ''}"><span class="flex items-center gap-1.5 min-w-0"><span class="text-slate-500">${i < 3 ? ['🥇', '🥈', '🥉'][i] : '#' + (i + 1)}</span>${avHtml(r.n, i === 0 && d.max > 0 ? 'win' : '')}<b class="truncate">${esc(r.n)}</b>${streakTag(r.n)}</span><span class="${r.d === d.max && r.d > 0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}"><span class="pcount" data-to="${r.d > 0 ? r.d : 0}">${r.d > 0 ? '+' + r.d : '0'}</span></span></div>`
       )
       .join('');
-  return `<section class="glass p-4 rounded-2xl space-y-2 border border-emerald-500/30"><div class="flex justify-between items-center"><h3 class="font-bold text-white text-sm">📊 ${t('summaryTitle')}</h3><span class="text-[10px] text-slate-400">${t('g_' + d.gid)}</span></div>${win}<details class="bg-slate-900/40 rounded-xl p-2"><summary class="text-[11px] font-bold cursor-pointer">${t('summaryRank')}</summary><div class="space-y-1 mt-1.5">${rows}</div></details><div class="flex gap-2"><button onclick="shareResultImage()" class="flex-1 bg-slate-800 py-2 rounded-xl text-[11px] font-bold" title="${t('summaryImage')}">🖼️ ${t('summaryShare')}</button><button onclick="rematchSummary()" class="flex-1 gbtn py-2 rounded-xl text-[11px] font-bold">🔁 ${t('summaryAgain')}</button></div></section>`;
+  return `<section class="glass p-4 rounded-2xl space-y-2 border border-emerald-500/30"><div class="flex justify-between items-center"><h3 class="font-bold text-white text-sm">📊 ${t('summaryTitle')}</h3><span class="text-[10px] text-slate-400">${t('g_' + d.gid)}</span></div>${win}${pod}<details class="bg-slate-900/40 rounded-xl p-2"><summary class="text-[11px] font-bold cursor-pointer">${t('summaryRank')}</summary><div class="space-y-1 mt-1.5">${rows}</div></details><div class="flex gap-2"><button onclick="shareResultImage()" class="flex-1 bg-slate-800 py-2 rounded-xl text-[11px] font-bold" title="${t('summaryImage')}">🖼️ ${t('summaryShare')}</button><button onclick="rematchSummary()" class="flex-1 gbtn py-2 rounded-xl text-[11px] font-bold">🔁 ${t('summaryAgain')}</button></div></section>`;
 }
 function rematchSummary() {
   const d = summaryData();
@@ -11464,7 +11551,7 @@ function clearLocalData() {
 function showNews() {
   const m = $('modal');
   if (!m) return;
-  const items = ['news23', 'news22', 'news21', 'news20', 'news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
+  const items = ['news24', 'news23', 'news22', 'news21', 'news20', 'news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">✨ ${t('newsTitle')}</h3><ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">${items.map((k) => `<li>${t(k)}</li>`).join('')}</ul><button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
   modalOpen();
 }
@@ -11557,7 +11644,8 @@ function showSettings() {
       ['bosco', t('thForest')],
       ['neon', t('thNeon')],
       ['ghiaccio', t('thIce')],
-      ['carta', t('thPaper')]
+      ['carta', t('thPaper')],
+      ['mezzanotte', t('thMidnight')]
     ],
     top = statsTop(5),
     fav = Object.entries(S.stats.byGame || {}).sort((a, b) => b[1] - a[1])[0],
@@ -11568,6 +11656,7 @@ function showSettings() {
   <div class="space-y-2">
     <button onclick="toggleSnd()" ${row(S.sndOn)}><span>🔔 ${t('setSound')}</span><span class="${S.sndOn ? 'text-emerald-400' : 'text-slate-500'}">${S.sndOn ? t('setOn') : t('setOff')}</span></button>
     <button onclick="toggleVib()" ${row(S.vibOn)}><span>📳 ${t('setVib')}</span><span class="${S.vibOn ? 'text-emerald-400' : 'text-slate-500'}">${S.vibOn ? t('setOn') : t('setOff')}</span></button>
+    <button onclick="toggleUiSnd()" ${row(S.uiSnd)}><span>👆 ${t('setUiSnd')}</span><span class="${S.uiSnd ? 'text-emerald-400' : 'text-slate-500'}">${S.uiSnd ? t('setOn') : t('setOff')}</span></button>
   </div>
   <div class="space-y-1.5"><p class="text-xs font-bold text-slate-300">🎵 ${t('setSndPack')}</p>
     <div class="flex gap-2">${[
@@ -11725,6 +11814,7 @@ function saveLocal() {
       vol: S.vol,
       snd: S.sndOn ? 1 : 0,
       vib: S.vibOn ? 1 : 0,
+      uiSnd: S.uiSnd ? 1 : 0,
       lastGame: S.lastGame,
       stats: S.stats,
       onboarded: S.onboarded ? 1 : 0,
@@ -11775,6 +11865,7 @@ function loadLocal() {
     S.vol = [0, 25, 50, 75, 100].includes(+d.vol) ? +d.vol : Math.max(0, Math.min(100, Math.round(+d.vol || 70)));
     S.sndOn = d.snd !== 0 && d.snd !== false;
     S.vibOn = d.vib !== 0 && d.vib !== false;
+    S.uiSnd = d.uiSnd !== 0 && d.uiSnd !== false;
     S.stats = sanitizeStats(d.stats);
     S.lastGame = typeof d.lastGame === 'string' && GAME_START[d.lastGame] ? d.lastGame : '';
     S.onboarded =
@@ -11838,14 +11929,114 @@ function loadLocal() {
 }
 let LAST_SCREEN = '';
 // Ingresso morbido quando si cambia schermata (una sola animazione, non a ogni render).
+// Dal setup alla partita la scheda gira, come una carta.
+function screenClass(from, to) {
+  return from === 'setup' && to === 'play' ? 'card-flip' : 'screen-in';
+}
 function screenIn() {
   try {
     const el = $('app');
     if (!el || !el.classList || S.screen === LAST_SCREEN) return;
+    const cls = screenClass(LAST_SCREEN, S.screen);
     LAST_SCREEN = S.screen;
-    el.classList.remove('screen-in');
+    el.classList.remove('screen-in', 'card-flip');
     void el.offsetWidth;
-    el.classList.add('screen-in');
+    el.classList.add(cls);
+  } catch (e) {}
+}
+// Punti del riepilogo che salgono da zero: una sola volta per risultato.
+let COUNT_SIG = '';
+function countsAllowed() {
+  try {
+    if (S.reduceMotion) return false;
+    const el = document.documentElement;
+    if (el && el.dataset && el.dataset.motion === 'off') return false;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+  } catch (e) {}
+  return true;
+}
+function animateCounts() {
+  try {
+    const d = summaryData();
+    if (!d || !d.rows.length) return;
+    const sig = d.gid + '|' + d.rows.map((r) => r.n + ':' + r.d).join(',');
+    if (sig === COUNT_SIG) return;
+    COUNT_SIG = sig;
+    if (!countsAllowed()) return;
+    const nodes = document.querySelectorAll ? document.querySelectorAll('.pcount') : null,
+      list = nodes ? Array.prototype.slice.call(nodes) : [];
+    if (!list.length) return;
+    const raf = window.requestAnimationFrame || ((fn) => setTimeout(fn, 16)),
+      t0 = Date.now(),
+      dur = 650,
+      paint = (k) => {
+        const e = 1 - Math.pow(1 - k, 3);
+        list.forEach((n) => {
+          const to = +n.getAttribute('data-to') || 0;
+          n.textContent = (to > 0 ? '+' : '') + Math.round(to * e);
+        });
+      },
+      step = () => {
+        const k = Math.min(1, (Date.now() - t0) / dur);
+        paint(k);
+        if (k < 1) raf(step);
+      };
+    paint(0);
+    raf(step);
+  } catch (e) {}
+}
+// Inclinazione 3D: solo con puntatore preciso, mai con animazioni spente.
+function tiltOK() {
+  try {
+    if (S.reduceMotion) return false;
+    return !!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+  } catch (e) {
+    return false;
+  }
+}
+function bindTilt() {
+  try {
+    if (window.__tiltBound || !document.addEventListener) return;
+    window.__tiltBound = true;
+    let cur = null;
+    const reset = () => {
+      if (cur) {
+        if (cur.style && cur.style.removeProperty) {
+          cur.style.removeProperty('--rx');
+          cur.style.removeProperty('--ry');
+        }
+        if (cur.classList) cur.classList.remove('tilt');
+      }
+      cur = null;
+    };
+    document.addEventListener(
+      'pointermove',
+      (e) => {
+        if (!tiltOK()) return;
+        const el = e && e.target && e.target.closest ? e.target.closest('.gcard') : null;
+        if (el !== cur) {
+          reset();
+          cur = el;
+        }
+        if (!el || !el.getBoundingClientRect || !el.style) return;
+        const r = el.getBoundingClientRect();
+        if (!r || !r.width || !r.height) return;
+        const px = (e.clientX - r.left) / r.width - 0.5,
+          py = (e.clientY - r.top) / r.height - 0.5;
+        el.style.setProperty('--ry', (px * 7).toFixed(2) + 'deg');
+        el.style.setProperty('--rx', (-py * 7).toFixed(2) + 'deg');
+        if (el.classList) el.classList.add('tilt');
+      },
+      { passive: true }
+    );
+    document.addEventListener(
+      'pointerout',
+      (e) => {
+        const el = e && e.target && e.target.closest ? e.target.closest('.gcard') : null;
+        if (el) reset();
+      },
+      { passive: true }
+    );
   } catch (e) {}
 }
 function render() {
@@ -11891,6 +12082,7 @@ function render() {
   const sum = summaryBar();
   $('app').innerHTML = (S.demo ? demoBar() : '') + sum + body;
   screenIn();
+  animateCounts();
   if (sum) maybeConfetti();
   else CONF_SIG = '';
   if (!tmAllowed() && (TMR.iv || TMR.done)) tmClear();
@@ -12056,6 +12248,21 @@ document.addEventListener('visibilitychange', () => {
 });
 if (document.addEventListener) document.addEventListener('keydown', trapFocus);
 if (window.addEventListener) window.addEventListener('online', netWake);
+// 1.20.0: micro-suoni sui pulsanti (tocco e tastiera) e inclinazione delle card.
+bindTilt();
+try {
+  if (document.addEventListener) {
+    const hit = (e) => {
+      const el = e && e.target;
+      const b = el && el.closest ? el.closest('button,[role="button"]') : null;
+      if (b && !b.disabled) sndClick();
+    };
+    document.addEventListener('pointerdown', hit, { passive: true });
+    document.addEventListener('click', (e) => {
+      if (e && e.detail === 0) hit(e);
+    });
+  }
+} catch (e) {}
 // Sblocco audio su iOS al primo gesto (timer di discussione).
 if (document.addEventListener)
   ['pointerdown', 'touchstart', 'keydown'].forEach((ev) =>

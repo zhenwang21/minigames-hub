@@ -242,6 +242,18 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 
 ## 11. Cosa è stato corretto nell'ultima revisione
 
+### Versione 1.20.0 (cosmetici: sfondo, cornici, podio, OLED)
+- **Sfondo vivo**: layer fisso `#glow` (aria-hidden) con tre aloni costruiti da `--acc1/--acc2/--acc3`, animazione `glowdrift` su `background-position`; spento da `data-motion="off"`, `data-contrast="high"` e `prefers-reduced-motion`. `#app` e l'header hanno `z-index:1` per restare sopra.
+- **Cornici avatar**: `avFrame(name)` legge `stats.wins` e `stats.best` (1/5/10 vittorie, 3/5 di fila) e restituisce `f1`–`f4`; `avHtml` aggiunge la classe e i CSS usano `box-shadow`. Legenda in `achHtml` via `avFrameHint`.
+- **Podio**: `summaryBar` costruisce `data-podium="1"` con ordine 2°-1°-3°, altezze 64/46/34 px e medaglie, sopra la classifica completa; l'immagine condivisa resta invariata.
+- **Punti animati**: `.pcount` con `data-to`; `animateCounts()` (chiamata in `render`) anima una sola volta per firma del risultato, con `countsAllowed()` che rispetta riduzione movimento.
+- **Micro-suoni**: `sndClick()` (1040 Hz, 50 ms, livello 0.28 del pacchetto) con throttle 45 ms; listener su `pointerdown` e `click` da tastiera per i pulsanti, `S.uiSnd` + `toggleUiSnd()` in impostazioni (persistito in locale e backup).
+- **Tilt 3D**: `.gcard.tilt` con variabili `--rx/--ry`, listener delegati `pointermove`/`pointerout`, attivo solo con `(hover:hover) and (pointer:fine)` e `tiltOK()`.
+- **Carta che gira**: `screenClass(from,to)` restituisce `card-flip` per setup→play, altrimenti `screen-in`; `screenIn` rimuove entrambe le classi prima di aggiungere quella giusta.
+- **Tema Mezzanotte**: aggiunto a `THEMES`, `THEME_DOT`, `THEME_ACC`, `THEME_BG` (`#000000`), CSS dedicato con vetro più scuro e accenti lavanda; etichetta `thMidnight`.
+- **Novità**: `news24` IT/EN in testa; `features.test.js` a 302 check.
+- `APP_VERSION` e `VERSION` portate a **1.20.0**; build: sorgente **540.663** byte, minificato **442.087** byte. Verifiche locali: 13/13 suite su sorgente e minificato, Playwright 3/3.
+
 ### Versione 1.19.0 (chiusura dei buchi della lista)
 - **Vittorie per gioco**: nuovo contatore `stats.wby` (default, sanitize, reset, backup) incrementato in `statsRecord` solo quando `max > 0`; `statsChartsHtml` disegna una seconda serie con `chartWins`. `statsRecord` ora crea `byGame`/`wby` se mancano, così i salvataggi vecchi o parziali non rompono.
 - **Aptica giusta/sbagliata**: `haptic('correct'|'wrong')` collegata a `ncToggleAt` (revisione Nomi Cose e Città), `chiResolve` (Chi sono io?) e `tbResolve` (Parole vietate). I pattern esistevano già in `VIB_PATTERN`.

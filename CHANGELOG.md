@@ -4,6 +4,37 @@
 release number; `sw.js` must follow it. Older history (1.2–1.5) is described in
 `MINIGAMES_HUB_HANDOFF.md`.
 
+## 1.20.0 — 2026-11-19
+
+### Added
+- **Animated theme background** — a fixed `#glow` layer paints three drifting
+  halos from the theme accents behind every screen; it stops with the
+  reduce-animations setting, high contrast and `prefers-reduced-motion`.
+- **Avatar frames** — avatars wear a bronze, silver, gold or legend ring unlocked
+  by the player's own wins (1 / 5 / 10) and best streak (3 / 5); the achievement
+  card explains the steps. Percentages come from the local statistics.
+- **Real podium** — the summary shows the top three on a stepped podium with
+  medals above the full ranking, still followed by the share-as-image button.
+- **Animated points** — the points gained in a game count up once per result,
+  skipped when animations are off.
+- **Midnight OLED theme** — a pure-black eighth theme with light lavender
+  accents and darker glass surfaces, aimed at saving battery at night.
+- **Navigation sounds** — a very short click on buttons that follows the sound
+  pack and volume; it has its own switch in the settings and is skipped on
+  keyboard shortcuts that fire twice.
+
+### Changed
+- **Setup → play** now turns like a card (`card-flip`) instead of the plain
+  screen fade.
+- **3D tilt** on the game cards with a precise pointer (desktop); touch devices
+  never get the effect and it is disabled with animations off.
+- Minified build: 442,087 bytes; source: 540,663 bytes.
+
+### Tests
+- `features.test.js` at 302 checks, including the new theme, frames, podium,
+  counters, sound switch, card flip and tilt hooks. 13/13 suites green on source
+  and minified build. Playwright: 3/3 passed locally.
+
 ## 1.19.0 — 2026-11-19
 
 ### Added

@@ -171,7 +171,7 @@ const lobby = resApp.run('viewOnline()');
 check(lobby.includes('copyCode()'), 'lobby con copia del codice');
 check(lobby.includes('1/2') && lobby.includes('connessi'), 'lobby mostra i giocatori connessi');
 check(lobby.includes('offline') && lobby.includes('host'), 'lobby distingue offline e host');
-check(lobby.includes('1.19.0'), 'lobby mostra la versione');
+check(lobby.includes('1.20.0'), 'lobby mostra la versione');
 // riepilogo condivisibile
 RS.scores = { Anna: 300, Bruno: 100 };
 RN.game = { g: 'impostore' };
@@ -394,7 +394,7 @@ check(q.run('backupReminder()') === '', 'senza dati il promemoria non compare');
 q.run('resetPrefs()');
 check(QS.timerPref === 120 && QS.mode === 'auto' && QS.ncPref.length === 0, 'ripristino preferenze giochi');
 q.run('showNews()');
-check(q.els.modal.innerHTML.includes('Novità 1.19.0'), 'la modale Novità è alla versione 1.19.0');
+check(q.els.modal.innerHTML.includes('Novità 1.20.0'), 'la modale Novità è alla versione 1.20.0');
 check(q.els.modal.innerHTML.includes('Colori e simboli dedicati'), 'le novità elencano i cosmetics');
 q.run('closeModal()');
 
@@ -1012,5 +1012,51 @@ check(
   ciYml.includes('playwright install') && ciYml.includes('lighthouse-ci-action') && ciYml.includes('npm ci'),
   'la CI esegue Playwright, Lighthouse e installa dal lockfile'
 );
+
+// --- 1.20.0: cosmetici (sfondo vivo, cornici, podio, punti, suoni, tilt, flip, OLED) ---
+const c20 = boot();
+check(
+  c20.run("THEMES.includes('mezzanotte')") && c20.run('THEME_BG.mezzanotte') === '#000000',
+  'il tema Mezzanotte è OLED puro'
+);
+check(/html\[data-theme="mezzanotte"\] body\{background:#000\}/.test(srcHtml), 'Mezzanotte usa il nero pieno');
+check(srcHtml.includes('id="glow"') && srcHtml.includes('@keyframes glowdrift'), 'lo sfondo animato è presente');
+
+c20.run('S.stats.wins = { Anna: 1, Bruno: 5, Carla: 15 }; S.stats.best = {}');
+check(
+  c20.run("avFrame('Anna')") === 'f1' && c20.run("avFrame('Bruno')") === 'f2' && c20.run("avFrame('Carla')") === 'f4',
+  'le cornici seguono le vittorie'
+);
+check(c20.run("avHtml('Anna')").indexOf('av f1') >= 0, "la cornice compare sull'avatar");
+c20.run('S.stats.best = { Dora: 3 }; S.stats.wins = {}');
+check(
+  c20.run("avFrame('Dora')") === 'f3' && c20.run("avFrame('Eva')") === '',
+  'le serie sbloccano le cornici alte e chi non ha risultati resta senza'
+);
+
+c20.run(
+  "S.screen='play'; S.game='impostore'; S.G={phase:'r'}; S.players=['Anna','Bruno','Carla']; S.scores={Anna:12,Bruno:6,Carla:1}; STATS_BASE={g:'impostore', scores:{Anna:0,Bruno:0,Carla:0}, done:true}"
+);
+const sb20 = c20.run('summaryBar()');
+check(sb20.includes('data-podium="1"') && sb20.includes('pcount'), 'il riepilogo ha podio e punti animati');
+check(c20.run("typeof animateCounts === 'function' && typeof countsAllowed === 'function'"), 'il conteggio animato è collegato');
+c20.run('S.reduceMotion = true');
+check(c20.run('countsAllowed()') === false, 'con le animazioni spente i punti restano fermi');
+c20.run('S.reduceMotion = false');
+
+check(
+  c20.run("typeof sndClick === 'function' && typeof toggleUiSnd === 'function'"),
+  'i micro-suoni hanno una funzione e un interruttore'
+);
+c20.run('S.uiSnd = true; toggleUiSnd()');
+check(c20.run('S.uiSnd') === false, "l'interruttore dei suoni di navigazione funziona");
+check(
+  c20.run("screenClass('setup','play')") === 'card-flip' && c20.run("screenClass('home','setup')") === 'screen-in',
+  'dal setup alla partita la scheda gira'
+);
+check(c20.run("typeof bindTilt === 'function' && typeof tiltOK === 'function'"), 'il tilt 3D è collegato');
+check(srcHtml.includes('.gcard.tilt{transform:perspective'), 'il tilt ha il suo CSS');
+check(srcHtml.includes('toggleUiSnd()') && srcHtml.includes('thMidnight'), 'impostazioni: suoni di navigazione e Mezzanotte');
+check(c20.run("t('thMidnight')") === 'Mezzanotte' && c20.run("t('setUiSnd')").length > 3, 'le nuove voci sono tradotte');
 
 done();
