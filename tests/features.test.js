@@ -171,7 +171,7 @@ const lobby = resApp.run('viewOnline()');
 check(lobby.includes('copyCode()'), 'lobby con copia del codice');
 check(lobby.includes('1/2') && lobby.includes('connessi'), 'lobby mostra i giocatori connessi');
 check(lobby.includes('offline') && lobby.includes('host'), 'lobby distingue offline e host');
-check(lobby.includes('1.20.0'), 'lobby mostra la versione');
+check(lobby.includes('1.21.0'), 'lobby mostra la versione');
 // riepilogo condivisibile
 RS.scores = { Anna: 300, Bruno: 100 };
 RN.game = { g: 'impostore' };
@@ -394,7 +394,7 @@ check(q.run('backupReminder()') === '', 'senza dati il promemoria non compare');
 q.run('resetPrefs()');
 check(QS.timerPref === 120 && QS.mode === 'auto' && QS.ncPref.length === 0, 'ripristino preferenze giochi');
 q.run('showNews()');
-check(q.els.modal.innerHTML.includes('Novità 1.20.0'), 'la modale Novità è alla versione 1.20.0');
+check(q.els.modal.innerHTML.includes('Novità 1.21.0'), 'la modale Novità è alla versione 1.21.0');
 check(q.els.modal.innerHTML.includes('Colori e simboli dedicati'), 'le novità elencano i cosmetics');
 q.run('closeModal()');
 
@@ -1058,5 +1058,88 @@ check(c20.run("typeof bindTilt === 'function' && typeof tiltOK === 'function'"),
 check(srcHtml.includes('.gcard.tilt{transform:perspective'), 'il tilt ha il suo CSS');
 check(srcHtml.includes('toggleUiSnd()') && srcHtml.includes('thMidnight'), 'impostazioni: suoni di navigazione e Mezzanotte');
 check(c20.run("t('thMidnight')") === 'Mezzanotte' && c20.run("t('setUiSnd')").length > 3, 'le nuove voci sono tradotte');
+
+// --- 1.21.0: serata a punti e storico partite ---
+const c21 = boot();
+c21.run("S.players=['Anna','Bruno','Carla']; S.scores={Anna:0,Bruno:0,Carla:0}; S.stats.recent=[]");
+c21.run('startTour(3)');
+check(
+  c21.run('S.tour && S.tour.plan.length') === 3 &&
+    c21.run('S.tour.idx') === 0 &&
+    c21.run("Object.keys(S.tour.pts).sort().join(',')") === 'Anna,Bruno,Carla',
+  'startTour pianifica tre partite e azzera i punti'
+);
+check(
+  c21.run("S.game") === c21.run('S.tour.plan[0]') && c21.run("S.screen") === 'setup',
+  'startTour apre il setup del primo gioco'
+);
+
+// Creditare i punti avanza la serata solo per il gioco previsto.
+const firstGame = c21.run('S.tour.plan[0]');
+const otherGame = c21.run("PLAYABLE.filter((g) => g !== S.tour.plan[0])[0]");
+c21.run(`tourCredit('${otherGame}', {Anna: 99})`);
+check(c21.run('S.tour.idx') === 0 && c21.run('S.tour.pts.Anna') === 0, 'un gioco fuori sequenza non muove la serata');
+c21.run(`tourCredit('${firstGame}', {Anna: 5, Bruno: 2, Carla: 0})`);
+check(
+  c21.run('S.tour.idx') === 1 && c21.run('S.tour.pts.Anna') === 5 && c21.run('S.tour.pts.Bruno') === 2,
+  'tourCredit somma i punti e passa alla partita dopo'
+);
+check(
+  c21.run('tourRank()[0].n') === 'Anna' && c21.run('tourRank()[0].p') === 5,
+  'la classifica della serata ordina per punti'
+);
+check(
+  c21.run(`tourSummaryBlock('${firstGame}').length > 0`) && c21.run(`tourSummaryBlock('${otherGame}')`) === '',
+  'il blocco serata compare solo per la partita appena chiusa'
+);
+
+c21.run('showTourStandings()');
+const tourModal = c21.els.modal.innerHTML;
+check(
+  tourModal.includes('Classifica finale') && tourModal.includes('Vincitore della serata') && tourModal.includes('Anna'),
+  'la classifica finale mostra vincitore e punti'
+);
+
+// Storico: filtro, rigioca e sanitizzazione.
+c21.run(
+  "S.stats.recent=[{g:'lupus',t:Date.now(),w:'Anna',p:['Anna','Bruno']},{g:'impostore',t:Date.now(),w:'Carla',p:['Carla','Dora']}]"
+);
+c21.run("showHistory('lupus')");
+check(c21.run('HIST_VIEW.length') === 1 && c21.run('HIST_VIEW[0].g') === 'lupus', 'lo storico filtra per gioco');
+check(
+  c21.els.modal.innerHTML.includes('Rigioca con gli stessi') && c21.els.modal.innerHTML.includes('Tutte'),
+  'lo storico ha filtri e il pulsante rigioca'
+);
+c21.run("S.players=['X']; showHistory(''); replayHistory(0)");
+check(
+  c21.run("S.players.join(',')") === 'Anna,Bruno' && c21.run('S.game') === 'lupus',
+  'rigiocare ripristina i giocatori della partita'
+);
+
+check(
+  c21.run("sanitizeTour(null)") === null && c21.run("sanitizeTour({plan:['nope'],idx:0})") === null,
+  'sanitizeTour scarta piani non validi'
+);
+const cleanTour = c21.run("sanitizeTour({plan:['impostore','lupus'],idx:9,pts:{Anna:'7',Bruno:-3}})");
+check(
+  cleanTour.idx === 2 && cleanTour.pts.Anna === 7 && cleanTour.pts.Bruno === 0 && cleanTour.done === true,
+  'sanitizeTour limita indice e punti'
+);
+const st21 = c21.run(
+  "sanitizeStats({recent:[{g:'impostore',t:Date.now(),w:'Anna',p:['Anna','  ','Bruno',null]}]}).recent[0]"
+);
+check(
+  st21.p.length === 2 && st21.p[0] === 'Anna' && st21.p[1] === 'Bruno',
+  'lo storico ripulito conserva solo i nomi validi'
+);
+check(
+  c21.run("t('tourTitle')") === 'Serata a punti' &&
+    c21.run("t('historyTitle')") === 'Storico partite' &&
+    c21.run("t('news25')").length > 20,
+  'le voci di serata e storico sono tradotte'
+);
+c21.run('showNews()');
+check(c21.els.modal.innerHTML.includes('Serata a punti'), 'le novità includono la serata');
+check(srcHtml.includes('news25') && srcHtml.includes('showHistory('), 'home, impostazioni e novità sono collegati');
 
 done();

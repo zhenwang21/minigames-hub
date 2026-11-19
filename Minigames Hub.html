@@ -676,7 +676,7 @@ const I = {
     installed: 'App installata',
     offline: 'Offline',
     news: 'Novità',
-    newsTitle: 'Novità 1.20.0',
+    newsTitle: 'Novità 1.21.0',
     news9: 'Rinomina e annulla rimozione dei giocatori.',
     news10: 'Statistiche con ultime partite ed export CSV.',
     news11: 'Backup: unisci o sostituisci, con avviso di versione.',
@@ -693,6 +693,7 @@ const I = {
     news22: 'Tastiera e schermo: Tab resta nella finestra aperta ed Esc la chiude.',
     news23: 'Condividi il setup con un QR, vittorie per gioco nelle statistiche, vibrazioni su risposta giusta o sbagliata e riconnessione con tentativi.',
     news24: 'Sfondi animati per tema, cornici avatar, podio con punti animati, micro-suoni e tema Mezzanotte OLED.',
+    news25: 'Serata a punti con classifica cumulativa, storico di tutte le partite con filtro e “rigioca con gli stessi”.',
     news7: 'Colori e simboli dedicati per ogni gioco.',
     news8: 'Avatar e colori per i giocatori in liste, lobby e classifiche.',
     news1: 'Introduzione per i nuovi arrivati e partita demo.',
@@ -741,6 +742,21 @@ const I = {
     importMerged: 'Backup unito ai dati esistenti.',
     statsRecent: 'Ultime partite',
     statsCsv: 'Esporta CSV',
+    tourTitle: 'Serata a punti',
+    tourStart: 'Inizia una serata',
+    tourStartHint: 'Più partite di fila: i punti di ogni gioco si sommano in un’unica classifica.',
+    tourGames: 'partite',
+    tourStarted: 'Serata avviata',
+    tourNext: 'Prossima partita',
+    tourResume: 'Riprendi',
+    tourLead: 'In testa',
+    tourFinal: 'Classifica finale',
+    tourWinner: 'Vincitore della serata',
+    tourNew: 'Nuova serata',
+    historyTitle: 'Storico partite',
+    historyAll: 'Tutte',
+    historyReplay: 'Rigioca con gli stessi',
+    historyEmpty: 'Nessuna partita registrata.',
     statsCsvOk: 'Statistiche esportate in CSV.',
     shareNote: 'Mostra a tutti',
     noteShared: 'Nota condivisa con la stanza.',
@@ -1180,7 +1196,7 @@ const I = {
     installed: 'App installed',
     offline: 'Offline',
     news: 'What’s new',
-    newsTitle: 'What’s new in 1.20.0',
+    newsTitle: 'What’s new in 1.21.0',
     news9: 'Rename players and undo a removal.',
     news10: 'Statistics with recent games and CSV export.',
     news11: 'Backup: merge or replace, with a version warning.',
@@ -1197,6 +1213,7 @@ const I = {
     news22: 'Keyboard and screen: Tab stays inside the open dialog and Esc closes it.',
     news23: 'Share the setup as a QR, wins per game in the stats, correct/wrong vibrations and reconnection attempts.',
     news24: 'Animated theme backgrounds, avatar frames, a podium with animated points, UI sounds and a Midnight OLED theme.',
+    news25: 'A game-night ladder with cumulative standings, a filterable match history and “replay with the same players”.',
     news7: 'Dedicated colours and symbols for every game.',
     news8: 'Avatars and colours for players in lists, lobbies and standings.',
     news1: 'A welcome intro for newcomers and a demo game.',
@@ -1245,6 +1262,21 @@ const I = {
     importMerged: 'Backup merged with your existing data.',
     statsRecent: 'Recent games',
     statsCsv: 'Export CSV',
+    tourTitle: 'Game night',
+    tourStart: 'Start a game night',
+    tourStartHint: 'Several games in a row: the points from each game add up in one standings table.',
+    tourGames: 'games',
+    tourStarted: 'Game night started',
+    tourNext: 'Next game',
+    tourResume: 'Resume',
+    tourLead: 'Leading',
+    tourFinal: 'Final standings',
+    tourWinner: 'Game night winner',
+    tourNew: 'New game night',
+    historyTitle: 'Match history',
+    historyAll: 'All',
+    historyReplay: 'Replay with same players',
+    historyEmpty: 'No matches recorded yet.',
     statsCsvOk: 'Statistics exported as CSV.',
     shareNote: 'Share with everyone',
     noteShared: 'Note shared with the room.',
@@ -1353,7 +1385,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.20.0';
+const APP_VERSION = '1.21.0';
 // Ripresa dopo reload/standby: la sessione dura al massimo due ore.
 const RESUME_TTL = 2 * 60 * 60 * 1000;
 let RESUME = { room: null, snap: null, savedAt: 0, lastKey: '' };
@@ -3861,6 +3893,7 @@ function backupData() {
     uiSnd: S.uiSnd ? 1 : 0,
     lastGame: S.lastGame,
     stats: S.stats,
+    tour: S.tour,
     onboarded: S.onboarded ? 1 : 0,
     dbAck: S.dbAck,
     textSize: S.textSize,
@@ -4111,6 +4144,7 @@ function applyBackup(d) {
   if (d.vib !== undefined) S.vibOn = d.vib !== 0 && d.vib !== false;
   if (d.uiSnd !== undefined) S.uiSnd = d.uiSnd !== 0 && d.uiSnd !== false;
   S.stats = sanitizeStats(d.stats);
+  S.tour = sanitizeTour(d.tour);
   S.lastGame = typeof d.lastGame === 'string' && GAME_START[d.lastGame] ? d.lastGame : '';
   S.onboarded = d.onboarded === 1 || d.onboarded === true;
   S.dbAck = [0, 1, 2].includes(+d.dbAck) ? +d.dbAck : S.dbAck;
@@ -6930,6 +6964,7 @@ const S = {
   uiSnd: true,
   lastGame: '',
   stats: { games: 0, byGame: {}, wby: {}, wins: {}, played: {}, streak: {}, best: {}, recent: [] },
+  tour: null,
   onboarded: false,
   dbAck: 0,
   textSize: 'm',
@@ -9367,6 +9402,7 @@ function viewHome() {
   ${onboardCard()}
   ${backupReminder()}
   ${dailyCard()}
+  ${tourCard()}
   <button onclick="mixGame()" class="w-full bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">🎲 ${t('mixStart')}</button>
   ${GAMES.map(
     ([
@@ -10992,9 +11028,17 @@ function statsRecord(gid, base, onlyIfScored) {
     } else st.streak[n] = 0;
   });
   if (!Array.isArray(st.recent)) st.recent = [];
-  st.recent.unshift({ g: gid, t: Date.now(), w: winners.slice(0, 8).join(', ') });
+  st.recent.unshift({
+    g: gid,
+    t: Date.now(),
+    w: winners.slice(0, 8).join(', '),
+    p: P.map((p) => cleanName(p, 16))
+      .filter(Boolean)
+      .slice(0, 8)
+  });
   st.recent = st.recent.slice(0, 20);
   statsPrune();
+  tourCredit(gid, delta);
   winChime(gid);
   haptic('win');
   announce(t('gameOver'));
@@ -11030,6 +11074,169 @@ function statsRecentHtml(n) {
         `<div class="flex justify-between gap-2 bg-slate-900 px-3 py-1.5 rounded-lg text-[10px]"><span class="truncate">${esc(t('g_' + e.g))}</span><span class="text-slate-400 text-right truncate">${fmtDate(e.t)}${e.w ? ' · ' + esc(e.w) : ''}</span></div>`
     )
     .join('')}</div>`;
+}
+// --- 1.21.0: serata a punti e storico partite ---
+// Una "serata" è una coda di giochi offline: i punti di ogni partita si sommano.
+function sanitizeTour(x) {
+  if (!x || typeof x !== 'object') return null;
+  const plan = (Array.isArray(x.plan) ? x.plan : []).filter((g) => PLAYABLE.includes(g)).slice(0, 9);
+  if (!plan.length) return null;
+  const T = {
+    plan,
+    idx: Math.max(0, Math.min(plan.length, Math.round(+x.idx || 0))),
+    pts: {},
+    done: x.done === true,
+    start: Math.max(0, +x.start || 0)
+  };
+  if (x.pts && typeof x.pts === 'object')
+    Object.keys(x.pts)
+      .slice(0, 40)
+      .forEach((k) => {
+        const n = cleanName(k, 20),
+          v = Math.max(0, Math.min(99999, Math.round(+x.pts[k] || 0)));
+        if (n) T.pts[n] = v;
+      });
+  T.done = T.done || T.idx >= plan.length;
+  return T;
+}
+function tourPool() {
+  const ok = PLAYABLE.filter((g) => {
+    const min = (GAME_START[g] && GAME_START[g][1]) || 2;
+    return !S.players.length || S.players.length >= min;
+  });
+  return ok.length ? ok : PLAYABLE.slice();
+}
+function tourRank() {
+  const T = S.tour;
+  if (!T) return [];
+  const names = new Set([...Object.keys(T.pts || {}), ...S.players.slice(0, 16)]);
+  return [...names]
+    .map((n) => ({ n, p: +((T.pts || {})[n] || 0) }))
+    .sort((a, b) => b.p - a.p || a.n.localeCompare(b.n));
+}
+function tourCredit(gid, delta) {
+  const T = S.tour;
+  if (!T || T.done || !Array.isArray(T.plan)) return;
+  if (T.plan[T.idx] !== gid) return;
+  Object.keys(delta || {}).forEach((p) => {
+    const n = cleanName(p, 20);
+    if (n) T.pts[n] = (+T.pts[n] || 0) + Math.max(0, +delta[p] || 0);
+  });
+  T.idx = Math.min(T.plan.length, (+T.idx || 0) + 1);
+  T.done = T.idx >= T.plan.length;
+  saveLocal();
+}
+function startTour(n) {
+  const order = shuffle(tourPool()),
+    count = Math.max(2, Math.min(9, Math.round(+n || 3))),
+    plan = [],
+    pts = {};
+  for (let i = 0; i < count; i++) plan.push(order[i % order.length]);
+  S.players.slice(0, 16).forEach((p) => (pts[p] = 0));
+  S.tour = { plan, idx: 0, pts, done: false, start: Date.now() };
+  saveLocal();
+  closeModal();
+  selectGame(plan[0]);
+  announce(t('tourStarted') + ' · ' + t('g_' + plan[0]));
+}
+function tourNext() {
+  const T = S.tour;
+  if (!T) return;
+  if (T.done) return showTourStandings();
+  const g = T.plan[T.idx];
+  if (!PLAYABLE.includes(g)) return tourClear();
+  selectGame(g);
+  announce(t('tourNext') + ': ' + t('g_' + g));
+}
+function tourClear() {
+  S.tour = null;
+  saveLocal();
+  closeModal();
+  render();
+}
+function showTourSetup() {
+  const m = $('modal');
+  if (!m) return;
+  const pool = tourPool();
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">🎟️ ${t('tourTitle')}</h3>
+  <p class="text-xs text-slate-400">${t('tourStartHint')}</p>
+  <div class="bg-slate-900 rounded-xl p-2 text-[10px] text-slate-400">${pool.map((g) => t('g_' + g)).join(' · ')}</div>
+  <div class="grid grid-cols-2 gap-2"><button onclick="startTour(3)" class="gbtn py-2.5 rounded-xl text-xs font-bold">3 ${t('tourGames')}</button><button onclick="startTour(5)" class="gbtn py-2.5 rounded-xl text-xs font-bold">5 ${t('tourGames')}</button></div>
+  <button onclick="closeModal()" class="w-full bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
+  modalOpen();
+}
+function showTourStandings() {
+  const T = S.tour;
+  if (!T) return;
+  const rank = tourRank(),
+    top = rank[0],
+    medal = ['🥇', '🥈', '🥉'],
+    m = $('modal');
+  if (!m) return;
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3 max-h-[85vh] overflow-y-auto"><div class="flex justify-between items-center"><h3 class="font-bold text-white">🏁 ${t('tourFinal')}</h3><span class="text-[10px] text-slate-400">${Math.min(T.idx, T.plan.length)}/${T.plan.length}</span></div>
+  ${top ? `<p class="text-sm font-extrabold text-amber-300">${t('tourWinner')}: ${esc(top.n)} · ${top.p} PT</p>` : ''}
+  <div class="space-y-1">${rank
+    .map(
+      (r, i) =>
+        `<div class="flex justify-between bg-slate-900 px-3 py-1.5 rounded-lg text-[11px]${i < 3 ? ' podium-' + (i + 1) : ''}"><span class="flex items-center gap-1.5 min-w-0"><span class="text-slate-500">${i < 3 ? medal[i] : '#' + (i + 1)}</span>${avHtml(r.n)}<b class="truncate">${esc(r.n)}</b></span><span class="${r.p === top.p && r.p > 0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">${r.p} PT</span></div>`
+    )
+    .join('')}</div>
+  <div class="grid grid-cols-2 gap-2"><button onclick="showTourSetup()" class="bg-slate-800 py-2.5 rounded-xl text-xs font-bold">🔁 ${t('tourNew')}</button><button onclick="tourClear()" class="gbtn py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div></div>`;
+  modalOpen();
+}
+function tourCard() {
+  const T = S.tour;
+  if (!T) return `<button onclick="showTourSetup()" class="w-full bg-slate-800 py-2.5 rounded-xl text-[11px] font-bold">🎟️ ${t('tourStart')}</button>`;
+  const rank = tourRank(),
+    top = rank[0],
+    n = T.plan.length,
+    played = Math.min(T.idx, n);
+  return `<div class="glass p-3 rounded-2xl border border-amber-500/30 space-y-2"><div class="flex justify-between items-center"><h3 class="font-bold text-white text-sm">🎟️ ${t('tourTitle')}</h3><span class="text-[10px] text-slate-400">${played}/${n}</span></div>
+  ${top ? `<p class="text-[11px] text-slate-400">${t('tourLead')}: <b class="text-slate-200">${esc(top.n)}</b> · ${top.p} PT</p>` : ''}
+  ${T.done ? `<button onclick="showTourStandings()" class="w-full gbtn py-2 rounded-xl text-[11px] font-bold">🏁 ${t('tourFinal')}</button>` : `<button onclick="tourNext()" class="w-full gbtn py-2 rounded-xl text-[11px] font-bold">▶️ ${t('tourResume')}: ${t('g_' + T.plan[T.idx])}</button>`}</div>`;
+}
+function tourSummaryBlock(gid) {
+  const T = S.tour;
+  if (!T) return '';
+  const played = Math.min(T.idx, T.plan.length);
+  // Solo quando la partita appena chiusa è quella prevista dalla serata.
+  if (played < 1 || T.plan[played - 1] !== gid) return '';
+  const rank = tourRank(),
+    top = rank[0];
+  return `<div class="bg-slate-900/60 rounded-xl p-2 space-y-1.5 border border-amber-500/30"><div class="flex justify-between text-[11px] font-bold"><span>🎟️ ${t('tourTitle')}</span><span class="text-slate-400">${played}/${T.plan.length}</span></div>${top ? `<p class="text-[10px] text-slate-400">${t('tourLead')}: <b class="text-slate-200">${esc(top.n)}</b> · ${top.p} PT</p>` : ''}${T.done ? `<button onclick="showTourStandings()" class="w-full gbtn py-2 rounded-xl text-[11px] font-bold">🏁 ${t('tourFinal')}</button>` : `<button onclick="tourNext()" class="w-full gbtn py-2 rounded-xl text-[11px] font-bold">▶️ ${t('tourNext')}: ${t('g_' + T.plan[T.idx])}</button>`}</div>`;
+}
+let HIST_VIEW = [];
+function showHistory(f) {
+  const all = (S.stats && S.stats.recent) || [],
+    games = [...new Set(all.map((e) => e.g).filter(Boolean))],
+    list = (HIST_VIEW = f ? all.filter((e) => e.g === f) : all.slice()),
+    chip = (v, label) =>
+      `<button onclick="showHistory('${v}')" aria-pressed="${(f || '') === v}" class="px-2 py-1 rounded-lg text-[10px] font-bold ${(f || '') === v ? 'bg-purple-600 text-white' : 'bg-slate-800 text-slate-400'}">${label}</button>`,
+    m = $('modal');
+  if (!m) return;
+  m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3 max-h-[85vh] overflow-y-auto"><div class="flex justify-between items-center"><h3 class="font-bold text-white">🗂️ ${t('historyTitle')}</h3><button onclick="closeModal()" class="text-xs bg-slate-800 px-3 py-1.5 rounded-xl">${t('close')}</button></div>
+  <div class="flex flex-wrap gap-1.5">${chip('', t('historyAll'))}${games.map((g) => chip(g, t('g_' + g))).join('')}</div>
+  ${list.length ? `<div class="space-y-1.5">${list
+    .map(
+      (e, i) =>
+        `<div class="bg-slate-900 rounded-xl px-3 py-2 space-y-0.5"><div class="flex justify-between text-[11px] font-bold"><span>${esc(t('g_' + e.g))}</span><span class="text-slate-400">${fmtDate(e.t)}</span></div>${e.w ? `<p class="text-[10px] text-amber-300">🥇 ${esc(e.w)}</p>` : ''}${e.p && e.p.length ? `<p class="text-[10px] text-slate-500 truncate">${e.p.map(esc).join(' · ')}</p>` : ''}<button onclick="replayHistory(${i})" class="text-[10px] font-bold text-emerald-300">▶️ ${t('historyReplay')}</button></div>`
+    )
+    .join('')}</div>` : `<p class="text-xs text-slate-500 italic text-center py-3">${t('historyEmpty')}</p>`}</div>`;
+  modalOpen();
+}
+function replayHistory(i) {
+  const e = HIST_VIEW[i];
+  if (!e || !PLAYABLE.concat(ONLY_ONLINE).includes(e.g)) return;
+  if (e.p && e.p.length) {
+    const uniq = [];
+    e.p.forEach((n) => {
+      if (!uniq.some((x) => x.toLowerCase() === n.toLowerCase())) uniq.push(n);
+    });
+    S.players = uniq.slice(0, 16);
+  }
+  closeModal();
+  selectGame(e.g);
+  saveLocal();
 }
 // Grafici leggeri: barre per gioco e attività degli ultimi 7 giorni, senza librerie.
 function dayKey(ts) {
@@ -11169,7 +11376,11 @@ function sanitizeStats(x) {
     .map((e) => ({
       g: e && typeof e.g === 'string' && GAME_START[e.g] ? e.g : '',
       t: Math.max(0, Math.min(Date.now() + 86400000, +((e && e.t) || 0))),
-      w: cleanText(e && e.w, 60)
+      w: cleanText(e && e.w, 60),
+      p: (Array.isArray(e && e.p) ? e.p : [])
+        .slice(0, 8)
+        .map((n) => cleanName(n, 16))
+        .filter(Boolean)
     }))
     .filter((e) => e.g && e.t)
     .sort((a, b) => b.t - a.t)
@@ -11467,7 +11678,7 @@ function summaryBar() {
           `<div class="flex justify-between bg-slate-900 px-3 py-1.5 rounded-lg text-[11px]${i < 3 ? ' podium-' + (i + 1) : ''}"><span class="flex items-center gap-1.5 min-w-0"><span class="text-slate-500">${i < 3 ? ['🥇', '🥈', '🥉'][i] : '#' + (i + 1)}</span>${avHtml(r.n, i === 0 && d.max > 0 ? 'win' : '')}<b class="truncate">${esc(r.n)}</b>${streakTag(r.n)}</span><span class="${r.d === d.max && r.d > 0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}"><span class="pcount" data-to="${r.d > 0 ? r.d : 0}">${r.d > 0 ? '+' + r.d : '0'}</span></span></div>`
       )
       .join('');
-  return `<section class="glass p-4 rounded-2xl space-y-2 border border-emerald-500/30"><div class="flex justify-between items-center"><h3 class="font-bold text-white text-sm">📊 ${t('summaryTitle')}</h3><span class="text-[10px] text-slate-400">${t('g_' + d.gid)}</span></div>${win}${pod}<details class="bg-slate-900/40 rounded-xl p-2"><summary class="text-[11px] font-bold cursor-pointer">${t('summaryRank')}</summary><div class="space-y-1 mt-1.5">${rows}</div></details><div class="flex gap-2"><button onclick="shareResultImage()" class="flex-1 bg-slate-800 py-2 rounded-xl text-[11px] font-bold" title="${t('summaryImage')}">🖼️ ${t('summaryShare')}</button><button onclick="rematchSummary()" class="flex-1 gbtn py-2 rounded-xl text-[11px] font-bold">🔁 ${t('summaryAgain')}</button></div></section>`;
+  return `<section class="glass p-4 rounded-2xl space-y-2 border border-emerald-500/30"><div class="flex justify-between items-center"><h3 class="font-bold text-white text-sm">📊 ${t('summaryTitle')}</h3><span class="text-[10px] text-slate-400">${t('g_' + d.gid)}</span></div>${win}${pod}${tourSummaryBlock(d.gid)}<details class="bg-slate-900/40 rounded-xl p-2"><summary class="text-[11px] font-bold cursor-pointer">${t('summaryRank')}</summary><div class="space-y-1 mt-1.5">${rows}</div></details><div class="flex gap-2"><button onclick="shareResultImage()" class="flex-1 bg-slate-800 py-2 rounded-xl text-[11px] font-bold" title="${t('summaryImage')}">🖼️ ${t('summaryShare')}</button><button onclick="rematchSummary()" class="flex-1 gbtn py-2 rounded-xl text-[11px] font-bold">🔁 ${t('summaryAgain')}</button></div></section>`;
 }
 function rematchSummary() {
   const d = summaryData();
@@ -11551,7 +11762,7 @@ function clearLocalData() {
 function showNews() {
   const m = $('modal');
   if (!m) return;
-  const items = ['news24', 'news23', 'news22', 'news21', 'news20', 'news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
+  const items = ['news25', 'news24', 'news23', 'news22', 'news21', 'news20', 'news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">✨ ${t('newsTitle')}</h3><ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">${items.map((k) => `<li>${t(k)}</li>`).join('')}</ul><button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
   modalOpen();
 }
@@ -11731,7 +11942,7 @@ function showSettings() {
     ${statsRecentHtml(4)}
     ${statsChartsHtml()}
     ${achHtml()}
-    <div class="flex flex-wrap gap-2 items-center">${+S.stats.games ? `<button onclick="statsCsv()" class="text-[11px] text-emerald-300 font-bold">⬇️ ${t('statsCsv')}</button>` : ''}${+S.stats.games ? `<button onclick="resetStats()" class="text-[11px] text-rose-400 font-bold">↺ ${t('statsReset')}</button>` : ''}</div>
+    <div class="flex flex-wrap gap-2 items-center">${+S.stats.games ? `<button onclick="statsCsv()" class="text-[11px] text-emerald-300 font-bold">⬇️ ${t('statsCsv')}</button>` : ''}${+S.stats.games ? `<button onclick="showHistory('')" class="text-[11px] text-slate-300 font-bold">🗂️ ${t('historyTitle')}</button>` : ''}${+S.stats.games ? `<button onclick="resetStats()" class="text-[11px] text-rose-400 font-bold">↺ ${t('statsReset')}</button>` : ''}</div>
   </div>
   <div class="space-y-2"><p class="text-xs font-bold text-slate-300">🧩 ${t('setGames')}</p><p class="text-[11px] text-slate-400">${t('setGamesHint')}</p><div class="flex flex-wrap gap-2"><button onclick="resetPrefs()" class="text-[11px] text-rose-400 font-bold">↺ ${t('resetPrefs')}</button><button onclick="forgetSeen()" class="text-[11px] text-amber-300 font-bold">🧹 ${t('forgetSeen')}</button><button onclick="showDbTip(true)" class="text-[11px] text-slate-300 font-bold">✍️ ${t('dbWhy')}</button><button onclick="myQOpen()" class="text-[11px] text-cyan-300 font-bold">✍️ ${t('myQ')} (${S.myQ.who.length + S.myQ.pv.length})</button></div></div>
   <div class="space-y-2"><p class="text-xs font-bold text-slate-300">💾 ${t('setData')}</p>
@@ -11817,6 +12028,7 @@ function saveLocal() {
       uiSnd: S.uiSnd ? 1 : 0,
       lastGame: S.lastGame,
       stats: S.stats,
+      tour: S.tour,
       onboarded: S.onboarded ? 1 : 0,
       dbAck: S.dbAck,
       textSize: S.textSize,
@@ -11867,6 +12079,7 @@ function loadLocal() {
     S.vibOn = d.vib !== 0 && d.vib !== false;
     S.uiSnd = d.uiSnd !== 0 && d.uiSnd !== false;
     S.stats = sanitizeStats(d.stats);
+    S.tour = sanitizeTour(d.tour);
     S.lastGame = typeof d.lastGame === 'string' && GAME_START[d.lastGame] ? d.lastGame : '';
     S.onboarded =
       d.onboarded === 1 ||

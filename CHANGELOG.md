@@ -4,6 +4,32 @@
 release number; `sw.js` must follow it. Older history (1.2–1.5) is described in
 `MINIGAMES_HUB_HANDOFF.md`.
 
+## 1.21.0 — 2026-11-19
+
+### Added
+- **Game night** — a queue of offline games (3 or 5 from the home card) with one cumulative
+  standings table. `S.tour` keeps the plan, the current index and the points per
+  player; `tourCredit` adds the points of the game that just ended only when it
+  matches the planned one, `tourRank` sorts the table, `tourSummaryBlock` shows
+  the progress in the end-of-game summary and the home card offers to start,
+  resume or see the final standings. The state is saved with the rest and
+  validated by `sanitizeTour` on import.
+- **Match history** — `showHistory` lists `stats.recent` with a filter per game
+  and **Replay with same players** (`replayHistory`) restores the table and
+  opens the setup of that game. Recent entries now also store the players
+  (`recent[].p`), validated when the save or a backup is loaded.
+
+### Changed
+- The statistics card links to the full history and the end-of-game summary
+  gains the game-night block.
+- Minified build: 451,329 bytes; source: 551,522 bytes.
+
+### Tests
+- `features.test.js` at 318 checks: tour planning, point crediting and
+  ordering, summary visibility, final standings, history filtering and replay,
+  plus `sanitizeTour` and the new `recent[].p` field. 13/13 suites green on
+  source and minified build. Playwright: 3/3 passed locally.
+
 ## 1.20.0 — 2026-11-19
 
 ### Added

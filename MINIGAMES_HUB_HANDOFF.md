@@ -242,6 +242,12 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 
 ## 11. Cosa è stato corretto nell'ultima revisione
 
+### Versione 1.21.0 (serata a punti e storico partite)
+- **Serata**: `S.tour = {plan, idx, pts, done, start}` salvato in locale e backup. `tourPool()` sceglie solo giochi avviabili con i giocatori presenti; `startTour(n)` mescola (`shuffle`) e pianifica 3–9 partite, azzera `pts` e apre il setup. `tourCredit(gid, delta)` somma i punti solo se `T.plan[T.idx] === gid`, poi avanza; `tourRank()` ordina per punti; `tourCard()` in home e `tourSummaryBlock(gid)` nel riepilogo compaiono solo per la partita giusta. `sanitizeTour` valida piano, indice e punti.
+- **Storico**: `stats.recent` ora salva anche `p` (nomi, max 8). `showHistory(f)` costruisce `HIST_VIEW` filtrata e la lista con chip per gioco; `replayHistory(i)` ripristina i giocatori unici e apre il setup dello stesso gioco. `sanitizeStats` valida `p` come gli altri campi.
+- **Integrazione**: pulsante “Storico partite” nella card statistiche, blocco serata nel riepilogo, `news25` IT/EN.
+- `APP_VERSION` e `VERSION` a **1.21.0**; build: sorgente **551.522** byte, minificato **451.329** byte. Verifiche locali: 13/13 suite su sorgente e minificato, Playwright 3/3, `features.test.js` a 318 check.
+
 ### Versione 1.20.0 (cosmetici: sfondo, cornici, podio, OLED)
 - **Sfondo vivo**: layer fisso `#glow` (aria-hidden) con tre aloni costruiti da `--acc1/--acc2/--acc3`, animazione `glowdrift` su `background-position`; spento da `data-motion="off"`, `data-contrast="high"` e `prefers-reduced-motion`. `#app` e l'header hanno `z-index:1` per restare sopra.
 - **Cornici avatar**: `avFrame(name)` legge `stats.wins` e `stats.best` (1/5/10 vittorie, 3/5 di fila) e restituisce `f1`–`f4`; `avHtml` aggiunge la classe e i CSS usano `box-shadow`. Legenda in `achHtml` via `avFrameHint`.
