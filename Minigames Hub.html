@@ -445,7 +445,11 @@ const I = {
   shareSetupHint: 'Inquadra il QR o apri il link su un altro telefono: stesso gioco, stessi giocatori, modalità veloce e timer. Ruoli e categorie restano su questo telefono.',
   setupLoaded: 'Impostazioni caricate.',
     joinInvite: 'Sei stato invitato nella stanza',
-    joinInviteHint: 'Scrivi il tuo nome e tocca Entra per partecipare.',
+    joinInviteHint: 'Scrivi il tuo nome e tocca “Entra nella stanza” per partecipare.',
+    joinRoom: 'Entra nella stanza',
+    orJoin: 'oppure entra con un codice',
+    otherCode: 'Inserisci un altro codice',
+    pinNeededHint: 'Questa stanza ha un PIN: inserisci le 4 cifre per entrare.',
     backupTitle: 'Backup impostazioni',
     exportBtn: 'Esporta',
     importBtn: 'Importa',
@@ -694,7 +698,7 @@ const I = {
     installed: 'App installata',
     offline: 'Offline',
     news: 'Novità',
-    newsTitle: 'Novità 1.24.0',
+    newsTitle: 'Novità 1.25.0',
     news9: 'Rinomina e annulla rimozione dei giocatori.',
     news10: 'Statistiche con ultime partite ed export CSV.',
     news11: 'Backup: unisci o sostituisci, con avviso di versione.',
@@ -715,6 +719,7 @@ const I = {
     news26: 'Ruota del turno per scegliere chi inizia e scheda giocatore con vittorie per gioco e serie migliore.',
     news27: 'Poster con la serata, avviso di obiettivo sbloccato, finestre animate e cambio tema in dissolvenza.',
     news28: 'Nuova icona dell’app: un dado luminoso al posto della vecchia maschera.',
+    news29: 'Schermata Online più chiara: campi impilati, invito con solo il nome e PIN solo quando serve.',
     news7: 'Colori e simboli dedicati per ogni gioco.',
     news8: 'Avatar e colori per i giocatori in liste, lobby e classifiche.',
     news1: 'Introduzione per i nuovi arrivati e partita demo.',
@@ -981,7 +986,11 @@ const I = {
   shareSetupHint: 'Scan the QR or open the link on another phone: same game, same players, quick mode and timer. Roles and categories stay on this phone.',
   setupLoaded: 'Setup loaded.',
     joinInvite: 'You were invited to the room',
-    joinInviteHint: 'Type your name and tap Join to take part.',
+    joinInviteHint: 'Type your name and tap “Join the room” to take part.',
+    joinRoom: 'Join the room',
+    orJoin: 'or join with a code',
+    otherCode: 'Enter another code',
+    pinNeededHint: 'This room has a PIN: enter the 4 digits to join.',
     backupTitle: 'Settings backup',
     exportBtn: 'Export',
     importBtn: 'Import',
@@ -1229,7 +1238,7 @@ const I = {
     installed: 'App installed',
     offline: 'Offline',
     news: 'What’s new',
-    newsTitle: 'What’s new in 1.24.0',
+    newsTitle: 'What’s new in 1.25.0',
     news9: 'Rename players and undo a removal.',
     news10: 'Statistics with recent games and CSV export.',
     news11: 'Backup: merge or replace, with a version warning.',
@@ -1250,6 +1259,7 @@ const I = {
     news26: 'A turn wheel to pick who starts and a player card with wins per game and best streak.',
     news27: 'A poster with the game night, an achievement toast, animated dialogs and a theme cross-fade.',
     news28: 'A new app icon: a glowing die instead of the old mask.',
+    news29: 'A clearer Online screen: stacked fields, an invite with just your name and a PIN only when needed.',
     news7: 'Dedicated colours and symbols for every game.',
     news8: 'Avatars and colours for players in lists, lobbies and standings.',
     news1: 'A welcome intro for newcomers and a demo game.',
@@ -1406,6 +1416,7 @@ const NET = {
   code: '',
   name: '',
   pin: '',
+  needPin: false,
   hostName: '',
   origHost: '',
   players: [],
@@ -1432,7 +1443,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.24.0';
+const APP_VERSION = '1.25.0';
 // Ripresa dopo reload/standby: la sessione dura al massimo due ore.
 const RESUME_TTL = 2 * 60 * 60 * 1000;
 let RESUME = { room: null, snap: null, savedAt: 0, lastKey: '' };
@@ -1543,6 +1554,7 @@ function netReset() {
     hostName: '',
     origHost: '',
     pin: '',
+    needPin: false,
     players: [],
     order: [],
     peers: {},
@@ -1613,6 +1625,7 @@ function tryCode(k) {
     NET.host = true;
     NET.code = code;
     NET.pin = '';
+    NET.needPin = false;
     NET.hostName = NET.name;
     NET.origHost = NET.name;
     NET.players = [NET.name];
@@ -1873,6 +1886,7 @@ function netJoin(codeArg, nameArg) {
     NET.err = X('Inserisci il codice stanza (5 caratteri).', 'Enter the room code (5 characters).');
     return render();
   }
+  if (code !== NET.lastCode) NET.needPin = false;
   const pe = $('on-pin');
   NET.pin = pinClean(pe ? pe.value : NET.pin);
   NET.lastCode = code;
@@ -2018,6 +2032,7 @@ function netAdopt(c, m, code) {
   NET.recTries = 0;
   NET.recovering = false;
   NET.code = m.code || code || NET.code;
+  NET.needPin = false;
   NET.players = m.players || [];
   NET.order = m.order || m.players || [];
   NET.peers = m.peers || {};
@@ -2175,6 +2190,7 @@ function netClientMsg(m, c) {
   }
   if (m.t === 'rej') {
     netReset();
+    if (m.why === 'pin') NET.needPin = true;
     if (m.why !== 'version') clearSession();
     NET.err =
       m.why === 'full'
@@ -4318,12 +4334,43 @@ function viewOnline() {
   }
   <button onclick="netClose();home()" class="w-full bg-slate-800 py-3 rounded-xl text-sm font-bold">${X('Esci dalla stanza', 'Leave the room')}</button></div>`;
   }
+  const invited = S.hint === 'invite' && !!NET.lastCode,
+    pinNeeded = !!(NET.pin || NET.needPin),
+    pinHint = NET.needPin
+      ? `<p class="text-[11px] text-amber-300 text-center">${t('pinNeededHint')}</p>`
+      : '',
+    pinField = pinNeeded
+      ? `<input id="on-pin" inputmode="numeric" autocomplete="off" maxlength="4" value="${esc(NET.pin || '')}" placeholder="${t('roomPinShort')}" aria-label="${t('roomPin')}" class="w-full min-w-0 text-center ${inp}">${pinHint}`
+      : '';
+  if (invited)
+    return `<div class="space-y-4 py-2">${back}<h2 class="text-xl font-extrabold text-center">🌐 Online <span class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full align-middle">beta</span></h2>
+  <div class="glass p-4 rounded-2xl border border-emerald-500/30 text-center space-y-1">
+    <p class="text-[11px] font-bold text-emerald-300">${t('joinInvite')}</p>
+    <p class="text-3xl font-extrabold tracking-[.35em] gtext">${esc(NET.lastCode)}</p>
+    <p class="text-[11px] text-slate-400">${t('joinInviteHint')}</p>
+  </div>
+  <input id="on-name" autocomplete="off" maxlength="16" value="${esc(NET.name)}" placeholder="${X('Il tuo nome', 'Your name')}" class="w-full min-w-0 ${inp}">${err}${pinField}
+  <button onclick="netJoin()" class="${BTN}">${t('joinRoom')}</button>
+  <button onclick="leaveInvite()" class="w-full bg-slate-800 py-2.5 rounded-xl text-xs font-bold">${t('otherCode')}</button></div>`;
   return `<div class="space-y-4 py-2">${back}<h2 class="text-xl font-extrabold text-center">🌐 Online <span class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full align-middle">beta</span></h2>
   ${S.hint === 'nomicose' ? `<p class="text-[11px] text-emerald-300 bg-emerald-600/10 border border-emerald-500/30 rounded-xl px-3 py-2 text-center">${t('ncHint')}</p>` : ''}
-  ${S.hint === 'invite' ? `<p class="text-[11px] text-emerald-300 bg-emerald-600/10 border border-emerald-500/30 rounded-xl px-3 py-2 text-center"><b>${t('joinInvite')}</b><br>${t('joinInviteHint')}</p>` : ''}
-  <input id="on-name" autocomplete="off" maxlength="16" value="${esc(NET.name)}" placeholder="${X('Il tuo nome', 'Your name')}" class="w-full ${inp}">${err}
+  <input id="on-name" autocomplete="off" maxlength="16" value="${esc(NET.name)}" placeholder="${X('Il tuo nome', 'Your name')}" class="w-full min-w-0 ${inp}">${err}
   <button onclick="netHost()" class="${BTN}">${X('Crea stanza', 'Create room')}</button>
-  <div class="flex gap-2"><input id="on-code" autocomplete="off" maxlength="5" value="${esc(NET.lastCode || '')}" placeholder="${X('Codice', 'Code')}" class="flex-1 uppercase tracking-widest text-center ${inp}"><input id="on-pin" inputmode="numeric" autocomplete="off" maxlength="4" value="${esc(NET.pin || '')}" placeholder="${t('roomPinShort')}" aria-label="${t('roomPin')}" class="w-16 text-center ${inp}"><button onclick="netJoin()" class="px-4 rounded-xl bg-slate-800 text-sm font-bold">${X('Entra', 'Join')}</button></div></div>`;
+  <div class="flex items-center gap-2 text-[10px] uppercase tracking-wide text-slate-500"><span class="h-px flex-1 bg-slate-700"></span><span>${t('orJoin')}</span><span class="h-px flex-1 bg-slate-700"></span></div>
+  <div class="space-y-2">
+    <input id="on-code" autocomplete="off" maxlength="5" value="${esc(NET.lastCode || '')}" placeholder="${X('Codice stanza', 'Room code')}" class="w-full min-w-0 uppercase tracking-widest text-center ${inp}">
+    ${pinField}
+    <button onclick="netJoin()" class="w-full bg-slate-800 py-3 rounded-xl text-sm font-bold">${t('joinRoom')}</button>
+  </div></div>`;
+}
+// Dalla schermata d'invito si può tornare al codice libero senza perdere il nome.
+function leaveInvite() {
+  S.hint = '';
+  NET.lastCode = '';
+  NET.pin = '';
+  NET.needPin = false;
+  NET.err = '';
+  render();
 }
 let CUST = [],
   CF = null,
@@ -11993,7 +12040,7 @@ function clearLocalData() {
 function showNews() {
   const m = $('modal');
   if (!m) return;
-  const items = ['news28', 'news27', 'news26', 'news25', 'news24', 'news23', 'news22', 'news21', 'news20', 'news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
+  const items = ['news29', 'news28', 'news27', 'news26', 'news25', 'news24', 'news23', 'news22', 'news21', 'news20', 'news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">✨ ${t('newsTitle')}</h3><ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">${items.map((k) => `<li>${t(k)}</li>`).join('')}</ul><button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
   modalOpen();
 }

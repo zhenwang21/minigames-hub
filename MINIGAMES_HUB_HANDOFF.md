@@ -242,6 +242,13 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 
 ## 11. Cosa è stato corretto nell'ultima revisione
 
+### Versione 1.25.0 (schermata Online, invito e PIN)
+- **Campi impilati**: `viewOnline()` non usa più una riga `flex` per codice, PIN ed Entra. Nome, codice, PIN e pulsante stanno in un blocco `space-y-2` con `w-full min-w-0`, quindi su schermi stretti non serve lo scroll orizzontale.
+- **Invito dedicato**: con `S.hint === 'invite'` e `NET.lastCode` valorizzato la schermata mostra il codice, il solo campo nome e “Entra nella stanza”; “Crea stanza” e il campo codice sono assenti. `leaveInvite()` riporta al codice libero azzerando `lastCode`, `pin`, `needPin` ed `err`.
+- **PIN condizionale**: nuovo `NET.needPin` in `NET`, azzerato da `netReset`, `netHost` e `netAdopt`. Il campo `on-pin` compare solo con `NET.pin` (link `&pin=`) o `NET.needPin`; il rifiuto `rej` con `why:'pin'` lo attiva e mostra il suggerimento `pinNeededHint`. Cambiando codice in `netJoin` il flag si azzera.
+- **Novità**: `news29` IT/EN in testa; etichette `joinRoom`, `orJoin`, `otherCode`, `pinNeededHint`.
+- `APP_VERSION` e `VERSION` a **1.25.0**; build: sorgente **565.375** byte, minificato **462.707** byte. Verifiche locali: 13/13 suite su sorgente e minificato, Playwright 3/3, `features.test.js` a 354 check, `pwa.test.js` a 38.
+
 ### Versione 1.24.0 (nuova icona)
 - **Icona PWA**: sostituita la maschera con un dado bianco inclinato di -12°, tre punti viola, gradiente viola→notte, alone e scintilla. `tools/make-icons.js` disegna tutto a mano (rotazione, ombra, punti, stella) con supersampling 3× e encoder PNG interno; `icons/icon.svg` è la versione vettoriale equivalente per favicon e manifest.
 - **Favicon**: `<link rel="icon" type="image/svg+xml" href="icons/icon.svg">` al posto dell'emoji in data URI.

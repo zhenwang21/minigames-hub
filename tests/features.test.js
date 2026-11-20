@@ -171,7 +171,7 @@ const lobby = resApp.run('viewOnline()');
 check(lobby.includes('copyCode()'), 'lobby con copia del codice');
 check(lobby.includes('1/2') && lobby.includes('connessi'), 'lobby mostra i giocatori connessi');
 check(lobby.includes('offline') && lobby.includes('host'), 'lobby distingue offline e host');
-check(lobby.includes('1.24.0'), 'lobby mostra la versione');
+check(lobby.includes('1.25.0'), 'lobby mostra la versione');
 // riepilogo condivisibile
 RS.scores = { Anna: 300, Bruno: 100 };
 RN.game = { g: 'impostore' };
@@ -394,7 +394,7 @@ check(q.run('backupReminder()') === '', 'senza dati il promemoria non compare');
 q.run('resetPrefs()');
 check(QS.timerPref === 120 && QS.mode === 'auto' && QS.ncPref.length === 0, 'ripristino preferenze giochi');
 q.run('showNews()');
-check(q.els.modal.innerHTML.includes('Novità 1.24.0'), 'la modale Novità è alla versione 1.24.0');
+check(q.els.modal.innerHTML.includes('Novità 1.25.0'), 'la modale Novità è alla versione 1.25.0');
 check(q.els.modal.innerHTML.includes('Colori e simboli dedicati'), 'le novità elencano i cosmetics');
 q.run('closeModal()');
 
@@ -1249,6 +1249,84 @@ check(
 check(
   c23.run("t('achUnlocked')") === 'Obiettivo sbloccato' && c23.run("t('news27')").length > 20,
   'le nuove voci sono tradotte'
+);
+
+// --- 1.25.0: schermata Online impilata, invito dedicato e PIN condizionale ---
+const inv = boot({ hash: '#room=ABCDE' });
+const invView = inv.run('viewOnline()');
+check(
+  invView.includes('ABCDE') && invView.includes('Sei stato invitato nella stanza'),
+  'l’invito mostra codice e messaggio'
+);
+check(
+  !invView.includes('Crea stanza') && !invView.includes('netHost()'),
+  'da un invito non viene chiesto di creare la stanza'
+);
+check(
+  invView.includes('id="on-name"') && !invView.includes('id="on-code"'),
+  'da un invito si sceglie solo il nome'
+);
+check(
+  invView.includes('leaveInvite()') && invView.includes('Inserisci un altro codice'),
+  'dall’invito si può passare al codice libero'
+);
+check(
+  !invView.includes('id="on-pin"') && !invView.includes('pinNeededHint'),
+  'senza PIN il campo non compare'
+);
+
+const invPin = boot({ hash: '#room=ABCDE&pin=4321' });
+const invPinView = invPin.run('viewOnline()');
+check(
+  invPin.NET.pin === '4321' && invPinView.includes('id="on-pin"') && invPinView.includes('value="4321"'),
+  'l’invito con PIN prepara il campo già compilato'
+);
+check(
+  !invPinView.includes('Crea stanza'),
+  'anche con PIN l’invito resta dedicato'
+);
+
+const free = boot({});
+free.run("S.hint=''; NET.lastCode=''; NET.pin=''; NET.needPin=false");
+const freeView = free.run('viewOnline()');
+check(
+  freeView.includes('Crea stanza') && freeView.includes('id="on-code"'),
+  'la schermata libera offre crea stanza e codice'
+);
+check(
+  !freeView.includes('id="on-pin"') && !freeView.includes('pinNeededHint'),
+  'il PIN resta nascosto finché non serve davvero'
+);
+check(
+  freeView.includes('space-y-2') &&
+    !/flex gap-2"><input id="on-code"/.test(freeView) &&
+    /id="on-code"[^>]*class="w-full min-w-0/.test(freeView),
+  'codice, PIN e ingresso sono impilati e non escono dai bordi'
+);
+
+const pinApp = boot({});
+pinApp.run(
+  "S.hint=''; S.screen='online'; NET.host=false; NET.name='Anna'; NET.lastCode='ABCDE'; NET.pin=''; NET.needPin=false; NET.st='idle'"
+);
+pinApp.call('netClientMsg', { t: 'rej', why: 'pin' }, null);
+check(pinApp.NET.needPin === true, 'il rifiuto per PIN attiva il campo');
+check(pinApp.NET.err.includes('PIN'), 'il rifiuto spiega che il PIN è errato');
+const pinView = pinApp.run('viewOnline()');
+check(
+  pinView.includes('id="on-pin"') && pinView.includes('Questa stanza ha un PIN'),
+  'dopo il rifiuto compaiono casella PIN e suggerimento'
+);
+pinApp.run('leaveInvite()');
+check(
+  pinApp.NET.lastCode === '' &&
+    pinApp.NET.pin === '' &&
+    pinApp.NET.needPin === false &&
+    pinApp.S.hint === '',
+  'uscire dall’invito pulisce codice e PIN'
+);
+check(
+  pinApp.run('viewOnline()').includes('Crea stanza'),
+  'dopo l’uscita torna la schermata libera'
 );
 
 done();

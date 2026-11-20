@@ -4,6 +4,28 @@
 release number; `sw.js` must follow it. Older history (1.2–1.5) is described in
 `MINIGAMES_HUB_HANDOFF.md`.
 
+## 1.25.0 — 2026-11-20
+
+### Changed
+- **Stacked Online form** — the name, code, PIN and join button now sit on
+  their own lines inside a `space-y-2` block with `w-full min-w-0` fields, so
+  the screen no longer scrolls sideways on narrow phones.
+- **Dedicated invite screen** — opening `#room=CODE` (or a QR) shows the room
+  code, a name field and a single “Join the room” button plus “Enter another
+  code”; “Create room” is hidden while an invite is active.
+- **Conditional PIN** — `NET.needPin` starts false, is set when the host
+  rejects a join with `why:'pin'`, and is cleared by `netReset`/`netAdopt` and
+  when the typed code changes. The PIN input only renders when the link
+  carries `&pin=` or the room asked for it, with a short hint after a rejection.
+- Minified build: 462,707 bytes; source: 565,375 bytes.
+
+### Tests
+- `features.test.js` at 354 checks: invite hides “Create room” and the code
+  field, invite with PIN pre-fills it, free screen hides the PIN, the join block
+  is stacked, a `rej` with `why:'pin'` reveals the field and hint, and
+  `leaveInvite` clears code/PIN. 13/13 suites green on source and minified
+  build. Playwright: 3/3 passed locally.
+
 ## 1.24.0 — 2026-11-20
 
 ### Changed
