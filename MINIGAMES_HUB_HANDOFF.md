@@ -242,6 +242,13 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 
 ## 11. Cosa è stato corretto nell'ultima revisione
 
+### Versione 1.23.0 (poster serata, avviso obiettivi, animazioni)
+- **Poster**: `resultTourLine()` aggiunge alla card condivisa avanzamento e capoclassifica della serata (solo con almeno una partita giocata); disegnata nella fascia sotto la classifica, sopra l'URL.
+- **Obiettivi**: `achBaseline()` salva gli id sbloccati all'avvio; `achToast()` confronta lo stato dopo ogni partita e chiama `showAchToast(ids)` una sola volta per i nuovi badge, con icona, nome, `role="status"` e rimozione dopo 3,8 s. `statsRecord` lo invoca dopo il conteggio.
+- **Finestre e temi**: `modalOpen` riavvia `pop` (animazione `modalpop`); `body` e `.glass` hanno `transition` su sfondo/bordo (`.35s`) per il cambio tema. Tutto spento con `data-motion="off"` e `prefers-reduced-motion`.
+- **Novità**: `news27` IT/EN in testa; nuova etichetta `achUnlocked`.
+- `APP_VERSION` e `VERSION` a **1.23.0**; build: sorgente **562.993** byte, minificato **460.640** byte. Verifiche locali: 13/13 suite su sorgente e minificato, Playwright 3/3, `features.test.js` a 339 check.
+
 ### Versione 1.22.0 (ruota del turno e scheda giocatore)
 - **Ruota**: `spinNames()` legge i giocatori del tavolo (o della lobby online), `spinPick()` usa `rnd`, `spinTurn()` calcola l'angolo del segmento vincente, accumula `SPIN_ROT`, ruota `#wheel` e mostra il risultato dopo la transizione (`0` ms con animazioni spente). `showSpin()` disegna la ruota con `conic-gradient` dai colori avatar, legenda e pulsante; il setup la affianca a “Condividi setup”.
 - **Scheda giocatore**: nuovo contatore `stats.pgw[nome][gioco]`, incrementato in `statsRecord` per i vincitori del gioco, incluso in `sanitizeStats`, in `statsPrune` e nel reset. `playerSummary(name)` restituisce vittorie, partite, serie e giochi ordinati; `showPlayer(name)` apre la scheda con le barre per gioco; i nomi nella tabella statistiche sono pulsanti con `playerArg`/`decodeURIComponent` per gestire gli apostrofi.

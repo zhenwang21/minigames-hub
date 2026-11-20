@@ -4,6 +4,29 @@
 release number; `sw.js` must follow it. Older history (1.2–1.5) is described in
 `MINIGAMES_HUB_HANDOFF.md`.
 
+## 1.23.0 — 2026-11-19
+
+### Added
+- **Achievement toast** — `achToast` compares the unlocked badges with a
+  baseline taken at launch and shows the new ones once in a small bottom toast
+  (`showAchToast`), with icon, name and a role for screen readers. The baseline
+  and the toast respect the reduced-motion setting.
+- **Game-night line in the poster** — the shared image adds the current game
+  night progress and leader (`resultTourLine`) when the result belongs to a
+  queue, without changing the rest of the layout.
+- **Dialog entrance and theme cross-fade** — `modalOpen` replays a short rise
+  animation and switching theme now cross-fades the page background and glass
+  surfaces; both stop with animations off.
+
+### Changed
+- Minified build: 460,640 bytes; source: 562,993 bytes.
+
+### Tests
+- `features.test.js` at 339 checks: poster game-night line, achievement
+  baseline and de-duplication, toast content, CSS hooks for the dialog, toast and
+  theme transition. 13/13 suites green on source and minified build. Playwright:
+  3/3 passed locally.
+
 ## 1.22.0 — 2026-11-19
 
 ### Added

@@ -171,7 +171,7 @@ const lobby = resApp.run('viewOnline()');
 check(lobby.includes('copyCode()'), 'lobby con copia del codice');
 check(lobby.includes('1/2') && lobby.includes('connessi'), 'lobby mostra i giocatori connessi');
 check(lobby.includes('offline') && lobby.includes('host'), 'lobby distingue offline e host');
-check(lobby.includes('1.22.0'), 'lobby mostra la versione');
+check(lobby.includes('1.23.0'), 'lobby mostra la versione');
 // riepilogo condivisibile
 RS.scores = { Anna: 300, Bruno: 100 };
 RN.game = { g: 'impostore' };
@@ -394,7 +394,7 @@ check(q.run('backupReminder()') === '', 'senza dati il promemoria non compare');
 q.run('resetPrefs()');
 check(QS.timerPref === 120 && QS.mode === 'auto' && QS.ncPref.length === 0, 'ripristino preferenze giochi');
 q.run('showNews()');
-check(q.els.modal.innerHTML.includes('Novità 1.22.0'), 'la modale Novità è alla versione 1.22.0');
+check(q.els.modal.innerHTML.includes('Novità 1.23.0'), 'la modale Novità è alla versione 1.23.0');
 check(q.els.modal.innerHTML.includes('Colori e simboli dedicati'), 'le novità elencano i cosmetics');
 q.run('closeModal()');
 
@@ -1210,6 +1210,45 @@ check(
     c22b.run("t('spinTitle')") === 'Chi inizia?' &&
     c22b.run("t('news26')").length > 20,
   'scheda, ruota e novità sono collegate e tradotte'
+);
+
+// --- 1.23.0: poster serata, avviso obiettivi, finestre animate, tema in dissolvenza ---
+const c23 = boot();
+c23.run("S.tour={plan:['impostore','lupus','mrwhite'],idx:2,pts:{Anna:12,Bruno:7},done:false,start:Date.now()}");
+const tl23 = c23.run('resultTourLine()');
+check(
+  tl23.includes('2/3') && tl23.includes('Anna') && tl23.includes('12 PT'),
+  'il poster mostra avanzamento e capoclassifica della serata'
+);
+c23.run('S.tour=null');
+check(c23.run('resultTourLine()') === '', 'senza serata il poster resta pulito');
+
+c23.run("S.stats={games:0,byGame:{},wby:{},wins:{},played:{},streak:{},best:{},pgw:{},recent:[]}; achBaseline()");
+c23.run("S.stats.wins={Anna:1}");
+check(
+  JSON.stringify(c23.run('achToast()')) === '["first"]',
+  'il primo obiettivo sbloccato viene rilevato'
+);
+check(
+  c23.run('ACH_LAST').includes('Prima vittoria') && c23.run('ACH_LAST').includes('🥇'),
+  "l'avviso mostra icona e nome dell'obiettivo"
+);
+check(c23.run('achToast()').length === 0, 'lo stesso obiettivo non viene annunciato due volte');
+check(
+  c23.run("showAchToast(['wins5','streak3'])").includes('5 vittorie'),
+  "più obiettivi insieme finiscono in un solo avviso"
+);
+check(
+  srcHtml.includes('.ach-toast') && srcHtml.includes('@keyframes modalpop') && srcHtml.includes('@keyframes toastin'),
+  'avviso e finestre hanno le loro animazioni'
+);
+check(
+  srcHtml.includes('transition:background-color .35s') && /classList\.add\((['"])pop\1\)/.test(srcHtml),
+  'il tema sfuma e la finestra rientra a ogni apertura'
+);
+check(
+  c23.run("t('achUnlocked')") === 'Obiettivo sbloccato' && c23.run("t('news27')").length > 20,
+  'le nuove voci sono tradotte'
 );
 
 done();

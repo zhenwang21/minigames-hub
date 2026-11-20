@@ -69,8 +69,9 @@ html[data-theme="carta"] body{background:#f7f2e8}
 html[data-theme="mezzanotte"]{--acc1:#c4b5fd;--acc2:#a78bfa;--acc3:#818cf8;--btn1:#5b21b6;--btn2:#6d28d9;color-scheme:dark}
 html[data-theme="mezzanotte"] body{background:#000}
 html[data-theme="mezzanotte"] .glass{background:rgba(8,8,12,.92);border-color:rgba(196,181,253,.16)}
-body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#0b0f19;color:#f8fafc;-webkit-tap-highlight-color:transparent}
-.glass{background:rgba(17,24,39,.85);border:1px solid rgba(255,255,255,.08)}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#0b0f19;color:#f8fafc;-webkit-tap-highlight-color:transparent;transition:background-color .35s ease,color .35s ease}
+.glass{background:rgba(17,24,39,.85);border:1px solid rgba(255,255,255,.08);transition:background-color .35s ease,border-color .35s ease}
+html[data-motion="off"] body,html[data-motion="off"] .glass{transition:none}
 .gtext{background:linear-gradient(135deg,var(--acc1),var(--acc2) 50%,var(--acc3));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .gbtn{background:linear-gradient(135deg,var(--btn1),var(--btn2));color:#fff}
 /* cosmetics: accento per gioco (identità visiva, separato dal tema scelto) */
@@ -143,6 +144,16 @@ html[data-motion="off"] #app.card-flip{animation:none}
 .wheel-pin{position:absolute;top:-9px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:16px solid #fbbf24;z-index:2}
 html[data-motion="off"] .wheel{transition:none}
 @media (prefers-reduced-motion:reduce){.wheel{transition:none}}
+/* ingresso delle finestre e avviso obiettivo */
+@keyframes modalpop{0%{transform:translateY(12px) scale(.98);opacity:0}100%{transform:none;opacity:1}}
+#modal.pop > div:first-child{animation:modalpop .26s ease-out}
+@keyframes toastin{0%{transform:translate(-50%,14px);opacity:0}100%{transform:translate(-50%,0);opacity:1}}
+.ach-toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:70;display:flex;align-items:center;gap:.6rem;max-width:calc(100vw - 1.5rem);padding:.65rem .9rem;border-radius:1rem;background:rgba(15,23,42,.97);border:1px solid rgba(251,191,36,.55);box-shadow:0 14px 34px -18px #000;animation:toastin .28s ease-out}
+.ach-toast .ic{font-size:1.5rem;line-height:1}
+.ach-toast b{display:block;font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:#fbbf24}
+.ach-toast span{display:block;font-size:.72rem;font-weight:700;color:#f8fafc}
+html[data-motion="off"] #modal.pop > div:first-child,html[data-motion="off"] .ach-toast{animation:none}
+@media (prefers-reduced-motion:reduce){#modal.pop > div:first-child,.ach-toast{animation:none}}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 #upd{position:fixed;left:.6rem;right:.6rem;bottom:calc(env(safe-area-inset-bottom,0px) + .6rem);z-index:70;display:none;align-items:center;gap:.5rem;background:#111827;border:1px solid var(--acc1);border-radius:1rem;padding:.55rem .8rem;box-shadow:0 12px 34px rgba(0,0,0,.55);font-size:.75rem;font-weight:700}
 #upd.on{display:flex}
@@ -613,6 +624,7 @@ const I = {
     chartWins: 'Vittorie per gioco',
     chartDays: 'Ultimi 7 giorni',
     achTitle: 'Obiettivi',
+    achUnlocked: 'Obiettivo sbloccato',
     dailyTitle: 'Sfida del giorno',
     dailyPlay: 'Gioca la sfida',
     dailyDone: 'Fatta oggi',
@@ -682,7 +694,7 @@ const I = {
     installed: 'App installata',
     offline: 'Offline',
     news: 'Novità',
-    newsTitle: 'Novità 1.22.0',
+    newsTitle: 'Novità 1.23.0',
     news9: 'Rinomina e annulla rimozione dei giocatori.',
     news10: 'Statistiche con ultime partite ed export CSV.',
     news11: 'Backup: unisci o sostituisci, con avviso di versione.',
@@ -701,6 +713,7 @@ const I = {
     news24: 'Sfondi animati per tema, cornici avatar, podio con punti animati, micro-suoni e tema Mezzanotte OLED.',
     news25: 'Serata a punti con classifica cumulativa, storico di tutte le partite con filtro e “rigioca con gli stessi”.',
     news26: 'Ruota del turno per scegliere chi inizia e scheda giocatore con vittorie per gioco e serie migliore.',
+    news27: 'Poster con la serata, avviso di obiettivo sbloccato, finestre animate e cambio tema in dissolvenza.',
     news7: 'Colori e simboli dedicati per ogni gioco.',
     news8: 'Avatar e colori per i giocatori in liste, lobby e classifiche.',
     news1: 'Introduzione per i nuovi arrivati e partita demo.',
@@ -1145,6 +1158,7 @@ const I = {
     chartWins: 'Wins per game',
     chartDays: 'Last 7 days',
     achTitle: 'Achievements',
+    achUnlocked: 'Achievement unlocked',
     dailyTitle: 'Daily challenge',
     dailyPlay: 'Play the challenge',
     dailyDone: 'Done today',
@@ -1214,7 +1228,7 @@ const I = {
     installed: 'App installed',
     offline: 'Offline',
     news: 'What’s new',
-    newsTitle: 'What’s new in 1.22.0',
+    newsTitle: 'What’s new in 1.23.0',
     news9: 'Rename players and undo a removal.',
     news10: 'Statistics with recent games and CSV export.',
     news11: 'Backup: merge or replace, with a version warning.',
@@ -1233,6 +1247,7 @@ const I = {
     news24: 'Animated theme backgrounds, avatar frames, a podium with animated points, UI sounds and a Midnight OLED theme.',
     news25: 'A game-night ladder with cumulative standings, a filterable match history and “replay with the same players”.',
     news26: 'A turn wheel to pick who starts and a player card with wins per game and best streak.',
+    news27: 'A poster with the game night, an achievement toast, animated dialogs and a theme cross-fade.',
     news7: 'Dedicated colours and symbols for every game.',
     news8: 'Avatars and colours for players in lists, lobbies and standings.',
     news1: 'A welcome intro for newcomers and a demo game.',
@@ -1415,7 +1430,7 @@ const NET = {
 };
 // Millisecondi di attesa prima di passare al prossimo candidato host.
 const NET_DIAL_MS = 3500;
-const APP_VERSION = '1.22.0';
+const APP_VERSION = '1.23.0';
 // Ripresa dopo reload/standby: la sessione dura al massimo due ore.
 const RESUME_TTL = 2 * 60 * 60 * 1000;
 let RESUME = { room: null, snap: null, savedAt: 0, lastKey: '' };
@@ -3714,6 +3729,15 @@ function resultLines() {
     max: d.max
   };
 }
+// Riga della serata nell'immagine: compare solo dopo almeno una partita della coda.
+function resultTourLine() {
+  const T = S.tour;
+  if (!T || !Array.isArray(T.plan) || !T.plan.length) return '';
+  const played = Math.min(+T.idx || 0, T.plan.length);
+  if (played < 1) return '';
+  const top = tourRank()[0];
+  return `🎟️ ${t('tourTitle')} ${played}/${T.plan.length}${top ? ' · ' + t('tourLead') + ': ' + clip(top.n, 18) + ' ' + top.p + ' PT' : ''}`;
+}
 // Immagine 1080×1080 disegnata al volo: nessun asset scaricato, nessun dato inviato.
 function shareResultImage() {
   try {
@@ -3770,6 +3794,12 @@ function shareResultImage() {
       x.fillText(r.d > 0 ? '+' + r.d : '0', W - 100, y);
       x.textAlign = 'left';
     });
+    const tourLine = resultTourLine();
+    if (tourLine) {
+      x.fillStyle = sub;
+      x.font = '600 28px system-ui, Segoe UI, sans-serif';
+      x.fillText(clip(tourLine, 80), 70, 982);
+    }
     x.fillStyle = sub;
     x.font = '600 30px system-ui, Segoe UI, sans-serif';
     x.fillText('zhenwang21.github.io/minigames-hub', 70, 1020);
@@ -11072,6 +11102,7 @@ function statsRecord(gid, base, onlyIfScored) {
   st.recent = st.recent.slice(0, 20);
   statsPrune();
   tourCredit(gid, delta);
+  achToast();
   winChime(gid);
   haptic('win');
   announce(t('gameOver'));
@@ -11478,6 +11509,53 @@ function achHtml() {
         `<div class="rounded-lg px-1.5 py-1 text-[9px] text-center border ${a.got ? 'bg-amber-500/10 border-amber-500/40 text-amber-200' : 'bg-slate-900 border-slate-700/60 text-slate-500'}" title="${esc(a.name)}"><div class="text-base leading-5">${a.icon}</div><div class="truncate">${esc(a.name)}</div></div>`
     )
     .join('')}</div><p class="text-[10px] text-slate-500">${t('avFrameHint')}</p></div>`;
+}
+// Avviso di obiettivo sbloccato: uno solo per volta, senza toccare le regole.
+// La base si prende all'avvio, così i badge già ottenuti non vengono riannunciati.
+let ACH_BASE = null,
+  ACH_LAST = '';
+function achIds(st) {
+  return ACH.filter((a) => {
+    try {
+      return !!a.test(st || {});
+    } catch (e) {
+      return false;
+    }
+  }).map((a) => a.id);
+}
+function achBaseline() {
+  ACH_BASE = achIds(S.stats);
+}
+function achToast() {
+  const now = achIds(S.stats);
+  if (!ACH_BASE) {
+    ACH_BASE = now;
+    return [];
+  }
+  const fresh = now.filter((id) => !ACH_BASE.includes(id));
+  ACH_BASE = now;
+  if (fresh.length) showAchToast(fresh);
+  return fresh;
+}
+function showAchToast(ids) {
+  const list = (ids || []).map((id) => ACH.find((a) => a.id === id)).filter(Boolean);
+  if (!list.length) return '';
+  const names = list.map((a) => X(a.it, a.en)),
+    text = clip(names.join(', '), 64);
+  ACH_LAST = list.map((a) => a.icon).join(' ') + ' ' + text;
+  try {
+    const box = document.createElement('div');
+    box.className = 'ach-toast';
+    box.setAttribute('role', 'status');
+    box.innerHTML = `<span class="ic">${list[0].icon}</span><div><b>${esc(t('achUnlocked'))}</b><span>${esc(text)}</span></div>`;
+    document.body.appendChild(box);
+    setTimeout(() => {
+      try {
+        box.remove();
+      } catch (e) {}
+    }, 3800);
+  } catch (e) {}
+  return ACH_LAST;
 }
 function statsCsv() {
   try {
@@ -11913,7 +11991,7 @@ function clearLocalData() {
 function showNews() {
   const m = $('modal');
   if (!m) return;
-  const items = ['news26', 'news25', 'news24', 'news23', 'news22', 'news21', 'news20', 'news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
+  const items = ['news27', 'news26', 'news25', 'news24', 'news23', 'news22', 'news21', 'news20', 'news19', 'news18', 'news16', 'news17', 'news14', 'news15', 'news9', 'news10', 'news11', 'news12', 'news13', 'news7', 'news8', 'news1', 'news2', 'news3', 'news4', 'news5', 'news6'];
   m.innerHTML = `<div class="glass w-full max-w-sm p-5 rounded-2xl space-y-3"><h3 class="font-bold text-white">✨ ${t('newsTitle')}</h3><ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">${items.map((k) => `<li>${t(k)}</li>`).join('')}</ul><button onclick="closeModal()" class="gbtn w-full py-2.5 rounded-xl text-xs font-bold">${t('close')}</button></div>`;
   modalOpen();
 }
@@ -12148,6 +12226,14 @@ function modalOpen() {
   MODAL_PREV = (typeof document !== 'undefined' && document.activeElement) || null;
   m.style.display = 'flex';
   m.setAttribute('aria-hidden', 'false');
+  // Riavvio dell'animazione d'ingresso a ogni apertura.
+  try {
+    if (m.classList) {
+      m.classList.remove('pop');
+      void m.offsetWidth;
+      m.classList.add('pop');
+    }
+  } catch (e) {}
   setTimeout(() => {
     try {
       const list = m.querySelectorAll
@@ -12458,6 +12544,7 @@ function render() {
 }
 loadLocal();
 loadSession();
+achBaseline();
 parseInvite();
 applyTheme();
 applyA11y();
