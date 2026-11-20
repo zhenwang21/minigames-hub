@@ -25,7 +25,7 @@ function inEllipse(x, y, cx, cy, rx, ry) {
     dy = (y - cy) / ry;
   return dx * dx + dy * dy <= 1;
 }
-// sfondo: gradiente violaceo -> notte, con alone in alto a sinistra
+// sfondo: gradiente viola -> notte, con alone viola in alto a sinistra
 function bg(x, y) {
   const g = clamp01((x * 0.55 + y * 0.75) / 1.3);
   let c = mix([88, 28, 135], [11, 15, 25], g);
@@ -34,24 +34,52 @@ function bg(x, y) {
   c = mix(c, [124, 58, 237], glow * 0.55);
   return c;
 }
+// Ruota un punto attorno a un centro: serve al dado inclinato.
+function rot(x, y, cx, cy, deg) {
+  const a = (deg * Math.PI) / 180,
+    cs = Math.cos(a),
+    sn = Math.sin(a),
+    dx = x - cx,
+    dy = y - cy;
+  return [cx + dx * cs - dy * sn, cy + dx * sn + dy * cs];
+}
+// Il dado è disegnato in coordinate locali, poi inclinato di -12°.
+const DIE = { cx: 0.5, cy: 0.49, half: 0.218, r: 0.072, tilt: -12 };
+function dieLocal(x, y) {
+  return rot(x, y, DIE.cx, DIE.cy, -DIE.tilt);
+}
+function inDie(x, y, grow) {
+  const p = dieLocal(x, y),
+    s = DIE.half + (grow || 0);
+  return roundRect(p[0], p[1], DIE.cx, DIE.cy, s * 2, s * 2, DIE.r) <= 0;
+}
+// Stella a quattro punte per l'accento in alto a destra.
+function inStar(x, y, cx, cy, r) {
+  const dx = Math.abs((x - cx) / r),
+    dy = Math.abs((y - cy) / r);
+  return Math.pow(dx, 0.55) + Math.pow(dy, 0.55) <= 1;
+}
 function colorAt(x, y) {
   let c = bg(x, y);
-  // maschera teatrale bianca
-  const body = roundRect(x, y, 0.5, 0.5, 0.58, 0.62, 0.16);
-  if (body <= 0) {
-    const shade = clamp01((y - 0.2) / 0.62);
-    c = mix([255, 255, 255], [214, 224, 240], shade);
-    // occhi e sorriso ritagliati: mostrano lo sfondo
+  // ombra morbida del dado, in coordinate schermo
+  if (!inDie(x, y, 0) && inDie(x - 0.014, y - 0.02, 0))
+    c = mix(c, [5, 6, 14], 0.32);
+  // dado bianco inclinato
+  const p = dieLocal(x, y);
+  if (roundRect(p[0], p[1], DIE.cx, DIE.cy, DIE.half * 2, DIE.half * 2, DIE.r) <= 0) {
+    const shade = clamp01((p[1] - 0.29) / 0.42);
+    c = mix([255, 255, 255], [224, 228, 244], shade);
+    // tre punti in diagonale, scavati nel dado
+    const off = DIE.half * 0.49;
     if (
-      inEllipse(x, y, 0.398, 0.425, 0.062, 0.048) ||
-      inEllipse(x, y, 0.602, 0.425, 0.062, 0.048)
+      inEllipse(p[0], p[1], DIE.cx - off, DIE.cy - off, 0.042, 0.042) ||
+      inEllipse(p[0], p[1], DIE.cx, DIE.cy, 0.042, 0.042) ||
+      inEllipse(p[0], p[1], DIE.cx + off, DIE.cy + off, 0.042, 0.042)
     )
-      c = bg(x, y);
-    const dx = x - 0.5,
-      dy = y - 0.44,
-      rr = Math.hypot(dx, dy);
-    if (dy > 0.055 && rr > 0.135 && rr < 0.2) c = bg(x, y);
+      c = mix([76, 29, 149], [124, 58, 237], clamp01((p[1] - 0.3) / 0.42));
   }
+  // scintilla
+  if (inStar(x, y, 0.765, 0.235, 0.062)) c = mix(c, [240, 171, 252], 0.92);
   return c;
 }
 

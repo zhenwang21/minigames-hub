@@ -4,6 +4,22 @@
 release number; `sw.js` must follow it. Older history (1.2–1.5) is described in
 `MINIGAMES_HUB_HANDOFF.md`.
 
+## 1.24.0 — 2026-11-20
+
+### Changed
+- **New app icon** — the theater mask is replaced by a tilted white die with
+  three violet pips, a violet-to-night gradient and a small sparkle. It is
+  drawn procedurally in `tools/make-icons.js` (no dependencies) and mirrored in
+  `icons/icon.svg`, so the favicon and the PWA icons match.
+- **Favicon** — the tab icon now points to `icons/icon.svg` instead of the
+  inline mask emoji.
+- Minified build: 460,671 bytes; source: 563,037 bytes.
+
+### Tests
+- `pwa.test.js` at 38 checks: the SVG carries the die gradient, tilt and pips,
+  and the page links it as favicon. 13/13 suites green on source and minified
+  build. Playwright: 3/3 passed locally.
+
 ## 1.23.0 — 2026-11-19
 
 ### Added

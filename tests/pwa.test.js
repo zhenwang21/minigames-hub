@@ -42,6 +42,16 @@ check(
 check((png.readUInt32BE(16) || 0) === 512, 'icon-512.png è 512x512', png.readUInt32BE(16));
 const svg = fs.readFileSync(path.join(ROOT, 'icons', 'icon.svg'), 'utf8');
 check(/^<svg[\s>]/.test(svg.trim()) && svg.includes('</svg>'), 'icon.svg è un SVG');
+check(
+  svg.includes('id="die"') && svg.includes('rotate(-12') && svg.includes('circle'),
+  'icon.svg è il dado inclinato con i punti'
+);
+check(
+  /<link rel="icon" type="image\/svg\+xml" href="icons\/icon\.svg">/.test(
+    fs.readFileSync(path.join(ROOT, 'Minigames Hub.html'), 'utf8')
+  ),
+  'la favicon usa la nuova icona'
+);
 
 const sw = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
 check(

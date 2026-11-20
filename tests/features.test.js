@@ -171,7 +171,7 @@ const lobby = resApp.run('viewOnline()');
 check(lobby.includes('copyCode()'), 'lobby con copia del codice');
 check(lobby.includes('1/2') && lobby.includes('connessi'), 'lobby mostra i giocatori connessi');
 check(lobby.includes('offline') && lobby.includes('host'), 'lobby distingue offline e host');
-check(lobby.includes('1.23.0'), 'lobby mostra la versione');
+check(lobby.includes('1.24.0'), 'lobby mostra la versione');
 // riepilogo condivisibile
 RS.scores = { Anna: 300, Bruno: 100 };
 RN.game = { g: 'impostore' };
@@ -394,7 +394,7 @@ check(q.run('backupReminder()') === '', 'senza dati il promemoria non compare');
 q.run('resetPrefs()');
 check(QS.timerPref === 120 && QS.mode === 'auto' && QS.ncPref.length === 0, 'ripristino preferenze giochi');
 q.run('showNews()');
-check(q.els.modal.innerHTML.includes('Novità 1.23.0'), 'la modale Novità è alla versione 1.23.0');
+check(q.els.modal.innerHTML.includes('Novità 1.24.0'), 'la modale Novità è alla versione 1.24.0');
 check(q.els.modal.innerHTML.includes('Colori e simboli dedicati'), 'le novità elencano i cosmetics');
 q.run('closeModal()');
 

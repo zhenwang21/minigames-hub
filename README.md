@@ -90,7 +90,7 @@ Online needs 3 players (Werewolf and Forbidden Words 4, Would You Rather and Nam
 | `Minigames Hub.min.html` | Same build as `index.html`, kept with an explicit name for offline sharing. |
 | `build-min.js` | `node build-min.js` regenerates both builds from the source (needs [terser](https://terser.org/)). |
 | `manifest.webmanifest`, `sw.js`, `icons/` | PWA install and offline shell; the cache version in `sw.js` must follow `APP_VERSION`. `icons/og.png` is the 1200×630 link-preview card. |
-| `tools/make-icons.js` | Regenerates the PNG icons with no dependencies. |
+| `tools/make-icons.js` | Regenerates the PNG icons (tilted die) with no dependencies. |
 | `tools/make-og.js` | Regenerates `icons/og.png` (1200×630) with the same dependency-free PNG encoder. |
 | `tools/bump-version.js` | `node tools/bump-version.js 1.12.0` updates `APP_VERSION`, both “What’s new” titles, `sw.js` and the version assertions, then rebuilds. |
 | `tools/size-report.js` | Prints raw/gzip sizes of the main files plus the inline JS/CSS split of the minified build. |

@@ -242,6 +242,12 @@ Regole importanti da **non cambiare** (sono volute dall'utente):
 
 ## 11. Cosa è stato corretto nell'ultima revisione
 
+### Versione 1.24.0 (nuova icona)
+- **Icona PWA**: sostituita la maschera con un dado bianco inclinato di -12°, tre punti viola, gradiente viola→notte, alone e scintilla. `tools/make-icons.js` disegna tutto a mano (rotazione, ombra, punti, stella) con supersampling 3× e encoder PNG interno; `icons/icon.svg` è la versione vettoriale equivalente per favicon e manifest.
+- **Favicon**: `<link rel="icon" type="image/svg+xml" href="icons/icon.svg">` al posto dell'emoji in data URI.
+- **Novità**: `news28` IT/EN in testa.
+- `APP_VERSION` e `VERSION` a **1.24.0**; build: sorgente **563.037** byte, minificato **460.671** byte. Verifiche locali: 13/13 suite su sorgente e minificato, Playwright 3/3, `pwa.test.js` a 38 check.
+
 ### Versione 1.23.0 (poster serata, avviso obiettivi, animazioni)
 - **Poster**: `resultTourLine()` aggiunge alla card condivisa avanzamento e capoclassifica della serata (solo con almeno una partita giocata); disegnata nella fascia sotto la classifica, sopra l'URL.
 - **Obiettivi**: `achBaseline()` salva gli id sbloccati all'avvio; `achToast()` confronta lo stato dopo ogni partita e chiama `showAchToast(ids)` una sola volta per i nuovi badge, con icona, nome, `role="status"` e rimozione dopo 3,8 s. `statsRecord` lo invoca dopo il conteggio.
